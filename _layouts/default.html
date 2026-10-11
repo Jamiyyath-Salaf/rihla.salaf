@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} · {% endif %}{{ site.title }}</title>
+  <meta name="description" content="{{ page.summary | default: site.tagline }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/style.css' | relative_url }}">
+  {% if site.logo %}<link rel="icon" href="{{ site.logo | relative_url }}">{% endif %}
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="{{ '/' | relative_url }}" class="brand">
+        {% if site.logo %}
+          <img src="{{ site.logo | relative_url }}" alt="" class="brand-logo">
+        {% else %}
+          <span class="brand-mark" aria-hidden="true">✦</span>
+        {% endif %}
+        {{ site.title }}
+      </a>
+      <nav class="nav-links">
+        <a href="{{ '/' | relative_url }}#events">Events</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    {{ content }}
+  </main>
+
+  <footer class="footer" id="contact">
+    <div class="container footer-inner">
+      <div>
+        <strong class="footer-name">{{ site.title }}</strong>
+        <p>{{ site.tagline }}</p>
+      </div>
+      <ul class="footer-links">
+        {% if site.email %}<li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>{% endif %}
+        {% if site.phone %}<li><a href="tel:{{ site.phone | remove: ' ' }}">{{ site.phone }}</a></li>{% endif %}
+        {% if site.instagram %}<li><a href="https://instagram.com/{{ site.instagram }}">@{{ site.instagram }}</a></li>{% endif %}
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>

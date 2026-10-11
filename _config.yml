@@ -1,0 +1,18 @@
+# Site settings — edit these
+title: Jamiyyath Salaf
+tagline: Community programmes, trips and events.
+# Put your logo file in the assets folder and set its name here, e.g. assets/logo.png
+logo:
+email: contact@example.org
+phone: "+91 00000 00000"
+instagram:
+
+collections:
+  events:
+    output: true
+    permalink: /events/:name/
+
+# Show events with future dates
+future: true
+
+exclude: [README.md]
