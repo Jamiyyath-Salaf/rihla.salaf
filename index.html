@@ -15,7 +15,7 @@ layout: default
     <li>
       <a href="{{ e.url | relative_url }}">
         <span class="event-name">{{ e.title }}{% if e.location %}<small class="event-loc">{{ e.location }}</small>{% endif %}</span>
-        {% if e.date %}{% assign m = e.date | date: "%-m" | minus: 1 %}<span class="event-date">{{ site.months[m] }} {{ e.date | date: "%Y" }}</span>{% endif %}
+        {% if e.date %}<span class="event-date">{% include daterange.html start=e.date end=e.end_date %}</span>{% endif %}
       </a>
     </li>
     {% endfor %}

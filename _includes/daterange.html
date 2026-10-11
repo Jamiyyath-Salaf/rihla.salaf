@@ -1,0 +1,9 @@
+{%- assign d1 = include.start -%}{%- assign d2 = include.end | default: include.start -%}
+{%- assign m1 = d1 | date: "%-m" | minus: 1 -%}{%- assign m2 = d2 | date: "%-m" | minus: 1 -%}
+{%- if include.end and m1 == m2 -%}
+{{ d1 | date: "%-d" }} – {{ d2 | date: "%-d" }} {{ site.months[m2] }} {{ d2 | date: "%Y" }}
+{%- elsif include.end -%}
+{{ d1 | date: "%-d" }} {{ site.months[m1] }} – {{ d2 | date: "%-d" }} {{ site.months[m2] }} {{ d2 | date: "%Y" }}
+{%- else -%}
+{{ d1 | date: "%-d" }} {{ site.months[m1] }} {{ d1 | date: "%Y" }}
+{%- endif -%}
