@@ -14,7 +14,7 @@ layout: default
     {% for e in events %}
     <li>
       <a href="{{ e.url | relative_url }}">
-        <span class="event-name">{{ e.title }}</span>
+        <span class="event-name">{{ e.title }}{% if e.location %}<small class="event-loc">{{ e.location }}</small>{% endif %}</span>
         {% if e.date %}{% assign m = e.date | date: "%-m" | minus: 1 %}<span class="event-date">{{ site.months[m] }} {{ e.date | date: "%Y" }}</span>{% endif %}
       </a>
     </li>
