@@ -1,64 +1,26 @@
 ---
 layout: default
 ---
-<section class="hero">
-  <div class="container hero-inner">
-    {% if site.logo %}
-      <img src="{{ site.logo | relative_url }}" alt="{{ site.title }} logo" class="hero-logo">
-    {% else %}
-      <div class="hero-logo hero-logo-placeholder" aria-hidden="true">{{ site.title | slice: 0 }}</div>
-    {% endif %}
-    <h1>{{ site.title }}</h1>
-    <p class="lead">{{ site.tagline }}</p>
-  </div>
-</section>
+<header class="home-head container">
+  {% if site.logo %}
+    <img src="{{ site.logo | relative_url }}" alt="{{ site.title }} logo" class="logo">
+  {% else %}
+    <div class="logo logo-placeholder" aria-hidden="true">{{ site.title | slice: 0 }}</div>
+  {% endif %}
+  <h1>{{ site.title }}</h1>
+</header>
 
-<section id="events" class="section">
-  <div class="container">
+<section class="container">
+  <ul class="event-list">
     {% assign events = site.events | sort: "date" | reverse %}
-
-    <div id="upcoming" hidden>
-      <p class="eyebrow">Upcoming</p>
-      <div class="event-grid"></div>
-    </div>
-
-    <div id="past">
-      <p class="eyebrow" id="past-label">Events</p>
-      <div class="event-grid">
-        {% for e in events %}
-        <a class="event-card" href="{{ e.url | relative_url }}"
-           data-end="{{ e.end_date | default: e.date | date: '%Y-%m-%d' }}">
-          {% if e.cover %}<img src="{{ e.cover | relative_url }}" alt="" class="event-card-img">{% endif %}
-          <div class="event-card-body">
-            <time datetime="{{ e.date | date: '%Y-%m-%d' }}">
-              {{ e.date | date: "%-d %b %Y" }}{% if e.end_date %} – {{ e.end_date | date: "%-d %b %Y" }}{% endif %}
-            </time>
-            <h2>{{ e.title }}</h2>
-            {% if e.location %}<p class="event-loc">📍 {{ e.location }}</p>{% endif %}
-            {% if e.summary %}<p>{{ e.summary }}</p>{% endif %}
-            <span class="event-more">View details →</span>
-          </div>
-        </a>
-        {% endfor %}
-      </div>
-      {% if events.size == 0 %}<p class="empty">No events yet. Check back soon.</p>{% endif %}
-    </div>
-  </div>
+    {% for e in events %}
+    <li>
+      <a href="{{ e.url | relative_url }}">
+        <span class="event-name">{{ e.title }}</span>
+        {% if e.date %}<span class="event-date">{{ e.date | date: "%b %Y" }}</span>{% endif %}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% if events.size == 0 %}<p class="muted">No events yet.</p>{% endif %}
 </section>
-
-<script>
-  // Split events into Upcoming / Past based on today's date.
-  (function () {
-    var today = new Date().toISOString().slice(0, 10);
-    var cards = document.querySelectorAll('#past .event-card');
-    var upGrid = document.querySelector('#upcoming .event-grid');
-    var up = [];
-    cards.forEach(function (c) { if (c.dataset.end >= today) up.push(c); });
-    if (!up.length) return;
-    up.reverse().forEach(function (c) { c.classList.add('is-upcoming'); upGrid.appendChild(c); });
-    document.getElementById('upcoming').hidden = false;
-    var label = document.getElementById('past-label');
-    label.textContent = 'Past events';
-    if (!document.querySelector('#past .event-card')) document.getElementById('past').hidden = true;
-  })();
-</script>

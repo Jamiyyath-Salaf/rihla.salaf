@@ -1,32 +1,10 @@
 ---
 layout: default
 ---
-<article class="event-page">
-  <section class="event-hero">
-    <div class="container">
-      <a href="{{ '/' | relative_url }}#events" class="back">← All events</a>
-      <h1>{{ page.title }}</h1>
-      {% if page.summary %}<p class="lead">{{ page.summary }}</p>{% endif %}
-
-      <div class="trip-facts">
-        <div class="fact"><span>Date</span><strong>{{ page.date | date: "%-d %b %Y" }}{% if page.end_date %} – {{ page.end_date | date: "%-d %b %Y" }}{% endif %}</strong></div>
-        {% if page.location %}<div class="fact"><span>Location</span><strong>{{ page.location }}</strong></div>{% endif %}
-        {% for f in page.facts %}<div class="fact"><span>{{ f[0] }}</span><strong>{{ f[1] }}</strong></div>{% endfor %}
-      </div>
-
-      {% if page.register_link %}
-        <a href="{{ page.register_link }}" class="btn">Register now</a>
-      {% endif %}
-    </div>
-  </section>
-
-  {% if page.cover %}
-  <div class="container"><img src="{{ page.cover | relative_url }}" alt="" class="event-cover"></div>
-  {% endif %}
-
-  <section class="section">
-    <div class="container prose event-body">
-      {{ content }}
-    </div>
-  </section>
-</article>
+<div class="container event">
+  <a href="{{ '/' | relative_url }}" class="back">← {{ site.title }}</a>
+  <h1>{{ page.title }}</h1>
+  <div class="updates">
+    {{ content }}
+  </div>
+</div>

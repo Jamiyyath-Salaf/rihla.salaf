@@ -1,18 +1,17 @@
-# Jamiyyath Salaf website
+# Jamiyyath Salaf staff updates
 
-Live at https://jamiyyath-salaf.github.io/rihla.salaf/
+https://jamiyyath-salaf.github.io/rihla.salaf/
 
-## Add a new event
+**Post an update:** open the event's file in `_events`, click the pencil (edit) icon,
+add a new `### date` line and your text at the top, then click **Commit changes**.
 
-1. Open the `_events` folder on GitHub and click **Add file → Create new file**.
-2. Name it like `my-event-2027.md`. The name becomes the page address.
-3. Copy the top part of `_events/rihla-2026.md`, change the details, and write the
-   description below the second `---`.
-4. Click **Commit changes**. The event appears on the home page after about a minute.
+**Add an event:** in `_events`, click **Add file → Create new file**, name it e.g. `camp-2027.md`, and start it with:
 
-Events whose end date is today or later show under **Upcoming**. The rest show under **Past events**.
+```
+---
+title: Camp 2027
+date: 2027-03-01
+---
+```
 
-## Change the logo, name or contact details
-
-Upload your logo into the `assets` folder, then edit `_config.yml` and set
-`logo: assets/your-logo.png`. The name, tagline, email and phone are set there too.
+Changes appear on the site about a minute after you commit.
