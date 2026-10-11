@@ -1,3 +1,4 @@
+baseurl: /rihla.salaf
 title: ޖަމްޢިއްޔަތުއް ސަލަފް
 logo: assets/logo.png
 
@@ -16,4 +17,4 @@ defaults:
       layout: event
 
 future: true
-exclude: [README.md]
+exclude: [README.md, .github]
