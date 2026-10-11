@@ -1,5 +1,5 @@
 ---
-title: Rihla 2026
+title: Salaf B.Atoll Trip 2026
 date: 2026-12-14
 ---
 
