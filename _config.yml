@@ -1,6 +1,8 @@
-title: Jamiyyath Salaf
-# Put your logo in the assets folder and set its name here, e.g. assets/logo.png
+title: ޖަމްޢިއްޔަތުއް ސަލަފް
 logo: assets/logo.png
+
+# Dhivehi month names, used for dates
+months: [ޖަނަވަރީ, ފެބްރުއަރީ, މާރިޗު, އޭޕްރީލް, މެއި, ޖޫން, ޖުލައި, އޮގަސްޓު, ސެޕްޓެމްބަރު, އޮކްޓޫބަރު, ނޮވެމްބަރު, ޑިސެމްބަރު]
 
 collections:
   events:

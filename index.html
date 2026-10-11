@@ -3,9 +3,7 @@ layout: default
 ---
 <header class="home-head container">
   {% if site.logo %}
-    <img src="{{ site.logo | relative_url }}" alt="{{ site.title }} logo" class="logo">
-  {% else %}
-    <div class="logo logo-placeholder" aria-hidden="true">{{ site.title | slice: 0 }}</div>
+    <img src="{{ site.logo | relative_url }}" alt="" class="logo">
   {% endif %}
   <h1>{{ site.title }}</h1>
 </header>
@@ -17,10 +15,10 @@ layout: default
     <li>
       <a href="{{ e.url | relative_url }}">
         <span class="event-name">{{ e.title }}</span>
-        {% if e.date %}<span class="event-date">{{ e.date | date: "%b %Y" }}</span>{% endif %}
+        {% if e.date %}{% assign m = e.date | date: "%-m" | minus: 1 %}<span class="event-date">{{ site.months[m] }} {{ e.date | date: "%Y" }}</span>{% endif %}
       </a>
     </li>
     {% endfor %}
   </ul>
-  {% if events.size == 0 %}<p class="muted">No events yet.</p>{% endif %}
+  {% if events.size == 0 %}<p class="muted">އަދި އެއްވެސް ހަރަކާތެއް ނެތް.</p>{% endif %}
 </section>

@@ -5,7 +5,6 @@
   --muted: #5c6b62;
   --line: #e3dccf;
   --accent: #1f7a35;
-  --accent-ink: #ffffff;
   --warm: #c8743a;
   --radius: 12px;
 }
@@ -17,7 +16,6 @@
     --muted: #a3b2a9;
     --line: #2e3a34;
     --accent: #7fd18f;
-    --accent-ink: #0f1a14;
     --warm: #e39a64;
   }
 }
@@ -25,46 +23,39 @@
 * { box-sizing: border-box; }
 body {
   margin: 0; background: var(--bg); color: var(--text);
-  font: 400 16px/1.6 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+  font: 400 18px/1.9 "MV Funa", Faruma, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
-h1, h3 { font-family: Fraunces, Georgia, serif; line-height: 1.2; }
+h1, h3 { line-height: 1.5; font-weight: 700; }
 a { color: var(--accent); }
 .container { width: min(720px, 100% - 32px); margin-inline: auto; }
-.muted { color: var(--muted); }
+.muted { color: var(--muted); text-align: center; }
 
 /* Home */
 .home-head { text-align: center; padding: 3.5rem 0 2rem; }
 .home-head h1 { font-size: clamp(1.8rem, 5vw, 2.4rem); margin: 0; }
-.logo { width: 128px; height: auto; display: block; margin: 0 auto 1rem; }
-/* white tile so the black lettering stays readable in dark mode */
-img.logo { background: #fff; padding: 10px; border-radius: 16px; }
-.logo-placeholder {
-  display: grid; place-items: center; border-radius: 50%;
-  background: var(--accent); color: var(--accent-ink);
-  font-family: Fraunces, Georgia, serif; font-size: 2.6rem; font-weight: 700;
-}
+/* white tile keeps the black lettering readable in dark mode */
+.logo { width: 128px; height: auto; display: block; margin: 0 auto 1rem; background: #fff; padding: 10px; border-radius: 16px; }
 .event-list { list-style: none; padding: 0; margin: 0 0 4rem; display: grid; gap: .7rem; }
 .event-list a {
   display: flex; justify-content: space-between; align-items: center; gap: 1rem;
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 1.1rem 1.3rem; color: var(--text); text-decoration: none;
+  padding: 1rem 1.3rem; color: var(--text); text-decoration: none;
   transition: border-color .15s, transform .15s;
 }
 .event-list a:hover { border-color: var(--accent); transform: translateY(-1px); }
-.event-name { font-weight: 600; font-size: 1.1rem; }
-.event-date { color: var(--muted); font-size: .9rem; white-space: nowrap; }
+.event-name { font-weight: 700; font-size: 1.15rem; }
+.event-date { color: var(--muted); font-size: .95rem; white-space: nowrap; }
 
 /* Event page */
-.event { padding: 2rem 0 4rem; }
-.back { text-decoration: none; font-weight: 500; font-size: .95rem; }
-.event h1 { font-size: clamp(1.8rem, 5vw, 2.4rem); margin: 1rem 0 1.5rem; }
+.event { padding: 2rem 0 4rem; text-align: center; }
+.back { text-decoration: none; font-size: 1rem; }
+.event h1 { font-size: clamp(1.7rem, 5vw, 2.3rem); margin: 1rem 0 1.5rem; }
+.updates { text-align: right; max-width: 600px; margin-inline: auto; }
 .updates h3 {
-  font-family: Inter, system-ui, sans-serif; font-size: .85rem; font-weight: 600;
-  color: var(--warm); text-transform: uppercase; letter-spacing: .06em;
+  font-size: 1rem; color: var(--warm);
   margin: 0; padding-top: 1.2rem; border-top: 1px solid var(--line);
 }
 .updates h3:first-of-type { border-top: 0; padding-top: 0; }
-.updates p, .updates ul { margin: .4rem 0 1.2rem; }
+.updates p, .updates ul { margin: .3rem 0 1.2rem; }
 .updates img { max-width: 100%; border-radius: var(--radius); }
-.event { text-align: center; }
-.updates { text-align: left; max-width: 600px; margin-inline: auto; }

@@ -1,15 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="dv" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>{% if page.title %}{{ page.title }} · {% endif %}{{ site.title }}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preload" href="{{ '/assets/fonts/mvfuna-regular.ttf' | relative_url }}" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="{{ '/style.css' | relative_url }}?v={{ site.time | date: '%s' }}">
   {% if site.logo %}<link rel="icon" href="{{ site.logo | relative_url }}">{% endif %}
+  <style>
+    @font-face { font-family: "MV Funa"; src: url("{{ '/assets/fonts/mvfuna-regular.ttf' | relative_url }}") format("truetype"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "MV Funa"; src: url("{{ '/assets/fonts/mvfuna-bold.ttf' | relative_url }}") format("truetype"); font-weight: 700; font-display: swap; }
+  </style>
 </head>
 <body>
   <main>
