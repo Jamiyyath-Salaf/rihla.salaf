@@ -5,7 +5,29 @@ layout: default
   <a href="{{ '/' | relative_url }}" class="back">→ {{ site.title }}</a>
   <h1>{{ page.title }}</h1>
   <p class="event-sub">{% if page.location %}{{ page.location }} · {% endif %}{% include daterange.html start=page.date end=page.end_date %}</p>
-  <div class="updates">
-    {{ content }}
-  </div>
+
+  {% if page.data %}
+  {% assign trip = site.data[page.data] %}
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="islands">{% include icon.html name="island" %}<span>ރަށްތައް</span></button>
+    <button role="tab" data-tab="roles">{% include icon.html name="org" %}<span>ޒިންމާތައް</span></button>
+    <button role="tab" data-tab="activities">{% include icon.html name="list" %}<span>ހަރަކާތްތައް</span></button>
+    <button role="tab" data-tab="updates">{% include icon.html name="bell" %}<span>އަޕްޑޭޓްތައް</span></button>
+  </nav>
+
+  <section class="panel" data-panel="islands" role="tabpanel"><div class="island-grid" id="island-grid"></div></section>
+  <section class="panel" data-panel="roles" role="tabpanel"><div class="org" id="org"></div></section>
+  <section class="panel" data-panel="activities" role="tabpanel"><div id="activity-list"></div></section>
+  <section class="panel" data-panel="updates" role="tabpanel"><div class="updates">{{ content }}</div></section>
+
+  <dialog id="sheet" class="sheet">
+    <button class="sheet-close" aria-label="ބަންދުކުރޭ">✕</button>
+    <div id="sheet-body"></div>
+  </dialog>
+
+  <script>window.TRIP = {{ trip | jsonify }};</script>
+  <script src="{{ '/assets/trip.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+  {% else %}
+  <div class="updates">{{ content }}</div>
+  {% endif %}
 </div>

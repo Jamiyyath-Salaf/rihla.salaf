@@ -3,6 +3,7 @@ title: ސަލަފް ރިޙްލާ 2026
 location: ބ. އަތޮޅު
 date: 2026-11-11
 end_date: 2026-11-15
+data: b_atoll_2026
 ---
 
 <!-- Add new updates at the top. Each update starts with ### and the date. -->

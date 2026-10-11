@@ -1,0 +1,88 @@
+# ސަލަފް ރިޙްލާ 2026 — trip information
+#
+# ISLANDS: fill in focal, phone and activities for each island.
+#   activities: write each activity on its own line starting with "- ".
+#   Use exactly the same spelling for the same activity on every island,
+#   so the Activities tab can count them together.
+#   info: any other details, as "label: value" lines.
+#
+# ROLES: the organizational structure. Each person can have a "team" under them.
+
+islands:
+  - name: އޭދަފުށި
+    focal:
+    phone:
+    activities: []
+    info: {}
+  - name: ދަރަވަންދޫ
+    focal:
+    phone:
+    activities: []
+    info: {}
+  - name: ދޮންފަނު
+    focal:
+    phone:
+    activities: []
+    info: {}
+  - name: ފެހެންދޫ
+    focal:
+    phone:
+    activities: []
+    info: {}
+  - name: ފުޅަދޫ
+    focal:
+    phone:
+    activities: []
+    info: {}
+  - name: ގޮއިދޫ
+    focal:
+    phone:
+    activities: []
+    info: {}
+  - name: ހިތާދޫ
+    focal:
+    phone:
+    activities: []
+    info: {}
+  - name: ކަމަދޫ
+    focal:
+    phone:
+    activities: []
+    info: {}
+  - name: ކެންދޫ
+    focal:
+    phone:
+    activities: []
+    info: {}
+  - name: ކިހާދޫ
+    focal:
+    phone:
+    activities: []
+    info: {}
+  - name: ކުޑަރިކިލު
+    focal:
+    phone:
+    activities: []
+    info: {}
+  - name: މާޅޮސް
+    focal:
+    phone:
+    activities: []
+    info: {}
+  - name: ތުޅާދޫ
+    focal:
+    phone:
+    activities: []
+    info: {}
+
+roles:
+  - role: ދަތުރުގެ ވެރިޔާ
+    name:
+    responsibilities: []
+    team:
+      - role: ކޯޑިނޭޓަރު
+        name:
+        responsibilities: []
+      - role: ކޯޑިނޭޓަރު
+        name:
+        responsibilities: []
