@@ -1,6 +1,6 @@
 title: Jamiyyath Salaf
 # Put your logo in the assets folder and set its name here, e.g. assets/logo.png
-logo:
+logo: assets/logo.png
 
 collections:
   events:

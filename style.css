@@ -4,7 +4,7 @@
   --text: #1f2a24;
   --muted: #5c6b62;
   --line: #e3dccf;
-  --accent: #2f6b4f;
+  --accent: #1f7a35;
   --accent-ink: #ffffff;
   --warm: #c8743a;
   --radius: 12px;
@@ -16,7 +16,7 @@
     --text: #e9efe9;
     --muted: #a3b2a9;
     --line: #2e3a34;
-    --accent: #7cc4a0;
+    --accent: #7fd18f;
     --accent-ink: #0f1a14;
     --warm: #e39a64;
   }
@@ -35,7 +35,9 @@ a { color: var(--accent); }
 /* Home */
 .home-head { text-align: center; padding: 3.5rem 0 2rem; }
 .home-head h1 { font-size: clamp(1.8rem, 5vw, 2.4rem); margin: 0; }
-.logo { width: 96px; height: 96px; object-fit: contain; display: block; margin: 0 auto 1rem; }
+.logo { width: 128px; height: auto; display: block; margin: 0 auto 1rem; }
+/* white tile so the black lettering stays readable in dark mode */
+img.logo { background: #fff; padding: 10px; border-radius: 16px; }
 .logo-placeholder {
   display: grid; place-items: center; border-radius: 50%;
   background: var(--accent); color: var(--accent-ink);
