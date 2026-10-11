@@ -16,3 +16,9 @@ collections:
 future: true
 
 exclude: [README.md]
+
+defaults:
+  - scope:
+      type: events
+    values:
+      layout: event
