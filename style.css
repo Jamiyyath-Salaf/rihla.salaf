@@ -393,3 +393,13 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .att-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
 .att { font-size: .85rem; border-radius: 999px; padding: .05rem .7rem; background: var(--bg); color: var(--muted); border: 1px solid var(--line); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 50%, transparent); }
 .att.here { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); border-color: transparent; font-weight: 700; text-decoration: none; }
+
+/* Activities not received yet */
+.pending-tag { display: inline-block; font-size: .8rem; font-weight: 700; color: #a15c12; background: color-mix(in srgb, #e39a3a 18%, transparent); border-radius: 999px; padding: .05rem .7rem; }
+@media (prefers-color-scheme: dark) { .pending-tag { color: #f0b46a; } }
+.pending-box { max-width: 760px; margin: 0 auto 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; background: color-mix(in srgb, #e39a3a 12%, transparent); border-radius: var(--radius); padding: .6rem 1rem; }
+.pending-box > span { color: #a15c12; font-weight: 700; font-size: .92rem; }
+@media (prefers-color-scheme: dark) { .pending-box > span { color: #f0b46a; } }
+.pending-box .chips { margin: 0; }
+.act { max-width: 760px; margin-inline: auto; margin-bottom: .7rem; }
+.summary { max-width: 760px; margin-inline: auto; }

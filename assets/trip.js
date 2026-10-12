@@ -53,7 +53,7 @@
       (isl.phone ? '<a href="tel:' + esc(String(isl.phone).replace(/\s/g, '')) + '" dir="ltr"><strong>' + esc(isl.phone) + '</strong></a>' : '<strong>—</strong>') + '</div>';
     if (isl.email) h += '<div>' + ICON.mail + '<span class="lbl">އީމެއިލް</span><a href="mailto:' + esc(isl.email) + '" dir="ltr"><strong>' + esc(isl.email) + '</strong></a></div>';
     h += '</div>';
-    h += '<h3>އެދިފައިވާ ހަރަކާތްތައް</h3>' + list(isl.activities);
+    h += '<h3>އެދިފައިވާ ހަރަކާތްތައް</h3>' + (isl.pending ? '<p>' + '<span class="pending-tag">ހަރަކާތްތައް އަދި ނުލިބޭ</span>' + '</p>' : list(isl.activities));
 
     var team = isl.team || [];
     h += '<h3>ޓީމް</h3>';
@@ -114,7 +114,7 @@
         (x.phone ? '<a class="call" href="tel:' + esc(String(x.phone).replace(/\s/g, '')) + '">' + ICON.phone + '<span dir="ltr">' + esc(x.phone) + '</span></a>' : '') +
       '</div>' +
       '<div class="island-stats">' +
-        stat(ICON.list, (x.activities || []).length, 'ހަރަކާތް') +
+        (x.pending ? '<span class="pending-tag">ހަރަކާތްތައް އަދި ނުލިބޭ</span>' : stat(ICON.list, (x.activities || []).length, 'ހަރަކާތް')) +
         stat(ICON.team, (x.team || []).length, 'މީހުން') +
         stat(ICON.clock, (x.schedule || []).length, 'ޝެޑިއުލް') +
       '</div></div>';
@@ -165,7 +165,8 @@
   var acts = {};
   all.forEach(function (isl, i) {
     (isl.activities || []).forEach(function (a) {
-      var key = String(a).trim();
+      // group by the activity name without bracketed notes, e.g. "ކުޑަކުދިންގެ ހަވީރު (12 ނޮވެންބަރު)"
+      var key = String(a).replace(/\([^)]*\)/g, '').replace(/[\s:/،]+$/, '').replace(/\s+/g, ' ').trim() || String(a).trim();
       if (!key) return;
       (acts[key] = acts[key] || []).push(i);
     });
@@ -177,13 +178,16 @@
       actNames.map(function (a) {
         return '<div class="act">' +
           '<div class="act-head"><span class="act-name">' + esc(a) + '</span>' +
-          '<span class="act-count"><strong>' + acts[a].length + '</strong> ' +
+          '<span class="act-count"><strong>' + acts[a].filter(function (i, n, arr) { return arr.indexOf(i) === n; }).length + '</strong> ' +
             (acts[a].every(function (i) { return all[i].kind === 'island'; }) ? 'ރަށް' : 'ބައިވެރިން') + '</span></div>' +
-          '<div class="chips">' + acts[a].map(function (i) {
+          '<div class="chips">' + acts[a].filter(function (i, n, arr) { return arr.indexOf(i) === n; }).map(function (i) {
             return '<button class="chip" data-i="' + i + '">' + esc(all[i].name) + '</button>';
           }).join('') + '</div></div>';
       }).join('')
     : '<p class="none">އަދި އެއްވެސް ރަށަކުން ހަރަކާތެއް އެދިފައެއް ނުވޭ</p>';
+  var pend = all.map(function (x, i) { return x.pending ? i : -1; }).filter(function (i) { return i >= 0; });
+  if (pend.length) actEl.innerHTML = '<div class="pending-box"><span>ހަރަކާތްތައް އަދި ނުލިބޭ:</span><div class="chips">' +
+    pend.map(function (i) { return '<button class="chip" data-i="' + i + '">' + esc(all[i].name) + '</button>'; }).join('') + '</div></div>' + actEl.innerHTML;
   actEl.addEventListener('click', function (e) {
     var b = e.target.closest('.chip');
     if (b) islandSheet(+b.dataset.i);
