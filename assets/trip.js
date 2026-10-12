@@ -324,7 +324,7 @@
             '<div class="task-main"><div class="task-title">' + esc(t.task || '—') + '</div>' +
               '<div class="task-meta">' +
                 (t.assignee ? '<span>' + ICON.user + esc(t.assignee) + '</span>' : '') +
-                (t.due ? '<span class="task-due">' + ICON.clock + dvDate(t.due) + (late ? ' · ލަސްވެފައި' : '') + '</span>' : '') +
+                (t.due ? '<span class="task-due">' + ICON.clock + dvDate(t.due) + (t.time ? ' · <span dir="ltr">' + esc(t.time) + '</span>' : '') + (late ? ' · ލަސްވެފައި' : '') + '</span>' : '') +
               '</div>' +
               (t.details ? '<p class="task-details">' + esc(t.details).replace(/\n/g, '<br>') + '</p>' : '') +
             '</div></div>';
@@ -333,6 +333,26 @@
   }
 
   /* ---------- Meetings ---------- */
+  // Meeting notes: "1. text" lines become numbered points, "- text" lines sub-points under them
+  function notes(txt) {
+    var head = [], points = [];
+    String(txt).split('\n').forEach(function (line) {
+      var l = line.trim(); if (!l) return;
+      var num = /^(\d+)\.\s*(.*)$/.exec(l), sub = /^[-–•]\s*(.*)$/.exec(l);
+      if (num) points.push({ n: num[1], lines: [num[2]], subs: [] });
+      else if (!points.length) head.push(l);
+      else if (sub) points[points.length - 1].subs.push(sub[1]);
+      else points[points.length - 1].lines.push(l);
+    });
+    return '<div class="notes">' +
+      head.map(function (h) { return '<div class="note-head">' + esc(h) + '</div>'; }).join('') +
+      points.map(function (p) {
+        return '<div class="note"><span class="note-n">' + esc(p.n) + '</span><div class="note-body">' +
+          p.lines.map(function (l) { return '<div>' + esc(l) + '</div>'; }).join('') +
+          p.subs.map(function (x) { return '<div class="note-sub">' + esc(x) + '</div>'; }).join('') +
+          '</div></div>';
+      }).join('') + '</div>';
+  }
   var mtEl = document.getElementById('meetings');
   if (mtEl) {
     var members = T.members || [];
@@ -358,7 +378,7 @@
             var here = att.indexOf(n) >= 0;
             return '<span class="att' + (here ? ' here' : '') + '">' + (here ? '✓ ' : '') + esc(n) + '</span>';
           }).join('') + '</div>') +
-        (m.details ? '<p class="task-details">' + esc(m.details).replace(/\n/g, '<br>') + '</p>' : '') +
+        (m.details ? notes(m.details) : '') +
         (m.image ? '<a class="meeting-img" href="' + esc((window.SITE_BASE || '') + '/' + m.image) + '" target="_blank" rel="noopener"><img src="' + esc((window.SITE_BASE || '') + '/' + m.image) + '" alt="" loading="lazy"><span>ބޮޑުކޮށް ބަލާ ↗</span></a>' : '') +
         '</div>';
     }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';

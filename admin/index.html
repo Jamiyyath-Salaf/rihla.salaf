@@ -416,6 +416,7 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
         fields: function (t, b, r) {
           b.appendChild(textField(t, 'task', 'މަސައްކަތް', { onchange: r }));
           b.appendChild(el('div', { class: 'grid2' }, [textField(t, 'assignee', 'ޒިންމާ ހަވާލުވާ މީހާ', { onchange: r }), dateField(t, 'due', 'ނިންމަންޖެހޭ ތާރީޚު', r)]));
+          b.appendChild(textField(t, 'time', 'ގަޑި (ބޭނުންނަމަ)', { ltr: true }));
           b.appendChild(areaField(t, 'details', 'ތަފްޞީލު'));
           b.appendChild(checkField(t, 'done', 'ނިމިއްޖެ', r));
         } });
@@ -456,7 +457,7 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
             b.appendChild(el('div', { class: 'grid2' }, [dateField(m, 'date', 'ތާރީޚު', r), textField(m, 'time', 'ގަޑި', { ltr: true })]));
             b.appendChild(textField(m, 'place', 'ތަން', { onchange: r }));
             b.appendChild(attendance(m));
-            b.appendChild(areaField(m, 'details', 'ތަފްޞީލު / ނިންމުންތައް'));
+            b.appendChild(areaField(m, 'details', 'ތަފްޞީލު / ނިންމުންތައް — "1." ފަށާ ލައިނަކީ ނަންބަރު ޖަހާފައިވާ ޕޮއިންޓެއް، "-" ފަށާ ލައިނަކީ ދަށު ޕޮއިންޓެއް'));
           } }),
         el('p', { class: 'hint', text: 'މެމްބަރުންގެ ލިސްޓު ބަދަލުކުރުމަށް:' }),
         membersBox
