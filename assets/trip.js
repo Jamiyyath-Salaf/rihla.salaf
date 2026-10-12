@@ -43,6 +43,35 @@
       (isl.phone ? '<a href="tel:' + esc(String(isl.phone).replace(/\s/g, '')) + '" dir="ltr"><strong>' + esc(isl.phone) + '</strong></a>' : '<strong>—</strong>') + '</div>';
     h += '</div>';
     h += '<h3>އެދިފައިވާ ހަރަކާތްތައް</h3>' + list(isl.activities);
+
+    var team = isl.team || [];
+    h += '<h3>ޓީމް</h3>';
+    h += team.length
+      ? '<ul class="team">' + team.map(function (m) {
+          return '<li>' + ICON.user + '<span class="team-name">' + esc(m.name) + '</span>' +
+            (m.role ? '<span class="team-role">' + esc(m.role) + '</span>' : '') + '</li>';
+        }).join('') + '</ul>'
+      : '<p class="none">' + EMPTY + '</p>';
+
+    var sched = isl.schedule || [];
+    h += '<h3>ހަރަކާތްތަކުގެ ޝެޑިއުލް</h3>';
+    if (sched.length) {
+      var days = [], byDay = {};
+      sched.forEach(function (s) {
+        var d = s.day || '';
+        if (!byDay[d]) { byDay[d] = []; days.push(d); }
+        byDay[d].push(s);
+      });
+      h += days.map(function (d) {
+        return '<div class="sched-day">' + (d ? '<p class="sched-date">' + esc(d) + '</p>' : '') +
+          '<ul class="sched">' + byDay[d].map(function (s) {
+            return '<li><span class="sched-time" dir="ltr">' + esc(s.time || '') + '</span><span>' + esc(s.activity) + '</span></li>';
+          }).join('') + '</ul></div>';
+      }).join('');
+    } else {
+      h += '<p class="none">' + EMPTY + '</p>';
+    }
+
     h += '<h3>އިތުރު މައުލޫމާތު</h3>';
     h += infoKeys.length
       ? '<dl class="kv">' + infoKeys.map(function (k) { return '<dt>' + esc(k) + '</dt><dd>' + esc(info[k]) + '</dd>'; }).join('') + '</dl>'
@@ -57,7 +86,8 @@
       '<span class="island-name">' + esc(isl.name) + '</span>' +
       '<span class="island-focal">' + ICON.user + (isl.focal ? esc(isl.focal) : '—') + '</span>' +
       '<span class="island-phone" dir="ltr">' + (isl.phone ? esc(isl.phone) : '') + '</span>' +
-      '<span class="badge">' + n + ' ހަރަކާތް</span>' +
+      '<span class="badges"><span class="badge">' + n + ' ހަރަކާތް</span>' +
+      ((isl.team || []).length ? '<span class="badge badge-muted">' + isl.team.length + ' މީހުން</span>' : '') + '</span>' +
       '</button>';
   }).join('') || '<p class="none">' + EMPTY + '</p>';
   grid.addEventListener('click', function (e) {

@@ -93,7 +93,7 @@ a { color: var(--accent); }
 .island-phone { color: var(--muted); font-size: .85rem; font-family: system-ui, sans-serif; }
 .island-phone:empty { display: none; }
 .badge {
-  margin-top: .35rem; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent);
   border-radius: 999px; padding: 0 .7rem; font-size: .82rem;
 }
 
@@ -157,3 +157,16 @@ a { color: var(--accent); }
 .kv { display: grid; grid-template-columns: auto 1fr; gap: .2rem 1rem; margin: .3rem 0; }
 .kv dt { color: var(--muted); }
 .kv dd { margin: 0; }
+.badges { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .35rem; }
+.badge-muted { background: var(--bg); color: var(--muted); }
+
+/* Island popup: team and schedule */
+.team { list-style: none; padding: 0; margin: .3rem 0; display: grid; gap: .3rem; }
+.team li { display: flex; align-items: center; gap: .5rem; }
+.team-name { font-weight: 700; }
+.team-role { color: var(--muted); font-size: .88rem; }
+.sched-day { margin: .4rem 0 .8rem; }
+.sched-date { margin: 0 0 .2rem; font-weight: 700; }
+.sched { list-style: none; padding: 0; margin: 0; border-right: 2px solid var(--accent); }
+.sched li { display: flex; gap: .8rem; padding: .25rem .8rem .25rem 0; align-items: baseline; }
+.sched-time { flex: none; min-width: 3.2rem; color: var(--accent); font-family: system-ui, sans-serif; font-size: .9rem; font-weight: 600; }
