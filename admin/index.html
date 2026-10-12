@@ -67,6 +67,8 @@ input:focus, textarea:focus { border-color: var(--accent); }
 input[type=date] { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: .35rem .7rem; }
 label.check { display: inline-flex; align-items: center; gap: .5rem; cursor: pointer; font-weight: 700; }
 label.check input { width: 22px; height: 22px; accent-color: var(--accent); }
+.att-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: .3rem .8rem; margin-top: .4rem; }
+.att-check { font-weight: 400; }
 input.ltr { direction: ltr; text-align: left; font-family: system-ui, sans-serif; font-size: .95rem; }
 textarea { min-height: 5.5rem; resize: vertical; line-height: 1.8; }
 fieldset { border: 1px solid var(--line); border-radius: 10px; padding: .5rem .8rem .8rem; margin: 0; }
@@ -93,7 +95,7 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
 
 /* Toast */
 .toast { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg);
-  padding: .5rem 1.2rem; border-radius: 999px; z-index: 20; max-width: calc(100% - 24px); text-align: center; }
+  padding: .5rem 1.2rem; border-radius: 14px; z-index: 20; width: max-content; max-width: calc(100% - 24px); text-align: center; }
 .toast[hidden] { display: none; }
 .dirty-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--warm); margin-left: .3rem; }
 </style>
@@ -427,6 +429,48 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
           b.appendChild(areaField(t, 'details', 'ތަފްޞީލު'));
           b.appendChild(checkField(t, 'done', 'ނިމިއްޖެ', r));
         } });
+    } },
+    meetings: { label: 'ބައްދަލުވުންތައް', render: function () {
+      data.members = data.members || []; data.meetings = data.meetings || [];
+      function attendance(m) {
+        m.attended = m.attended || [];
+        var box = el('div', { class: 'att-grid' });
+        var names = data.members.concat(m.attended.filter(function (a) { return data.members.indexOf(a) < 0; }));
+        var count = el('span', { class: 'hint' });
+        function upd() { count.textContent = m.attended.length + ' / ' + names.length + ' ހާޒިރު'; }
+        names.forEach(function (n) {
+          var cb = el('input', { type: 'checkbox' }); cb.checked = m.attended.indexOf(n) >= 0;
+          cb.addEventListener('change', function () {
+            var i = m.attended.indexOf(n);
+            if (cb.checked && i < 0) m.attended.push(n); if (!cb.checked && i >= 0) m.attended.splice(i, 1);
+            markDirty(); upd();
+          });
+          box.appendChild(el('label', { class: 'check att-check' }, [cb, el('span', { text: n })]));
+        });
+        upd();
+        var all = el('button', { class: 'btn btn-ghost btn-small', type: 'button', text: 'ހުރިހާ ހާޒިރު', onclick: function () {
+          m.attended = names.slice(); markDirty(); box.querySelectorAll('input').forEach(function (c) { c.checked = true; }); upd();
+        } });
+        return el('fieldset', null, [el('legend', { text: 'ހާޒިރީ' }), el('div', { class: 'item-tools', style: 'justify-content:space-between' }, [count, all]), box]);
+      }
+      var membersBox = el('details', { class: 'item' }, [el('summary', null, [el('span', { class: 'item-title', text: 'މެމްބަރުން (' + data.members.length + ')' })])]);
+      var mb = el('div', { class: 'item-body' });
+      mb.appendChild(listField(data, 'members', 'ހާޒިރީ ނަގާ މީހުންގެ ނަންތައް'));
+      membersBox.appendChild(mb);
+      return el('div', null, [
+        itemList(data.meetings, { heading: 'ބައްދަލުވުންތައް', addLabel: 'ބައްދަލުވުމެއް', titleKey: 'title',
+          sub: function (m) { return [m.date, m.place, m.attended && m.attended.length ? m.attended.length + ' ހާޒިރު' : ''].filter(Boolean).join(' · '); },
+          blank: function () { return { title: '', date: '', time: '', place: '', attended: [], details: '' }; },
+          fields: function (m, b, r) {
+            b.appendChild(textField(m, 'title', 'ސުރުޚީ (ބޭނުންނަމަ)', { onchange: r }));
+            b.appendChild(el('div', { class: 'grid2' }, [dateField(m, 'date', 'ތާރީޚު', r), textField(m, 'time', 'ގަޑި', { ltr: true })]));
+            b.appendChild(textField(m, 'place', 'ތަން', { onchange: r }));
+            b.appendChild(attendance(m));
+            b.appendChild(areaField(m, 'details', 'ތަފްޞީލު / ނިންމުންތައް'));
+          } }),
+        el('p', { class: 'hint', text: 'މެމްބަރުންގެ ލިސްޓު ބަދަލުކުރުމަށް:' }),
+        membersBox
+      ]);
     } },
     sponsors: { label: 'ސްޕޮންސާ + ހަދިޔާ', render: function () {
       data.sponsors = data.sponsors || []; data.gifts = data.gifts || [];

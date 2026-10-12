@@ -260,9 +260,9 @@
     var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
     return m ? (+m[3]) + ' ' + MONTHS[+m[2] - 1] + ' ' + m[1] : esc(iso || '');
   }
+  var today = new Date(); today = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
   var tasksEl = document.getElementById('tasks');
   if (tasksEl) {
-    var today = new Date(); today = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
     var tasks = (T.tasks || []).map(function (t, i) { return Object.assign({ _i: i }, t); });
     // open tasks first, by due date (no date last); finished tasks at the bottom
     tasks.sort(function (a, b) {
@@ -290,6 +290,36 @@
             '</div></div>';
         }).join('') + '</div>'
       : '<p class="none">' + EMPTY + '</p>';
+  }
+
+  /* ---------- Meetings ---------- */
+  var mtEl = document.getElementById('meetings');
+  if (mtEl) {
+    var members = T.members || [];
+    var meetings = (T.meetings || []).slice().sort(function (a, b) { return (b.date || '') < (a.date || '') ? -1 : 1; });
+    var PLACE = '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
+    mtEl.innerHTML = meetings.length ? '<div class="task-list">' + meetings.map(function (m) {
+      var att = m.attended || [];
+      var upcoming = m.date && m.date >= today;
+      // everyone on the member list, plus anyone ticked who is no longer on it
+      var names = members.concat(att.filter(function (a) { return members.indexOf(a) < 0; }));
+      var pct = names.length ? Math.round(att.length / names.length * 100) : 0;
+      return '<div class="meeting' + (upcoming ? ' is-upcoming' : '') + '">' +
+        '<div class="meeting-head">' +
+          '<div class="meeting-date"><b>' + (m.date ? +m.date.slice(8, 10) : '—') + '</b><span>' + (m.date ? MONTHS[+m.date.slice(5, 7) - 1] : '') + '</span></div>' +
+          '<div class="meeting-info"><div class="task-title">' + esc(m.title || 'ބައްދަލުވުން') + (upcoming ? ' <span class="up-tag">ކުރިއަށް</span>' : '') + '</div>' +
+            '<div class="task-meta">' + (m.date ? '<span>' + ICON.clock + dvDate(m.date) + (m.time ? ' · <span dir="ltr">' + esc(m.time) + '</span>' : '') + '</span>' : '') +
+            (m.place ? '<span>' + PLACE + esc(m.place) + '</span>' : '') + '</div></div>' +
+          (upcoming ? '' : '<div class="att-count"><span class="att-num" dir="ltr"><b>' + att.length + '</b>/' + names.length + '</span><span>ހާޒިރު</span></div>') +
+        '</div>' +
+        (upcoming ? '' : '<div class="att-bar"><i style="width:' + pct + '%"></i></div>' +
+          '<div class="att-chips">' + names.map(function (n) {
+            var here = att.indexOf(n) >= 0;
+            return '<span class="att' + (here ? ' here' : '') + '">' + (here ? '✓ ' : '') + esc(n) + '</span>';
+          }).join('') + '</div>') +
+        (m.details ? '<p class="task-details">' + esc(m.details).replace(/\n/g, '<br>') + '</p>' : '') +
+        '</div>';
+    }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';
   }
 
   /* ---------- Sponsors + gifts ---------- */

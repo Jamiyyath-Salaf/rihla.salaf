@@ -367,3 +367,29 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .gift-main { flex: 1; min-width: 0; }
 .gift-title { font-weight: 700; font-size: 1.08rem; }
 .gift-qty { font-family: system-ui, sans-serif; color: var(--muted); font-weight: 600; font-size: .95rem; }
+
+/* Seven tabs: one row on desktop, 4 + 3 on phones */
+.tabs, .event .tabs { grid-template-columns: repeat(7, 1fr); max-width: 1040px; }
+@media (max-width: 640px) { .tabs, .event .tabs { grid-template-columns: repeat(4, 1fr); } }
+
+/* Meetings */
+.meeting { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 1rem 1.2rem; text-align: right; display: grid; gap: .7rem; }
+.meeting.is-upcoming { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
+.meeting-head { display: flex; align-items: center; gap: .9rem; }
+.meeting-date {
+  flex: none; width: 58px; height: 62px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--accent); color: #fff; line-height: 1.2;
+}
+@media (prefers-color-scheme: dark) { .meeting-date { color: #0f1a14; } }
+.meeting-date b { font-family: system-ui, sans-serif; font-size: 1.5rem; }
+.meeting-date span { font-size: .72rem; }
+.meeting-info { flex: 1; min-width: 0; }
+.up-tag { font-size: .75rem; font-weight: 700; background: var(--accent); color: #fff; border-radius: 999px; padding: 0 .55rem; vertical-align: middle; }
+.att-count { flex: none; text-align: center; font-family: system-ui, sans-serif; color: var(--muted); line-height: 1.2; display: flex; flex-direction: column; }
+.att-count b { color: var(--accent); font-size: 1.6rem; }
+.att-count span { font-family: "MV Funa", sans-serif; font-size: .75rem; }
+.att-bar { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.att-bar i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.att-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.att { font-size: .85rem; border-radius: 999px; padding: .05rem .7rem; background: var(--bg); color: var(--muted); border: 1px solid var(--line); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 50%, transparent); }
+.att.here { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); border-color: transparent; font-weight: 700; text-decoration: none; }
