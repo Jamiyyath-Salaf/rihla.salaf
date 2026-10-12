@@ -228,3 +228,19 @@ a { color: var(--accent); }
 
 /* Titles use MV Funa Black */
 h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
+
+/* Other participants */
+.group-title { font-size: 1.4rem; margin: 2rem 0 .8rem; text-align: right; }
+.island-other .island-head {
+  align-items: center;
+  background:
+    radial-gradient(120px 80px at 0% 100%, rgba(255,255,255,.18), transparent 70%),
+    linear-gradient(135deg, #1d5f8f, #2b8bb0);
+}
+.head-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.18); flex: none; }
+.island-other .avatar { background: color-mix(in srgb, #2b8bb0 16%, transparent); color: #1d5f8f; }
+@media (prefers-color-scheme: dark) { .island-other .avatar { color: #8cc8e4; } }
+.focal-title { color: var(--muted); font-size: .78rem; line-height: 1.5; }
+.contact-title { color: var(--muted); font-size: .9rem; padding-right: 1.6rem; margin-top: -.3rem; }
+.contact-card a { min-width: 0; overflow-wrap: anywhere; text-align: left; }
+.contact-card a[href^="mailto"] strong { font-size: .82rem; font-weight: 600; }

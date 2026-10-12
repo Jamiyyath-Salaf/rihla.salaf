@@ -1,7 +1,11 @@
 (function () {
   var T = window.TRIP || {};
   var islands = T.islands || [];
+  var others = T.participants || [];
   var roles = T.roles || [];
+  // Islands and other participants share one list so popups and activity chips can refer to either
+  var all = islands.map(function (x) { return Object.assign({ kind: 'island' }, x); })
+    .concat(others.map(function (x) { return Object.assign({ kind: 'other' }, x); }));
 
   var EMPTY = 'އަދި މައުލޫމާތެއް ނެތް';
   var ICON = {
@@ -10,6 +14,8 @@
     list: '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 10h6M9 14h6M9 18h4"/></svg>',
     team: '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c2 .7 3.2 2.5 3.6 5.2"/></svg>',
     clock: '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    mail: '<svg class="icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+    building: '<svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V7l8-4 8 4v14"/><path d="M10 10h4M12 8v4"/><path d="M9 21v-5h6v5"/></svg>',
     info: '<svg class="icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>'
   };
 
@@ -36,14 +42,16 @@
 
   /* ---------- Islands ---------- */
   function islandSheet(i) {
-    var isl = islands[i];
+    var isl = all[i];
     var info = isl.info || {};
     var infoKeys = Object.keys(info);
-    var h = '<h2>' + esc(isl.name) + '</h2>';
+    var h = '<h2>' + (isl.kind === 'island' ? 'ބ. ' : '') + esc(isl.name) + '</h2>';
     h += '<div class="contact-card">';
     h += '<div>' + ICON.user + '<span class="lbl">ފޯކަލް ޕޮއިންޓް</span><strong>' + (isl.focal ? esc(isl.focal) : '—') + '</strong></div>';
+    if (isl.title) h += '<div class="contact-title">' + esc(isl.title) + '</div>';
     h += '<div>' + ICON.phone + '<span class="lbl">ނަންބަރު</span>' +
       (isl.phone ? '<a href="tel:' + esc(String(isl.phone).replace(/\s/g, '')) + '" dir="ltr"><strong>' + esc(isl.phone) + '</strong></a>' : '<strong>—</strong>') + '</div>';
+    if (isl.email) h += '<div>' + ICON.mail + '<span class="lbl">އީމެއިލް</span><a href="mailto:' + esc(isl.email) + '" dir="ltr"><strong>' + esc(isl.email) + '</strong></a></div>';
     h += '</div>';
     h += '<h3>އެދިފައިވާ ހަރަކާތްތައް</h3>' + list(isl.activities);
 
@@ -84,29 +92,44 @@
 
   var grid = document.getElementById('island-grid');
   var totalActs = 0, totalTeam = 0;
-  islands.forEach(function (isl) { totalActs += (isl.activities || []).length; totalTeam += (isl.team || []).length; });
+  all.forEach(function (x) { totalActs += (x.activities || []).length; totalTeam += (x.team || []).length; });
   var summary = '<div class="island-summary">' +
     '<div><strong>' + islands.length + '</strong><span>ރަށް</span></div>' +
     '<div><strong>' + totalActs + '</strong><span>ހަރަކާތް</span></div>' +
     '<div><strong>' + totalTeam + '</strong><span>ޓީމު މެމްބަރުން</span></div></div>';
-  grid.innerHTML = islands.length ? summary + '<div class="island-cards">' + islands.map(function (isl, i) {
-    var stat = function (icon, n, label) {
-      return '<span class="stat' + (n ? '' : ' stat-zero') + '">' + icon + '<b>' + n + '</b> ' + label + '</span>';
-    };
-    return '<div class="island" role="button" tabindex="0" data-i="' + i + '">' +
-      '<div class="island-head"><span class="island-num">' + (i + 1) + '</span>' +
-        '<span class="island-atoll">ބ.</span><span class="island-name">' + esc(isl.name) + '</span></div>' +
+
+  function stat(icon, n, label) {
+    return '<span class="stat' + (n ? '' : ' stat-zero') + '">' + icon + '<b>' + n + '</b> ' + label + '</span>';
+  }
+  function card(x, i, num) {
+    var island = x.kind === 'island';
+    return '<div class="island' + (island ? '' : ' island-other') + '" role="button" tabindex="0" data-i="' + i + '">' +
+      '<div class="island-head">' +
+        (island ? '<span class="island-num">' + num + '</span><span class="island-atoll">ބ.</span>' : '<span class="head-icon">' + ICON.building + '</span>') +
+        '<span class="island-name">' + esc(x.name) + '</span></div>' +
       '<div class="island-body">' +
-        '<div class="focal"><span class="avatar">' + (isl.focal ? esc(isl.focal.charAt(0)) : ICON.user) + '</span>' +
-          '<span class="focal-text"><span class="focal-label">ފޯކަލް ޕޮއިންޓް</span><span class="focal-name">' + (isl.focal ? esc(isl.focal) : '—') + '</span></span></div>' +
-        (isl.phone ? '<a class="call" href="tel:' + esc(String(isl.phone).replace(/\s/g, '')) + '">' + ICON.phone + '<span dir="ltr">' + esc(isl.phone) + '</span></a>' : '') +
+        '<div class="focal"><span class="avatar">' + (x.focal ? esc(x.focal.charAt(0)) : ICON.user) + '</span>' +
+          '<span class="focal-text"><span class="focal-label">ފޯކަލް ޕޮއިންޓް</span><span class="focal-name">' + (x.focal ? esc(x.focal) : '—') + '</span>' +
+          (x.title ? '<span class="focal-title">' + esc(x.title) + '</span>' : '') + '</span></div>' +
+        (x.phone ? '<a class="call" href="tel:' + esc(String(x.phone).replace(/\s/g, '')) + '">' + ICON.phone + '<span dir="ltr">' + esc(x.phone) + '</span></a>' : '') +
       '</div>' +
       '<div class="island-stats">' +
-        stat(ICON.list, (isl.activities || []).length, 'ހަރަކާތް') +
-        stat(ICON.team, (isl.team || []).length, 'މީހުން') +
-        stat(ICON.clock, (isl.schedule || []).length, 'ޝެޑިއުލް') +
+        stat(ICON.list, (x.activities || []).length, 'ހަރަކާތް') +
+        stat(ICON.team, (x.team || []).length, 'މީހުން') +
+        stat(ICON.clock, (x.schedule || []).length, 'ޝެޑިއުލް') +
       '</div></div>';
-  }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';
+  }
+
+  var html = '';
+  if (islands.length) {
+    html += summary + '<div class="island-cards">' +
+      all.filter(function (x) { return x.kind === 'island'; }).map(function (x, n) { return card(x, n, n + 1); }).join('') + '</div>';
+  }
+  if (others.length) {
+    html += '<h2 class="group-title">އެހެނިހެން ބައިވެރިން</h2><div class="island-cards">' +
+      others.map(function (x, n) { return card(all[islands.length + n], islands.length + n); }).join('') + '</div>';
+  }
+  grid.innerHTML = html || '<p class="none">' + EMPTY + '</p>';
   grid.addEventListener('click', function (e) {
     if (e.target.closest('.call')) return;
     var b = e.target.closest('.island');
@@ -140,7 +163,7 @@
 
   /* ---------- Activities (grouped across islands) ---------- */
   var acts = {};
-  islands.forEach(function (isl, i) {
+  all.forEach(function (isl, i) {
     (isl.activities || []).forEach(function (a) {
       var key = String(a).trim();
       if (!key) return;
@@ -150,13 +173,14 @@
   var actNames = Object.keys(acts).sort(function (a, b) { return acts[b].length - acts[a].length; });
   var actEl = document.getElementById('activity-list');
   actEl.innerHTML = actNames.length
-    ? '<p class="summary">' + actNames.length + ' ހަރަކާތް · ' + islands.filter(function (s) { return (s.activities || []).length; }).length + ' ރަށުން</p>' +
+    ? '<p class="summary">' + actNames.length + ' ހަރަކާތް · ' + all.filter(function (s) { return (s.activities || []).length; }).length + ' ބައިވެރިންގެ ފަރާތުން</p>' +
       actNames.map(function (a) {
         return '<div class="act">' +
           '<div class="act-head"><span class="act-name">' + esc(a) + '</span>' +
-          '<span class="act-count"><strong>' + acts[a].length + '</strong> ރަށް</span></div>' +
+          '<span class="act-count"><strong>' + acts[a].length + '</strong> ' +
+            (acts[a].every(function (i) { return all[i].kind === 'island'; }) ? 'ރަށް' : 'ބައިވެރިން') + '</span></div>' +
           '<div class="chips">' + acts[a].map(function (i) {
-            return '<button class="chip" data-i="' + i + '">' + esc(islands[i].name) + '</button>';
+            return '<button class="chip" data-i="' + i + '">' + esc(all[i].name) + '</button>';
           }).join('') + '</div></div>';
       }).join('')
     : '<p class="none">އަދި އެއްވެސް ރަށަކުން ހަރަކާތެއް އެދިފައެއް ނުވޭ</p>';
