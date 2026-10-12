@@ -475,12 +475,13 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
             b.appendChild(areaField(x, 'notes', 'ނޯޓު'));
           } }),
         itemList(data.gifts, { heading: 'ހަދިޔާ', addLabel: 'ހަދިޔާއެއް', titleKey: 'item',
-          sub: function (g) { return [g.qty ? '× ' + g.qty : '', g['for']].filter(Boolean).join(' · '); },
+          sub: function (g) { return [g.received ? '✓' : 'އަދި ނުލިބޭ', g.qty ? '× ' + g.qty : '', g['for']].filter(Boolean).join(' · '); },
           blank: function () { return { item: '', qty: '', 'for': '', from: '', notes: '' }; },
           fields: function (g, b, r) {
             b.appendChild(el('div', { class: 'grid2' }, [textField(g, 'item', 'ހަދިޔާ', { onchange: r }), textField(g, 'qty', 'އަދަދު', { onchange: r })]));
             b.appendChild(el('div', { class: 'grid2' }, [textField(g, 'for', 'ދެވޭނީ (ރަށް / މީހުން)', { onchange: r }), textField(g, 'from', 'ސްޕޮންސާ')]));
             b.appendChild(areaField(g, 'notes', 'ނޯޓު'));
+            b.appendChild(checkField(g, 'received', 'ލިބިއްޖެ', r));
           } })
       ]);
     } }

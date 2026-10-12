@@ -507,3 +507,18 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .mcard-go { color: var(--muted); font-size: 1.6rem; font-family: system-ui, sans-serif; line-height: 1; }
 .sheet .att-none { margin: .2rem 0; }
 .nowrap { white-space: nowrap; }
+
+/* Gifts: not received (orange) / received (green) */
+.gift-group { font-size: 1.15rem; margin: 1rem auto .6rem; max-width: 760px; text-align: right; display: flex; align-items: center; gap: .5rem; }
+.gift-group.pending { color: #b5701c; }
+.gift-group.pending .group-count { background: color-mix(in srgb, #c0392b 12%, transparent); color: #c0392b; }
+.gift-group.done .group-count { background: color-mix(in srgb, #2b5aa0 12%, transparent); color: #2b5aa0; }
+@media (prefers-color-scheme: dark) { .gift-group.pending { color: #f0b46a; } }
+.gift { border-right: 5px solid #e0a54a; padding: .9rem 1.1rem; }
+.gift .task-check { margin-top: 0; width: 30px; height: 30px; }
+.gift-icon { width: 52px; height: 52px; border-radius: 14px; background: color-mix(in srgb, #e0a54a 18%, transparent); color: #a8701e; }
+.gift.is-received { border-right-color: var(--accent); }
+.gift.is-received .task-check { background: var(--accent); border-color: var(--accent); }
+.gift.is-received .gift-icon { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); }
+.no-sponsor { color: var(--muted); opacity: .6; }
+.gift-title { font-weight: 900; font-size: 1.15rem; }

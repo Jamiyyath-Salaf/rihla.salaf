@@ -415,18 +415,25 @@
         (s.notes ? '<p class="task-details">' + esc(s.notes).replace(/\n/g, '<br>') + '</p>' : '') +
         '</div>';
     }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';
-    h += '<h2 class="group-title">ހަދިޔާ <span class="group-count">' + gifts.length + '</span></h2>';
-    h += gifts.length ? '<div class="gift-list">' + gifts.map(function (g) {
-      return '<div class="gift"><span class="gift-icon">' + GIFT + '</span>' +
+    // gifts split into not-received and received
+    function giftCard(g) {
+      return '<div class="gift' + (g.received ? ' is-received' : '') + '">' +
+        '<span class="task-check">' + (g.received ? '✓' : '') + '</span>' +
+        '<span class="gift-icon">' + GIFT + '</span>' +
         '<div class="gift-main"><div class="gift-title">' + esc(g.item || '—') +
           (g.qty ? ' <span class="gift-qty">× ' + esc(g.qty) + '</span>' : '') + '</div>' +
           '<div class="task-meta">' +
-            (g['for'] ? '<span>ދެވޭނީ: ' + esc(g['for']) + '</span>' : '') +
-            (g.from ? '<span>ސްޕޮންސާ: ' + esc(g.from) + '</span>' : '') +
+            (g.from ? '<span>ސްޕޮންސަރ: ' + esc(g.from) + '</span>' : '<span class="no-sponsor">ސްޕޮންސަރެއް ނުލިބޭ</span>') +
+            (g['for'] ? '<span>· ' + esc(g['for']) + '</span>' : '') +
           '</div>' +
           (g.notes ? '<p class="task-details">' + esc(g.notes).replace(/\n/g, '<br>') + '</p>' : '') +
         '</div></div>';
-    }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';
+    }
+    var giftsOpen = gifts.filter(function (g) { return !g.received; }), giftsDone = gifts.filter(function (g) { return g.received; });
+    h += '<h2 class="group-title">ހަދިޔާ</h2>';
+    if (!gifts.length) h += '<p class="none">' + EMPTY + '</p>';
+    if (giftsOpen.length) h += '<h3 class="gift-group pending">އަދި ނުލިބޭ <span class="group-count">' + giftsOpen.length + '</span></h3><div class="gift-list">' + giftsOpen.map(giftCard).join('') + '</div>';
+    if (giftsDone.length) h += '<h3 class="gift-group done">ލިބިފައިވާ <span class="group-count">' + giftsDone.length + '</span></h3><div class="gift-list">' + giftsDone.map(giftCard).join('') + '</div>';
     spEl.innerHTML = h;
   }
 
