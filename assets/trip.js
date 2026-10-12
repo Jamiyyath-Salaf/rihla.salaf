@@ -195,6 +195,49 @@
   var pend = all.map(function (x, i) { return x.pending ? i : -1; }).filter(function (i) { return i >= 0; });
   if (pend.length) actEl.innerHTML = '<div class="pending-box"><span>ހަރަކާތްތައް އަދި ނުލިބޭ:</span><div class="chips">' +
     pend.map(function (i) { return '<button class="chip" data-i="' + i + '">' + esc(all[i].name) + '</button>'; }).join('') + '</div></div>' + actEl.innerHTML;
+  /* ---------- Print: activities by island, then by activity ---------- */
+  var printBtn = document.createElement('div');
+  printBtn.className = 'print-bar';
+  printBtn.innerHTML = '<button type="button" class="print-btn"><svg class="icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg><span>ޕްރިންޓް</span></button>';
+  actEl.insertBefore(printBtn, actEl.firstChild);
+  printBtn.querySelector('button').addEventListener('click', function () {
+    var title = (document.querySelector('.event h1') || {}).textContent || '';
+    var sub = (document.querySelector('.event-sub') || {}).textContent || '';
+    var logo = document.querySelector('link[rel="icon"]');
+    var islandsOnly = all.filter(function (x) { return x.kind === 'island'; });
+    var others = all.filter(function (x) { return x.kind !== 'island'; });
+    function block(x, n) {
+      var acts = x.activities || [];
+      return '<section class="p-island"><h3>' + (n ? '<span class="p-n">' + n + '</span>' : '') + (x.kind === 'island' ? 'ބ. ' : '') + esc(x.name) +
+        (x.focal ? '<small>' + esc(x.focal) + (x.phone ? ' · <span dir="ltr">' + esc(x.phone) + '</span>' : '') + '</small>' : '') + '</h3>' +
+        (x.pending ? '<p class="p-pending">ހަރަކާތްތައް އަދި ނުލިބޭ</p>'
+          : acts.length ? '<ol>' + acts.map(function (a) { return '<li>' + esc(a) + '</li>'; }).join('') + '</ol>' : '<p class="p-pending">—</p>') +
+        '</section>';
+    }
+    var totalActs = all.reduce(function (n, x) { return n + (x.activities || []).length; }, 0);
+    var html =
+      '<header class="p-head">' + (logo ? '<img src="' + logo.href + '" alt="">' : '') +
+        '<div><h1>' + esc(title) + '</h1><p>' + esc(sub) + '</p></div></header>' +
+      '<h2>1. ރަށްތަކުން އެދިފައިވާ ހަރަކާތްތައް</h2>' +
+      '<p class="p-sum">' + islandsOnly.length + ' ރަށް · ' + totalActs + ' ހަރަކާތް</p>' +
+      '<div class="p-grid">' + islandsOnly.map(function (x, i) { return block(x, i + 1); }).join('') + '</div>' +
+      (others.length ? '<h2 class="p-sub">އެހެނިހެން ބައިވެރިން</h2><div class="p-grid">' + others.map(function (x) { return block(x); }).join('') + '</div>' : '') +
+      '<h2 class="p-break">2. ހަރަކާތްތަކަށް އެދިފައިވާ ރަށްތައް</h2>' +
+      '<p class="p-sum">' + actNames.length + ' ހަރަކާތް · ބޮޑު އަދަދަކުން އެދިފައިވާ ހަރަކާތްތައް މަތީގައި</p>' +
+      '<table class="p-table"><thead><tr><th>#</th><th>ހަރަކާތް</th><th>އަދަދު</th><th>ރަށްތައް</th></tr></thead><tbody>' +
+      actNames.map(function (a, i) {
+        var who = uniq(acts[a]);
+        return '<tr><td>' + (i + 1) + '</td><td>' + esc(a) + '</td><td class="p-c">' + who.length + '</td><td>' +
+          who.map(function (k) { return esc(all[k].name); }).join('، ') + '</td></tr>';
+      }).join('') + '</tbody></table>' +
+      '<p class="p-foot">ޕްރިންޓްކުރި ތާރީޚު: ' + dvDate(today) + '</p>';
+    var area = document.getElementById('print-area') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'print-area' }));
+    area.innerHTML = html;
+    var imgs = area.querySelectorAll('img'), left = imgs.length;
+    function go() { window.print(); }
+    if (!left) go(); else imgs.forEach(function (im) { if (im.complete) { if (!--left) go(); } else im.onload = im.onerror = function () { if (!--left) go(); }; });
+  });
+
   function actSheet(n) {
     var a = actNames[n];
     openSheet('<p class="sheet-kicker">ހަރަކާތް</p><h2>' + esc(a) + '</h2>' +
