@@ -162,35 +162,59 @@
   });
 
   /* ---------- Activities (grouped across islands) ---------- */
-  var acts = {};
+  // Activities with different wording but the same meaning are joined by T.activity_groups
+  var groupOf = {};
+  (T.activity_groups || []).forEach(function (g) { (g.items || []).forEach(function (t) { groupOf[String(t).trim()] = g.name; }); });
+  var acts = {};   // group name -> [{i: participant index, text: original wording}]
   all.forEach(function (isl, i) {
     (isl.activities || []).forEach(function (a) {
-      // group by the activity name without bracketed notes, e.g. "ކުޑަކުދިންގެ ހަވީރު (12 ނޮވެންބަރު)"
-      var key = String(a).replace(/\([^)]*\)/g, '').replace(/[\s:/،]+$/, '').replace(/\s+/g, ' ').trim() || String(a).trim();
-      if (!key) return;
-      (acts[key] = acts[key] || []).push(i);
+      var text = String(a).trim();
+      if (!text) return;
+      var key = groupOf[text] || text;
+      (acts[key] = acts[key] || []).push({ i: i, text: text });
     });
   });
-  var actNames = Object.keys(acts).sort(function (a, b) { return acts[b].length - acts[a].length; });
+  function uniq(list) { return list.map(function (x) { return x.i; }).filter(function (i, n, arr) { return arr.indexOf(i) === n; }); }
+  var actNames = Object.keys(acts).sort(function (a, b) { return uniq(acts[b]).length - uniq(acts[a]).length; });
   var actEl = document.getElementById('activity-list');
   actEl.innerHTML = actNames.length
     ? '<p class="summary">' + actNames.length + ' ހަރަކާތް · ' + all.filter(function (s) { return (s.activities || []).length; }).length + ' ބައިވެރިންގެ ފަރާތުން</p>' +
-      actNames.map(function (a) {
-        return '<div class="act">' +
+      '<div class="act-grid">' + actNames.map(function (a, n) {
+        var who = uniq(acts[a]);
+        return '<div class="act" data-g="' + n + '" role="button" tabindex="0">' +
           '<div class="act-head"><span class="act-name">' + esc(a) + '</span>' +
-          '<span class="act-count"><strong>' + acts[a].filter(function (i, n, arr) { return arr.indexOf(i) === n; }).length + '</strong> ' +
-            (acts[a].every(function (i) { return all[i].kind === 'island'; }) ? 'ރަށް' : 'ބައިވެރިން') + '</span></div>' +
-          '<div class="chips">' + acts[a].filter(function (i, n, arr) { return arr.indexOf(i) === n; }).map(function (i) {
+          '<span class="act-count"><strong>' + who.length + '</strong> ' +
+            (who.every(function (i) { return all[i].kind === 'island'; }) ? 'ރަށް' : 'ބައިވެރިން') + '</span></div>' +
+          '<div class="chips">' + who.map(function (i) {
             return '<button class="chip" data-i="' + i + '">' + esc(all[i].name) + '</button>';
           }).join('') + '</div></div>';
-      }).join('')
+      }).join('') + '</div>'
     : '<p class="none">އަދި އެއްވެސް ރަށަކުން ހަރަކާތެއް އެދިފައެއް ނުވޭ</p>';
   var pend = all.map(function (x, i) { return x.pending ? i : -1; }).filter(function (i) { return i >= 0; });
   if (pend.length) actEl.innerHTML = '<div class="pending-box"><span>ހަރަކާތްތައް އަދި ނުލިބޭ:</span><div class="chips">' +
     pend.map(function (i) { return '<button class="chip" data-i="' + i + '">' + esc(all[i].name) + '</button>'; }).join('') + '</div></div>' + actEl.innerHTML;
+  function actSheet(n) {
+    var a = actNames[n];
+    openSheet('<p class="sheet-kicker">ހަރަކާތް</p><h2>' + esc(a) + '</h2>' +
+      '<h3>' + uniq(acts[a]).length + ' ރަށުން ލިޔެފައިވާ ގޮތް</h3><ul class="act-sources">' +
+      acts[a].map(function (x) {
+        return '<li><button class="chip" data-i="' + x.i + '">' + esc(all[x.i].name) + '</button><span>' + esc(x.text) + '</span></li>';
+      }).join('') + '</ul>');
+  }
   actEl.addEventListener('click', function (e) {
-    var b = e.target.closest('.chip');
-    if (b) islandSheet(+b.dataset.i);
+    var c = e.target.closest('.chip');
+    if (c) { islandSheet(+c.dataset.i); return; }
+    var g = e.target.closest('.act');
+    if (g) actSheet(+g.dataset.g);
+  });
+  actEl.addEventListener('keydown', function (e) {
+    var g = e.target.closest('.act');
+    if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); actSheet(+g.dataset.g); }
+  });
+  // chips inside the popup open that island
+  sheet.addEventListener('click', function (e) {
+    var c = e.target.closest('.act-sources .chip');
+    if (c) islandSheet(+c.dataset.i);
   });
 
   /* ---------- Facilitators ---------- */

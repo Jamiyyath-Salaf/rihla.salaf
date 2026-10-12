@@ -403,3 +403,16 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .pending-box .chips { margin: 0; }
 .act { max-width: 760px; margin-inline: auto; margin-bottom: .7rem; }
 .summary { max-width: 760px; margin-inline: auto; }
+
+/* Activities: two per row */
+.act-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .8rem; max-width: 1040px; margin-inline: auto; }
+@media (max-width: 560px) { .act-grid { grid-template-columns: 1fr; } }
+.act-grid .act { max-width: none; margin: 0; cursor: pointer; display: flex; flex-direction: column; gap: .2rem; transition: border-color .15s, transform .15s; }
+.act-grid .act:hover, .act-grid .act:focus-visible { border-color: var(--accent); transform: translateY(-2px); outline: none; }
+.act-name { line-height: 1.6; }
+.summary, .pending-box { max-width: 1040px; }
+.act-sources { list-style: none; padding: 0; margin: .4rem 0; display: grid; gap: .5rem; }
+.act-sources li { display: flex; align-items: baseline; gap: .6rem; }
+.act-sources .chip { flex: none; }
+.act-sources span { font-size: .95rem; }
+#activity-list { max-width: 1040px; }
