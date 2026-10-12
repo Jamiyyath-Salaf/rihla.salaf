@@ -244,3 +244,80 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .contact-title { color: var(--muted); font-size: .9rem; padding-right: 1.6rem; margin-top: -.3rem; }
 .contact-card a { min-width: 0; overflow-wrap: anywhere; text-align: left; }
 .contact-card a[href^="mailto"] strong { font-size: .82rem; font-weight: 600; }
+
+/* Tabs: five across */
+.tabs { grid-template-columns: repeat(5, 1fr); }
+@media (max-width: 480px) { .tabs button { font-size: .72rem; padding: .5rem .1rem .3rem; } }
+
+/* Facilitators */
+.group-title:first-child { margin-top: 0; }
+.group-count {
+  display: inline-block; font-family: system-ui, sans-serif; font-size: .85rem; font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent);
+  border-radius: 999px; padding: 0 .6rem; vertical-align: middle;
+}
+.fac-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: .8rem; }
+.fac {
+  display: flex; flex-direction: column; text-align: right; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+  border-top: 4px solid var(--warm); transition: transform .18s, box-shadow .18s;
+}
+.fac:hover, .fac:focus-visible { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(20,60,30,.12); outline: none; }
+.fac-top { display: flex; align-items: center; gap: .75rem; padding: 1rem 1.1rem .6rem; }
+.fac-avatar {
+  flex: none; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center;
+  background: linear-gradient(135deg, var(--warm), #e0a55f); color: #fff; font-weight: 900; font-size: 1.4rem;
+}
+.fac-id { display: flex; flex-direction: column; line-height: 1.5; min-width: 0; }
+.fac-name { font-weight: 900; font-size: 1.15rem; }
+.fac-island { display: inline-flex; align-items: center; gap: .25rem; color: var(--muted); font-size: .85rem; }
+.fac-route { padding: .2rem 1.1rem .7rem; display: flex; flex-direction: column; gap: .25rem; }
+.fac-label { color: var(--muted); font-size: .75rem; }
+.route-chain { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem; font-size: .88rem; }
+.route-chain span { background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 0 .6rem; }
+.route-chain span:last-child { background: color-mix(in srgb, var(--accent) 14%, transparent); border-color: transparent; color: var(--accent); font-weight: 700; }
+.route-chain i { font-style: normal; color: var(--muted); font-family: system-ui, sans-serif; }
+.route-chip { display: inline-block; border-radius: 999px; padding: 0 .7rem; font-size: .88rem; }
+.route-male { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-weight: 700; }
+.route-steps { list-style: none; margin: .3rem 0; padding: 0 1.4rem 0 0; position: relative; }
+.route-steps::before { content: ""; position: absolute; right: .45rem; top: .9rem; bottom: .9rem; border-right: 2px dashed var(--line); }
+.route-steps li { position: relative; padding: .2rem 0; }
+.route-steps li::before {
+  content: ""; position: absolute; right: -1.2rem; top: .85rem; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--surface); border: 2px solid var(--warm);
+}
+.route-steps li:last-child::before { background: var(--accent); border-color: var(--accent); }
+.route-steps li:last-child { font-weight: 700; color: var(--accent); }
+
+/* Wider trip page, roomier island cards (4 per row on desktop) */
+.container.event { width: min(1180px, 100% - 32px); }
+.event .tabs { max-width: 760px; margin-inline: auto; }
+.island-summary { max-width: 760px; margin-inline: auto; margin-bottom: 1.4rem; }
+.island-cards { grid-template-columns: repeat(4, 1fr); gap: 1.1rem; }
+@media (max-width: 1000px) { .island-cards { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 760px)  { .island-cards { grid-template-columns: repeat(2, 1fr); gap: .7rem; } }
+.island { border-radius: 18px; min-height: 290px; }
+.island-head { padding: 1.4rem 1.3rem 1.5rem; min-height: 96px; align-items: flex-end; }
+.island-name { font-size: 1.6rem; }
+.island-num { font-size: 4.6rem; top: -.5rem; }
+.island-body { padding: 1.1rem 1.3rem .6rem; gap: .9rem; }
+.avatar { width: 48px; height: 48px; font-size: 1.3rem; }
+.focal-name { font-size: 1.08rem; white-space: normal; }
+.call { padding: .45rem .9rem; font-size: 1.02rem; }
+.island-stats { padding: .8rem 1.3rem .9rem; }
+.stat { font-size: .88rem; }
+@media (max-width: 480px) {
+  .island { min-height: 0; }
+  .island-head { padding: 1rem .9rem 1.1rem; min-height: 78px; }
+  .island-name { font-size: 1.25rem; }
+  .island-num { font-size: 3.4rem; }
+  .island-body { padding: .8rem .9rem .4rem; }
+  .avatar { width: 38px; height: 38px; font-size: 1.05rem; }
+  .focal-name { font-size: .95rem; }
+  .call { font-size: .9rem; padding: .35rem .6rem; }
+  .island-stats { padding: .6rem .9rem .7rem; }
+  .stat { font-size: .74rem; }
+}
+.event .updates { max-width: 680px; }
+.org, #activity-list { max-width: 760px; margin-inline: auto; }
+.fac-route .route-chip { align-self: flex-start; }

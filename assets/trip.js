@@ -189,6 +189,67 @@
     if (b) islandSheet(+b.dataset.i);
   });
 
+  /* ---------- Facilitators ---------- */
+  var F = T.facilitators || {};
+  var facGroups = [
+    { title: 'ޝައިޚުން', people: F.sheikhs || [] },
+    { title: 'އެހެނިހެން', people: F.others || [] }
+  ];
+  var facAll = [];
+  var PIN = '<svg class="icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
+  var WORKSHOP = '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8"/></svg>';
+
+  function inMale(p) { return !(p.route || []).length; }
+  function routeChain(p) {
+    if (inMale(p)) return '<span class="route-chip route-male">މާލޭގައި</span>';
+    return '<span class="route-chain">' + p.route.map(function (r) { return '<span>' + esc(r) + '</span>'; }).join('<i>←</i>') + '</span>';
+  }
+  function facCard(p, i) {
+    return '<div class="fac" role="button" tabindex="0" data-f="' + i + '">' +
+      '<div class="fac-top"><span class="fac-avatar">' + (p.name ? esc(p.name.charAt(0)) : ICON.user) + '</span>' +
+        '<div class="fac-id"><span class="fac-name">' + (p.name ? esc(p.name) : '—') + '</span>' +
+        (p.island ? '<span class="fac-island">' + PIN + esc(p.island) + '</span>' : '') + '</div></div>' +
+      '<div class="fac-route"><span class="fac-label">ދަތުރުގެ މަގު</span>' + routeChain(p) + '</div>' +
+      '<div class="island-stats">' +
+        stat(ICON.list, (p.activities || []).length, 'ހަރަކާތް') +
+        stat(WORKSHOP, (p.workshops || []).length, 'ވޯކްޝޮޕް') +
+      '</div></div>';
+  }
+  function facSheet(i) {
+    var p = facAll[i];
+    var h = '<p class="sheet-kicker">' + esc(p._group) + '</p><h2>' + (p.name ? esc(p.name) : '—') + '</h2>';
+    h += '<div class="contact-card">';
+    h += '<div>' + PIN + '<span class="lbl">ރަށް</span><strong>' + (p.island ? esc(p.island) : '—') + '</strong></div>';
+    if (p.phone) h += '<div>' + ICON.phone + '<span class="lbl">ނަންބަރު</span><a href="tel:' + esc(String(p.phone).replace(/\s/g, '')) + '" dir="ltr"><strong>' + esc(p.phone) + '</strong></a></div>';
+    h += '</div>';
+    h += '<h3>ދަތުރުގެ މަގު</h3>';
+    h += inMale(p)
+      ? '<p><span class="route-chip route-male">މާލޭގައި</span></p>'
+      : '<ol class="route-steps">' + p.route.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ol>';
+    h += '<h3>ކުރެވޭނެ ހަރަކާތްތައް</h3>' + list(p.activities);
+    h += '<h3>ވޯކްޝޮޕްތައް</h3>' + list(p.workshops);
+    openSheet(h);
+  }
+  var facEl = document.getElementById('facilitators');
+  if (facEl) {
+    facEl.innerHTML = facGroups.map(function (g) {
+      var cards = g.people.map(function (p) {
+        var i = facAll.push(Object.assign({ _group: g.title }, p)) - 1;
+        return facCard(p, i);
+      }).join('');
+      return '<h2 class="group-title">' + g.title + ' <span class="group-count">' + g.people.length + '</span></h2>' +
+        (cards ? '<div class="fac-cards">' + cards + '</div>' : '<p class="none">' + EMPTY + '</p>');
+    }).join('');
+    facEl.addEventListener('click', function (e) {
+      var b = e.target.closest('.fac');
+      if (b) facSheet(+b.dataset.f);
+    });
+    facEl.addEventListener('keydown', function (e) {
+      var b = e.target.closest('.fac');
+      if (b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); facSheet(+b.dataset.f); }
+    });
+  }
+
   /* ---------- Tabs ---------- */
   var tabs = document.querySelectorAll('.tabs [data-tab]');
   var panels = document.querySelectorAll('.panel');
