@@ -429,3 +429,44 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .act-sources .chip { width: 7.5rem; flex: none; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .act-sources li { align-items: center; }
 @media (max-width: 480px) { .act-sources .chip { width: 6.5rem; } }
+
+/* Org chart */
+.org { max-width: 900px; }
+.orgchart { display: flex; flex-direction: column; align-items: stretch; padding: .5rem 0 1rem; }
+.org-level { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 1rem; position: relative; }
+/* connectors: a gap between levels with a horizontal bar in its middle;
+   each node above drops a line to the bar, each node below rises from it */
+.org-link { height: 2.4rem; }
+.org-level:not(.org-top)::before,
+.org-level:not(:last-child)::after {
+  content: ""; position: absolute; inset-inline: calc(50% / var(--n)); border-top: 2px solid var(--line);
+}
+.org-level:not(.org-top)::before { top: -1.2rem; }
+.org-level:not(:last-child)::after { bottom: -1.2rem; }
+.org-level:not(.org-top) .org-node::before,
+.org-level:not(:last-child) .org-node::after {
+  content: ""; position: absolute; left: 50%; height: 1.2rem; border-left: 2px solid var(--line);
+}
+.org-level:not(.org-top) .org-node::before { top: -1.2rem; }
+.org-level:not(:last-child) .org-node::after { bottom: -1.2rem; }
+.org-node {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: .2rem; text-align: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 1rem .6rem .7rem;
+}
+.org-top .org-node { border: 2px solid var(--accent); box-shadow: 0 6px 18px rgba(20,60,30,.10); }
+.org-avatar {
+  width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center;
+  background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-weight: 900; font-size: 1.4rem;
+}
+.org-top .org-avatar { background: var(--accent); color: #fff; width: 62px; height: 62px; font-size: 1.6rem; }
+@media (prefers-color-scheme: dark) { .org-top .org-avatar { color: #0f1a14; } }
+.org-name { font-weight: 900; font-size: 1.1rem; line-height: 1.5; }
+.org-role { color: var(--warm); font-size: .85rem; }
+.org-node .info-btn { width: 34px; height: 34px; margin-top: .2rem; }
+@media (max-width: 480px) {
+  .org-level { gap: .5rem; }
+  .org-node { padding: .8rem .3rem .6rem; }
+  .org-avatar { width: 42px; height: 42px; font-size: 1.1rem; }
+  .org-top .org-avatar { width: 48px; height: 48px; font-size: 1.25rem; }
+  .org-name { font-size: .95rem; }
+}

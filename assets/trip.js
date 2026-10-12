@@ -2,7 +2,6 @@
   var T = window.TRIP || {};
   var islands = T.islands || [];
   var others = T.participants || [];
-  var roles = T.roles || [];
   // Islands and other participants share one list so popups and activity chips can refer to either
   var all = islands.map(function (x) { return Object.assign({ kind: 'island' }, x); })
     .concat(others.map(function (x) { return Object.assign({ kind: 'other' }, x); }));
@@ -140,24 +139,27 @@
     if (b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); islandSheet(+b.dataset.i); }
   });
 
-  /* ---------- Roles (org structure) ---------- */
+  /* ---------- Org chart: levels of people, top level first ---------- */
+  var levels = (T.org || []).filter(function (l) { return (l.people || []).length; });
   var flatRoles = [];
-  function roleNode(r) {
-    var id = flatRoles.push(r) - 1;
-    var kids = r.team || [];
-    return '<li><div class="node">' +
-      '<div class="node-text"><span class="node-role">' + esc(r.role) + '</span>' +
-      '<span class="node-name">' + (r.name ? esc(r.name) : '—') + '</span></div>' +
-      '<button class="info-btn" data-r="' + id + '" aria-label="ޒިންމާތައް">' + ICON.info + '</button>' +
-      '</div>' + (kids.length ? '<ul>' + kids.map(roleNode).join('') + '</ul>' : '') + '</li>';
-  }
   var org = document.getElementById('org');
-  org.innerHTML = roles.length ? '<ul class="tree">' + roles.map(roleNode).join('') + '</ul>' : '<p class="none">' + EMPTY + '</p>';
+  org.innerHTML = levels.length ? '<div class="orgchart">' + levels.map(function (l, li) {
+    return (li ? '<div class="org-link" aria-hidden="true"></div>' : '') +
+      '<div class="org-level' + (li ? '' : ' org-top') + '" style="--n:' + l.people.length + '">' + l.people.map(function (p) {
+        var id = flatRoles.push(p) - 1;
+        return '<div class="org-node">' +
+          '<span class="org-avatar">' + (p.name ? esc(p.name.charAt(0)) : ICON.user) + '</span>' +
+          '<span class="org-name">' + (p.name ? esc(p.name) : '—') + '</span>' +
+          (p.role ? '<span class="org-role">' + esc(p.role) + '</span>' : '') +
+          '<button class="info-btn" data-r="' + id + '" aria-label="ޒިންމާތައް">' + ICON.info + '</button>' +
+          '</div>';
+      }).join('') + '</div>';
+  }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';
   org.addEventListener('click', function (e) {
     var b = e.target.closest('.info-btn');
     if (!b) return;
     var r = flatRoles[+b.dataset.r];
-    openSheet('<p class="sheet-kicker">' + esc(r.role) + '</p><h2>' + (r.name ? esc(r.name) : '—') + '</h2>' +
+    openSheet((r.role ? '<p class="sheet-kicker">' + esc(r.role) + '</p>' : '') + '<h2>' + (r.name ? esc(r.name) : '—') + '</h2>' +
       '<h3>ޒިންމާތައް</h3>' + list(r.responsibilities));
   });
 

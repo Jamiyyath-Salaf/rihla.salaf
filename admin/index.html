@@ -362,43 +362,32 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
         fields: function (it, b, r) { placeFields(it, b, r, true); } });
     } },
     roles: { label: 'ޒިންމާތައް', render: function () {
-      data.roles = data.roles || [];
+      data.org = data.org || [];
       var box = el('div');
-      function renderRoles() { box.innerHTML = ''; box.appendChild(roleList(data.roles, 0)); }
-      function roleList(arr, depth) {
-        var wrap = el('div');
-        arr.forEach(function (r, i) {
-          r.team = r.team || []; r.responsibilities = r.responsibilities || [];
-          var title = el('span', { class: 'item-title', text: (r.role || '—') });
-          var sub = el('span', { class: 'item-sub', text: r.name || '' });
-          var d = el('details', { class: 'item' }, [el('summary', null, [title, sub])]);
-          var body = el('div', { class: 'item-body' });
-          var refresh = function () { title.textContent = r.role || '—'; sub.textContent = r.name || ''; };
-          body.appendChild(el('div', { class: 'grid2' }, [
-            textField(r, 'role', 'މަޤާމް', { onchange: refresh }), textField(r, 'name', 'ނަން', { onchange: refresh })
-          ]));
-          body.appendChild(listField(r, 'responsibilities', 'ޒިންމާތައް'));
-          body.appendChild(el('div', { class: 'item-tools' }, [
-            el('button', { class: 'btn btn-add btn-small', type: 'button', text: '+ މީނާގެ ދަށުން މީހަކު', onclick: function () {
-              r.team.push({ role: '', name: '', responsibilities: [] }); markDirty(); renderRoles();
-            } }),
-            el('button', { class: 'btn btn-del btn-small', type: 'button', text: 'ފޮހެލާ', onclick: function () {
-              if (confirm('"' + (r.role || '') + '" ފޮހެލަންވީތަ؟ (މީނާގެ ދަށުގައިވާ މީހުން ވެސް ފޮހެވޭނެ)')) { arr.splice(i, 1); markDirty(); renderRoles(); }
-            } })
-          ]));
-          d.appendChild(body);
-          wrap.appendChild(d);
-          if (r.team.length) wrap.appendChild(el('div', { class: 'role-children' }, [roleList(r.team, depth + 1)]));
+      function renderOrg() {
+        box.innerHTML = '';
+        data.org.forEach(function (lvl, li) {
+          lvl.people = lvl.people || [];
+          var list = itemList(lvl.people, { heading: 'ލެވެލް ' + (li + 1) + (li === 0 ? ' (އެންމެ މަތީ)' : ''), addLabel: 'މީހަކު', titleKey: 'name',
+            sub: function (p) { return p.role || ''; },
+            blank: function () { return { name: '', role: '', responsibilities: [] }; },
+            fields: function (p, b, r) {
+              b.appendChild(el('div', { class: 'grid2' }, [textField(p, 'name', 'ނަން', { onchange: r }), textField(p, 'role', 'މަޤާމް (ބޭނުންނަމަ)', { onchange: r })]));
+              b.appendChild(listField(p, 'responsibilities', 'ޒިންމާތައް'));
+            } });
+          var del = el('button', { class: 'btn btn-del btn-small', type: 'button', text: 'މި ލެވެލް ފޮހެލާ', onclick: function () {
+            if (confirm('ލެވެލް ' + (li + 1) + ' އާއި އޭގައިވާ ހުރިހާ މީހުން ފޮހެލަންވީތަ؟')) { data.org.splice(li, 1); markDirty(); renderOrg(); }
+          } });
+          box.appendChild(el('fieldset', { style: 'margin-bottom:1rem' }, [list, el('div', { class: 'item-tools' }, [del])]));
         });
-        return wrap;
       }
-      renderRoles();
+      renderOrg();
       return el('div', null, [
         el('div', { class: 'section-head' }, [el('h2', { text: 'ޒިންމާތައް' }),
-          el('button', { class: 'btn btn-add btn-small', type: 'button', text: '+ މައި މަޤާމެއް', onclick: function () {
-            data.roles.push({ role: '', name: '', responsibilities: [], team: [] }); markDirty(); renderRoles();
+          el('button', { class: 'btn btn-add btn-small', type: 'button', text: '+ ލެވެލެއް', onclick: function () {
+            data.org.push({ people: [] }); markDirty(); renderOrg();
           } })]),
-        el('p', { class: 'hint', text: 'ކޮންމެ މީހެއްގެ ދަށުގައި މީހުން އިތުރުކުރުމަށް "+ މީނާގެ ދަށުން މީހަކު" އަށް ފިއްތަވާ.' }),
+        el('p', { class: 'hint', text: 'ލެވެލް 1 ދައްކާނީ އެންމެ މަތީގައި، ދެން ތިރިއަށް.' }),
         box
       ]);
     } },
