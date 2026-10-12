@@ -487,3 +487,23 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .note-body { flex: 1; min-width: 0; line-height: 1.8; }
 .note-sub { color: var(--muted); font-size: .92rem; padding-right: 1rem; position: relative; }
 .note-sub::before { content: "–"; position: absolute; right: 0; }
+
+/* Compact meeting cards */
+.meeting-list { max-width: 760px; margin-inline: auto; display: grid; gap: .6rem; }
+.mcard {
+  display: flex; align-items: center; gap: .9rem; text-align: right; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: .8rem 1rem;
+  transition: border-color .15s, transform .15s;
+}
+.mcard:hover, .mcard:focus-visible { border-color: var(--accent); transform: translateY(-2px); outline: none; }
+.mcard.is-upcoming { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
+.mcard-n {
+  flex: none; width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center;
+  background: var(--accent); color: #fff; font-family: system-ui, sans-serif; font-weight: 800; font-size: 1.3rem;
+}
+@media (prefers-color-scheme: dark) { .mcard-n { color: #0f1a14; } }
+.mcard-info { flex: 1; min-width: 0; }
+.mcard-title { font-weight: 900; font-size: 1.1rem; }
+.mcard-go { color: var(--muted); font-size: 1.6rem; font-family: system-ui, sans-serif; line-height: 1; }
+.sheet .att-none { margin: .2rem 0; }
+.nowrap { white-space: nowrap; }

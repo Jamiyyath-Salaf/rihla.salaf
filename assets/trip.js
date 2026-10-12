@@ -356,32 +356,48 @@
   var mtEl = document.getElementById('meetings');
   if (mtEl) {
     var members = T.members || [];
-    var meetings = (T.meetings || []).slice().sort(function (a, b) { return (b.date || '') < (a.date || '') ? -1 : 1; });
+    // number meetings in date order (1 = first), list newest first
+    var meetings = (T.meetings || []).slice().sort(function (a, b) { return (a.date || '') < (b.date || '') ? -1 : 1; })
+      .map(function (m, i) { return Object.assign({ _n: i + 1 }, m); }).reverse();
     var PLACE = '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
-    mtEl.innerHTML = meetings.length ? '<div class="task-list">' + meetings.map(function (m) {
+    function when(m) {
+      return m.date ? dvDay(m.date) + dvDate(m.date) + (m.time ? ' <span class="nowrap">· <span dir="ltr">' + esc(m.time) + '</span></span>' : '') : (m.time ? '<span dir="ltr">' + esc(m.time) + '</span>' : '');
+    }
+    function attendance(m) {
       var att = m.attended || [];
-      var upcoming = m.date && m.date >= today;
-      // everyone on the member list, plus anyone ticked who is no longer on it
       var names = members.concat(att.filter(function (a) { return members.indexOf(a) < 0; }));
+      if (m.date && m.date >= today) return '';
+      if (!att.length) return '<h3>ހާޒިރީ</h3><p class="att-none">ހާޒިރީ ނަގާފައެއް ނުވޭ</p>';
       var pct = names.length ? Math.round(att.length / names.length * 100) : 0;
-      return '<div class="meeting' + (upcoming ? ' is-upcoming' : '') + '">' +
-        '<div class="meeting-head">' +
-          '<div class="meeting-date"><b>' + (m.date ? +m.date.slice(8, 10) : '—') + '</b><span>' + (m.date ? MONTHS[+m.date.slice(5, 7) - 1] : '') + '</span></div>' +
-          '<div class="meeting-info"><div class="task-title">' + esc(m.title || 'ބައްދަލުވުން') + (upcoming ? ' <span class="up-tag">ކުރިއަށް</span>' : '') + '</div>' +
-            '<div class="task-meta">' + (m.date ? '<span>' + ICON.clock + dvDay(m.date) + dvDate(m.date) + (m.time ? ' · <span dir="ltr">' + esc(m.time) + '</span>' : '') + '</span>' : '') +
-            (m.place ? '<span>' + PLACE + esc(m.place) + '</span>' : '') + '</div></div>' +
-          (upcoming || !att.length ? '' : '<div class="att-count"><span class="att-num" dir="ltr"><b>' + att.length + '</b>/' + names.length + '</span><span>ހާޒިރު</span></div>') +
-        '</div>' +
-        (!upcoming && !att.length ? '<p class="att-none">ހާޒިރީ ނަގާފައެއް ނުވޭ</p>' : '') +
-        (upcoming || !att.length ? '' : '<div class="att-bar"><i style="width:' + pct + '%"></i></div>' +
-          '<div class="att-chips">' + names.map(function (n) {
-            var here = att.indexOf(n) >= 0;
-            return '<span class="att' + (here ? ' here' : '') + '">' + (here ? '✓ ' : '') + esc(n) + '</span>';
-          }).join('') + '</div>') +
-        (m.details ? notes(m.details) : '') +
-        (m.image ? '<a class="meeting-img" href="' + esc((window.SITE_BASE || '') + '/' + m.image) + '" target="_blank" rel="noopener"><img src="' + esc((window.SITE_BASE || '') + '/' + m.image) + '" alt="" loading="lazy"><span>ބޮޑުކޮށް ބަލާ ↗</span></a>' : '') +
-        '</div>';
+      return '<h3>ހާޒިރީ · <span dir="ltr">' + att.length + '/' + names.length + '</span></h3>' +
+        '<div class="att-bar"><i style="width:' + pct + '%"></i></div>' +
+        '<div class="att-chips" style="margin-top:.5rem">' + names.map(function (n) {
+          var here = att.indexOf(n) >= 0;
+          return '<span class="att' + (here ? ' here' : '') + '">' + (here ? '✓ ' : '') + esc(n) + '</span>';
+        }).join('') + '</div>';
+    }
+    mtEl.innerHTML = meetings.length ? '<div class="meeting-list">' + meetings.map(function (m, i) {
+      var upcoming = m.date && m.date >= today;
+      return '<div class="mcard' + (upcoming ? ' is-upcoming' : '') + '" role="button" tabindex="0" data-m="' + i + '">' +
+        '<span class="mcard-n">' + m._n + '</span>' +
+        '<div class="mcard-info"><div class="mcard-title">ބައްދަލުވުން ' + m._n + (upcoming ? ' <span class="up-tag">ކުރިއަށް</span>' : '') + '</div>' +
+          '<div class="task-meta"><span>' + ICON.clock + when(m) + '</span>' +
+          (m.place ? '<span>' + PLACE + esc(m.place) + '</span>' : '') + '</div></div>' +
+        '<span class="mcard-go">‹</span></div>';
     }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';
+    function meetingSheet(i) {
+      var m = meetings[i];
+      openSheet('<p class="sheet-kicker">ބައްދަލުވުން ' + m._n + '</p>' +
+        '<h2>' + (m.title ? esc(m.title) : 'ބައްދަލުވުން ' + m._n) + '</h2>' +
+        '<div class="task-meta" style="margin-bottom:.6rem"><span>' + ICON.clock + when(m) + '</span>' + (m.place ? '<span>' + PLACE + esc(m.place) + '</span>' : '') + '</div>' +
+        (m.details ? notes(m.details) : '<p class="none">' + EMPTY + '</p>') +
+        attendance(m));
+    }
+    mtEl.addEventListener('click', function (e) { var c = e.target.closest('.mcard'); if (c) meetingSheet(+c.dataset.m); });
+    mtEl.addEventListener('keydown', function (e) {
+      var c = e.target.closest('.mcard');
+      if (c && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); meetingSheet(+c.dataset.m); }
+    });
   }
 
   /* ---------- Sponsors + gifts ---------- */
