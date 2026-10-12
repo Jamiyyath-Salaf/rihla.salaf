@@ -291,6 +291,11 @@
 
   /* ---------- Tasks ---------- */
   var MONTHS = ['ޖަނަވަރީ', 'ފެބްރުއަރީ', 'މާރިޗު', 'އޭޕްރީލް', 'މެއި', 'ޖޫން', 'ޖުލައި', 'އޮގަސްޓު', 'ސެޕްޓެމްބަރު', 'އޮކްޓޫބަރު', 'ނޮވެންބަރު', 'ޑިސެމްބަރު'];
+  var DAYS = ['އާދިއްތަ', 'ހޯމަ', 'އަންގާރަ', 'ބުދަ', 'ބުރާސްފަތި', 'ހުކުރު', 'ހޮނިހިރު'];
+  function dvDay(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
+    return m ? DAYS[new Date(+m[1], +m[2] - 1, +m[3]).getDay()] + '، ' : '';
+  }
   function dvDate(iso) {
     var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
     return m ? (+m[3]) + ' ' + MONTHS[+m[2] - 1] + ' ' + m[1] : esc(iso || '');
@@ -343,16 +348,18 @@
         '<div class="meeting-head">' +
           '<div class="meeting-date"><b>' + (m.date ? +m.date.slice(8, 10) : '—') + '</b><span>' + (m.date ? MONTHS[+m.date.slice(5, 7) - 1] : '') + '</span></div>' +
           '<div class="meeting-info"><div class="task-title">' + esc(m.title || 'ބައްދަލުވުން') + (upcoming ? ' <span class="up-tag">ކުރިއަށް</span>' : '') + '</div>' +
-            '<div class="task-meta">' + (m.date ? '<span>' + ICON.clock + dvDate(m.date) + (m.time ? ' · <span dir="ltr">' + esc(m.time) + '</span>' : '') + '</span>' : '') +
+            '<div class="task-meta">' + (m.date ? '<span>' + ICON.clock + dvDay(m.date) + dvDate(m.date) + (m.time ? ' · <span dir="ltr">' + esc(m.time) + '</span>' : '') + '</span>' : '') +
             (m.place ? '<span>' + PLACE + esc(m.place) + '</span>' : '') + '</div></div>' +
-          (upcoming ? '' : '<div class="att-count"><span class="att-num" dir="ltr"><b>' + att.length + '</b>/' + names.length + '</span><span>ހާޒިރު</span></div>') +
+          (upcoming || !att.length ? '' : '<div class="att-count"><span class="att-num" dir="ltr"><b>' + att.length + '</b>/' + names.length + '</span><span>ހާޒިރު</span></div>') +
         '</div>' +
-        (upcoming ? '' : '<div class="att-bar"><i style="width:' + pct + '%"></i></div>' +
+        (!upcoming && !att.length ? '<p class="att-none">ހާޒިރީ ނަގާފައެއް ނުވޭ</p>' : '') +
+        (upcoming || !att.length ? '' : '<div class="att-bar"><i style="width:' + pct + '%"></i></div>' +
           '<div class="att-chips">' + names.map(function (n) {
             var here = att.indexOf(n) >= 0;
             return '<span class="att' + (here ? ' here' : '') + '">' + (here ? '✓ ' : '') + esc(n) + '</span>';
           }).join('') + '</div>') +
         (m.details ? '<p class="task-details">' + esc(m.details).replace(/\n/g, '<br>') + '</p>' : '') +
+        (m.image ? '<a class="meeting-img" href="' + esc((window.SITE_BASE || '') + '/' + m.image) + '" target="_blank" rel="noopener"><img src="' + esc((window.SITE_BASE || '') + '/' + m.image) + '" alt="" loading="lazy"><span>ބޮޑުކޮށް ބަލާ ↗</span></a>' : '') +
         '</div>';
     }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';
   }
