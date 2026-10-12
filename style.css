@@ -572,3 +572,4 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .pdf-doc .p-table { font-size: 12px; line-height: 1.6; }
 .pdf-doc .p-table td { padding: 3px 8px; }
 .pdf-doc .p-table th { padding: 4px 8px; }
+.org-node .info-btn { margin-top: auto; } .org-node .org-role { margin-bottom: .3rem; line-height: 1.6; }
