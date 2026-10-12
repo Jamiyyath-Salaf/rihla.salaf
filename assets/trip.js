@@ -198,7 +198,7 @@
   /* ---------- Print: activities by island, then by activity ---------- */
   var printBtn = document.createElement('div');
   printBtn.className = 'print-bar';
-  printBtn.innerHTML = '<button type="button" class="print-btn"><svg class="icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg><span>ޕްރިންޓް</span></button>';
+  printBtn.innerHTML = '<button type="button" class="print-btn"><svg class="icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg><span>ޑައުންލޯޑް (PDF)</span></button>';
   actEl.insertBefore(printBtn, actEl.firstChild);
   printBtn.querySelector('button').addEventListener('click', function () {
     var title = (document.querySelector('.event h1') || {}).textContent || '';
@@ -206,36 +206,74 @@
     var logo = document.querySelector('link[rel="icon"]');
     var islandsOnly = all.filter(function (x) { return x.kind === 'island'; });
     var others = all.filter(function (x) { return x.kind !== 'island'; });
+    function num(v) { return '<span class="p-num">' + v + '</span>'; }
     function block(x, n) {
       var acts = x.activities || [];
       return '<section class="p-island"><h3>' + (n ? '<span class="p-n">' + n + '</span>' : '') + (x.kind === 'island' ? 'ބ. ' : '') + esc(x.name) +
-        (x.focal ? '<small>' + esc(x.focal) + (x.phone ? ' · <span dir="ltr">' + esc(x.phone) + '</span>' : '') + '</small>' : '') + '</h3>' +
+        (x.focal ? '<small>' + esc(x.focal) + (x.phone ? ' · ' + num(esc(x.phone)) : '') + '</small>' : '') + '</h3>' +
         (x.pending ? '<p class="p-pending">ހަރަކާތްތައް އަދި ނުލިބޭ</p>'
-          : acts.length ? '<ol>' + acts.map(function (a) { return '<li>' + esc(a) + '</li>'; }).join('') + '</ol>' : '<p class="p-pending">—</p>') +
+          : acts.length ? '<div class="p-list">' + acts.map(function (a, k) { return '<div class="p-row"><span class="p-k">' + (k + 1) + '.</span><span>' + esc(a) + '</span></div>'; }).join('') + '</div>' : '<p class="p-pending">—</p>') +
         '</section>';
     }
     var totalActs = all.reduce(function (n, x) { return n + (x.activities || []).length; }, 0);
     var html =
       '<header class="p-head">' + (logo ? '<img src="' + logo.href + '" alt="">' : '') +
-        '<div><h1>' + esc(title) + '</h1><p>' + esc(sub) + '</p></div></header>' +
-      '<h2>1. ރަށްތަކުން އެދިފައިވާ ހަރަކާތްތައް</h2>' +
-      '<p class="p-sum">' + islandsOnly.length + ' ރަށް · ' + totalActs + ' ހަރަކާތް</p>' +
+        '<div><h1>' + esc(title).replace(/(\d+)/g, num('$1')) + '</h1><p>' + esc(sub).replace(/(\d+)/g, num('$1')) + '</p></div></header>' +
+      '<h2>' + num('1.') + ' ރަށްތަކުން އެދިފައިވާ ހަރަކާތްތައް</h2>' +
+      '<p class="p-sum">' + num(islandsOnly.length) + ' ރަށް · ' + num(totalActs) + ' ހަރަކާތް</p>' +
       '<div class="p-grid">' + islandsOnly.map(function (x, i) { return block(x, i + 1); }).join('') + '</div>' +
       (others.length ? '<h2 class="p-sub">އެހެނިހެން ބައިވެރިން</h2><div class="p-grid">' + others.map(function (x) { return block(x); }).join('') + '</div>' : '') +
-      '<h2 class="p-break">2. ހަރަކާތްތަކަށް އެދިފައިވާ ރަށްތައް</h2>' +
-      '<p class="p-sum">' + actNames.length + ' ހަރަކާތް · ބޮޑު އަދަދަކުން އެދިފައިވާ ހަރަކާތްތައް މަތީގައި</p>' +
+      '<div class="html2pdf__page-break"></div><h2 class="p-break">' + num('2.') + ' ހަރަކާތްތަކަށް އެދިފައިވާ ރަށްތައް</h2>' +
+      '<p class="p-sum">' + num(actNames.length) + ' ހަރަކާތް · ބޮޑު އަދަދަކުން އެދިފައިވާ ހަރަކާތްތައް މަތީގައި</p>' +
       '<table class="p-table"><thead><tr><th>#</th><th>ހަރަކާތް</th><th>އަދަދު</th><th>ރަށްތައް</th></tr></thead><tbody>' +
       actNames.map(function (a, i) {
         var who = uniq(acts[a]);
         return '<tr><td>' + (i + 1) + '</td><td>' + esc(a) + '</td><td class="p-c">' + who.length + '</td><td>' +
           who.map(function (k) { return esc(all[k].name); }).join('، ') + '</td></tr>';
       }).join('') + '</tbody></table>' +
-      '<p class="p-foot">ޕްރިންޓްކުރި ތާރީޚު: ' + dvDate(today) + '</p>';
-    var area = document.getElementById('print-area') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'print-area' }));
-    area.innerHTML = html;
-    var imgs = area.querySelectorAll('img'), left = imgs.length;
-    function go() { window.print(); }
-    if (!left) go(); else imgs.forEach(function (im) { if (im.complete) { if (!--left) go(); } else im.onload = im.onerror = function () { if (!--left) go(); }; });
+      '<p class="p-foot">ތައްޔާރުކުރި ތާރީޚު: ' + dvDate(today).replace(/(\d+)/g, num('$1')) + '</p>';
+    var btn = printBtn.querySelector('button'), label = btn.querySelector('span');
+    var doc = document.createElement('div');
+    doc.className = 'pdf-doc';
+    doc.innerHTML = html;
+    // The PDF engine loses spaces between right-to-left words, so give every word its own box
+    (function wordify(root) {
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
+      while (walker.nextNode()) if (/\S\s+\S/.test(walker.currentNode.nodeValue)) nodes.push(walker.currentNode);
+      nodes.forEach(function (n) {
+        var frag = document.createDocumentFragment();
+        n.nodeValue.split(/\s+/).forEach(function (w, i, arr) {
+          if (!w) return;
+          // right-to-left marks keep brackets and commas on the correct side
+          var sp = document.createElement('span'); sp.className = 'w'; sp.textContent = /[\u0780-\u07BF]/.test(w) ? '\u200F' + w + '\u200F' : w; frag.appendChild(sp);
+          if (i < arr.length - 1) frag.appendChild(document.createTextNode(' '));
+        });
+        n.parentNode.replaceChild(frag, n);
+      });
+    })(doc);
+    function save() {
+      label.textContent = 'ތައްޔާރުކުރަނީ...'; btn.disabled = true;
+      document.fonts.ready.then(function () {
+        return window.html2pdf().set({
+          margin: [10, 10, 12, 10],
+          filename: (title || 'activities').trim() + ' - ހަރަކާތްތައް.pdf',
+          image: { type: 'jpeg', quality: 0.95 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['css', 'legacy'], avoid: ['.p-island', 'tr', '.p-head'] }
+        }).from(doc).save();
+      }).catch(function () { alert('PDF ހެދިއެއް ނުދިޔައީ. އަލުން މަސައްކަތްކުރައްވާ.'); })
+        .then(function () { label.textContent = 'ޑައުންލޯޑް (PDF)'; btn.disabled = false; });
+    }
+    if (window.html2pdf) save();
+    else {
+      label.textContent = 'ތައްޔާރުކުރަނީ...';
+      var sc = document.createElement('script');
+      sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+      sc.onload = save;
+      sc.onerror = function () { label.textContent = 'ޑައުންލޯޑް (PDF)'; alert('PDF ހެދިއެއް ނުދިޔައީ. އިންޓަނެޓް ޗެކްކުރައްވާ.'); };
+      document.head.appendChild(sc);
+    }
   });
 
   function actSheet(n) {

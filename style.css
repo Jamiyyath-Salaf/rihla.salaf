@@ -531,34 +531,32 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
   border-radius: 999px; padding: .3rem 1rem;
 }
 .print-btn:hover { background: var(--accent); color: var(--surface); }
-#print-area { display: none; }
-
-/* Printed document */
-@media print {
-  @page { size: A4; margin: 14mm 12mm; }
-  body { background: #fff !important; color: #000; font-size: 11.5pt; line-height: 1.75; }
-  body > *:not(#print-area) { display: none !important; }
-  #print-area { display: block; direction: rtl; text-align: right; }
-  #print-area h1 { font-size: 18pt; margin: 0; font-weight: 900; }
-  #print-area h2 { font-size: 14pt; font-weight: 900; margin: 6mm 0 1mm; color: #1f7a35; }
-  #print-area .p-break { break-before: page; margin-top: 0; }
-  .p-head { display: flex; align-items: center; gap: 4mm; border-bottom: 2px solid #1f7a35; padding-bottom: 3mm; }
-  .p-head img { width: 18mm; height: auto; }
-  .p-head p { margin: 0; color: #444; }
-  .p-sum { margin: 0 0 3mm; color: #555; font-size: 10pt; }
-  .p-grid { columns: 2; column-gap: 8mm; }
-  .p-island { break-inside: avoid; margin: 0 0 4mm; border: 1px solid #ccc; border-radius: 3mm; padding: 2mm 3mm; }
-  .p-island h3 { margin: 0 0 1mm; font-size: 12pt; font-weight: 900; display: flex; align-items: baseline; gap: 2mm; flex-wrap: wrap; }
-  .p-island h3 small { font-weight: 400; font-size: 9pt; color: #555; }
-  .p-n { display: inline-block; min-width: 6mm; text-align: center; background: #1f7a35; color: #fff; border-radius: 1.5mm; font-family: system-ui, sans-serif; font-size: 9pt; }
-  .p-island ol { margin: 0; padding-right: 5mm; }
-  .p-island li { margin: .3mm 0; }
-  .p-pending { margin: 0; color: #b5701c; font-weight: 700; }
-  .p-table { width: 100%; border-collapse: collapse; font-size: 10.5pt; }
-  .p-table th { background: #1f7a35; color: #fff; padding: 1.5mm 2mm; text-align: right; }
-  .p-table td { border-bottom: 1px solid #ddd; padding: 1.5mm 2mm; vertical-align: top; }
-  .p-table tr { break-inside: avoid; }
-  .p-table td:first-child, .p-c { text-align: center; font-family: system-ui, sans-serif; white-space: nowrap; }
-  .p-c { font-weight: 700; color: #1f7a35; }
-  .p-foot { margin-top: 6mm; color: #777; font-size: 9pt; }
-}
+/* Downloadable PDF document (rendered off to the side, then saved) */
+.pdf-doc { width: 190mm; direction: rtl; text-align: right; background: #fff; color: #000; font-family: "MV Funa", Faruma, sans-serif; font-size: 12.5px; line-height: 1.75; }
+.pdf-doc h1 { font-size: 22px; margin: 0; font-weight: 900; }
+.pdf-doc h2 { font-size: 17px; font-weight: 900; margin: 18px 0 2px; color: #1f7a35; }
+.pdf-doc .p-break { margin-top: 0; }
+.pdf-doc .p-head { display: flex; align-items: center; gap: 14px; border-bottom: 2px solid #1f7a35; padding-bottom: 10px; }
+.pdf-doc .p-head img { width: 64px; height: auto; }
+.pdf-doc .p-head p { margin: 0; color: #444; }
+.pdf-doc .p-sum { margin: 0 0 10px; color: #555; font-size: 11.5px; }
+.pdf-doc .p-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 14px; align-items: start; }
+.pdf-doc * { overflow-wrap: anywhere; }
+.pdf-doc .p-num { display: inline-block; direction: ltr; font-family: system-ui, sans-serif; margin: 0 5px; }
+.pdf-doc .p-list { display: grid; gap: 1px; }
+.pdf-doc .p-row { display: flex; gap: 5px; align-items: baseline; }
+.pdf-doc .p-k { flex: none; min-width: 18px; color: #1f7a35; font-family: system-ui, sans-serif; font-size: 11px; direction: ltr; text-align: left; }
+.pdf-doc .p-island { border: 1px solid #ccc; border-radius: 8px; padding: 6px 10px; }
+.pdf-doc .p-island h3 { margin: 0 0 2px; font-size: 14.5px; font-weight: 900; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.pdf-doc .p-island h3 small { font-weight: 400; font-size: 11px; color: #555; }
+.pdf-doc .p-n { display: inline-block; min-width: 22px; text-align: center; background: #1f7a35; color: #fff; border-radius: 5px; font-family: system-ui, sans-serif; font-size: 11px; }
+.pdf-doc .p-island ol { margin: 0; padding-right: 18px; }
+.pdf-doc .p-pending { margin: 0; color: #b5701c; font-weight: 700; }
+.pdf-doc .p-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.pdf-doc .p-table th { background: #1f7a35; color: #fff; padding: 5px 8px; text-align: right; }
+.pdf-doc .p-table td { border-bottom: 1px solid #ddd; padding: 5px 8px; vertical-align: top; }
+.pdf-doc .p-table td:first-child, .pdf-doc .p-c { text-align: center; font-family: system-ui, sans-serif; white-space: nowrap; }
+.pdf-doc .p-c { font-weight: 700; color: #1f7a35; }
+.pdf-doc .p-foot { margin-top: 16px; color: #777; font-size: 11px; }
+.print-btn:disabled { opacity: .6; cursor: wait; }
+.pdf-doc .w { display: inline-block; }
