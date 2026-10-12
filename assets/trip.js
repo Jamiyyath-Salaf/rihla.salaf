@@ -201,6 +201,7 @@
 
   function inMale(p) { return !(p.route || []).length; }
   function routeChain(p) {
+    if (inMale(p) && !p.island) return '<span class="route-chip">—</span>';
     if (inMale(p)) return '<span class="route-chip route-male">މާލޭގައި</span>';
     return '<span class="route-chain">' + p.route.map(function (r) { return '<span>' + esc(r) + '</span>'; }).join('<i>←</i>') + '</span>';
   }
@@ -210,6 +211,7 @@
         '<div class="fac-id"><span class="fac-name">' + (p.name ? esc(p.name) : '—') + '</span>' +
         (p.island ? '<span class="fac-island">' + PIN + esc(p.island) + '</span>' : '') + '</div></div>' +
       '<div class="fac-route"><span class="fac-label">ދަތުރުގެ މަގު</span>' + routeChain(p) + '</div>' +
+      (p.phone ? '<a class="call fac-call" href="tel:' + esc(String(p.phone).replace(/\s/g, '')) + '">' + ICON.phone + '<span dir="ltr">' + esc(p.phone) + '</span></a>' : '') +
       '<div class="island-stats">' +
         stat(ICON.list, (p.activities || []).length, 'ހަރަކާތް') +
         stat(WORKSHOP, (p.workshops || []).length, 'ވޯކްޝޮޕް') +
@@ -222,8 +224,9 @@
     h += '<div>' + PIN + '<span class="lbl">ރަށް</span><strong>' + (p.island ? esc(p.island) : '—') + '</strong></div>';
     if (p.phone) h += '<div>' + ICON.phone + '<span class="lbl">ނަންބަރު</span><a href="tel:' + esc(String(p.phone).replace(/\s/g, '')) + '" dir="ltr"><strong>' + esc(p.phone) + '</strong></a></div>';
     h += '</div>';
+    if (p.email) h = h.replace(/<\/div>$/, '') + '<div>' + ICON.mail + '<span class="lbl">އީމެއިލް</span><a href="mailto:' + esc(p.email) + '" dir="ltr"><strong>' + esc(p.email) + '</strong></a></div></div>';
     h += '<h3>ދަތުރުގެ މަގު</h3>';
-    h += inMale(p)
+    h += inMale(p) && !p.island ? '<p class="none">' + EMPTY + '</p>' : inMale(p)
       ? '<p><span class="route-chip route-male">މާލޭގައި</span></p>'
       : '<ol class="route-steps">' + p.route.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ol>';
     h += '<h3>ކުރެވޭނެ ހަރަކާތްތައް</h3>' + list(p.activities);
@@ -241,6 +244,7 @@
         (cards ? '<div class="fac-cards">' + cards + '</div>' : '<p class="none">' + EMPTY + '</p>');
     }).join('');
     facEl.addEventListener('click', function (e) {
+      if (e.target.closest('.call')) return;
       var b = e.target.closest('.fac');
       if (b) facSheet(+b.dataset.f);
     });

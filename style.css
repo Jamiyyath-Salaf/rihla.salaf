@@ -321,3 +321,4 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .event .updates { max-width: 680px; }
 .org, #activity-list { max-width: 760px; margin-inline: auto; }
 .fac-route .route-chip { align-self: flex-start; }
+.fac-call { margin: 0 1.1rem .8rem; }
