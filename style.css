@@ -424,3 +424,8 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .tag-list { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .3rem; }
 .tag-list span { background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: .05rem .7rem; font-size: .9rem; }
 .side-by-side > div:last-child .tag-list span { background: color-mix(in srgb, var(--warm) 12%, transparent); border-color: transparent; }
+
+/* Activity popup: equal-width island tags so the wording lines up */
+.act-sources .chip { width: 7.5rem; flex: none; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.act-sources li { align-items: center; }
+@media (max-width: 480px) { .act-sources .chip { width: 6.5rem; } }
