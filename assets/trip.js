@@ -7,6 +7,9 @@
   var ICON = {
     user: '<svg class="icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/></svg>',
     phone: '<svg class="icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></svg>',
+    list: '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 10h6M9 14h6M9 18h4"/></svg>',
+    team: '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c2 .7 3.2 2.5 3.6 5.2"/></svg>',
+    clock: '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
     info: '<svg class="icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>'
   };
 
@@ -80,19 +83,38 @@
   }
 
   var grid = document.getElementById('island-grid');
-  grid.innerHTML = islands.map(function (isl, i) {
-    var n = (isl.activities || []).length;
-    return '<button class="island" data-i="' + i + '">' +
-      '<span class="island-name">' + esc(isl.name) + '</span>' +
-      '<span class="island-focal">' + ICON.user + (isl.focal ? esc(isl.focal) : '—') + '</span>' +
-      '<span class="island-phone" dir="ltr">' + (isl.phone ? esc(isl.phone) : '') + '</span>' +
-      '<span class="badges"><span class="badge">' + n + ' ހަރަކާތް</span>' +
-      ((isl.team || []).length ? '<span class="badge badge-muted">' + isl.team.length + ' މީހުން</span>' : '') + '</span>' +
-      '</button>';
-  }).join('') || '<p class="none">' + EMPTY + '</p>';
+  var totalActs = 0, totalTeam = 0;
+  islands.forEach(function (isl) { totalActs += (isl.activities || []).length; totalTeam += (isl.team || []).length; });
+  var summary = '<div class="island-summary">' +
+    '<div><strong>' + islands.length + '</strong><span>ރަށް</span></div>' +
+    '<div><strong>' + totalActs + '</strong><span>ހަރަކާތް</span></div>' +
+    '<div><strong>' + totalTeam + '</strong><span>ޓީމު މެމްބަރުން</span></div></div>';
+  grid.innerHTML = islands.length ? summary + '<div class="island-cards">' + islands.map(function (isl, i) {
+    var stat = function (icon, n, label) {
+      return '<span class="stat' + (n ? '' : ' stat-zero') + '">' + icon + '<b>' + n + '</b> ' + label + '</span>';
+    };
+    return '<div class="island" role="button" tabindex="0" data-i="' + i + '">' +
+      '<div class="island-head"><span class="island-num">' + (i + 1) + '</span>' +
+        '<span class="island-atoll">ބ.</span><span class="island-name">' + esc(isl.name) + '</span></div>' +
+      '<div class="island-body">' +
+        '<div class="focal"><span class="avatar">' + (isl.focal ? esc(isl.focal.charAt(0)) : ICON.user) + '</span>' +
+          '<span class="focal-text"><span class="focal-label">ފޯކަލް ޕޮއިންޓް</span><span class="focal-name">' + (isl.focal ? esc(isl.focal) : '—') + '</span></span></div>' +
+        (isl.phone ? '<a class="call" href="tel:' + esc(String(isl.phone).replace(/\s/g, '')) + '">' + ICON.phone + '<span dir="ltr">' + esc(isl.phone) + '</span></a>' : '') +
+      '</div>' +
+      '<div class="island-stats">' +
+        stat(ICON.list, (isl.activities || []).length, 'ހަރަކާތް') +
+        stat(ICON.team, (isl.team || []).length, 'މީހުން') +
+        stat(ICON.clock, (isl.schedule || []).length, 'ޝެޑިއުލް') +
+      '</div></div>';
+  }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';
   grid.addEventListener('click', function (e) {
+    if (e.target.closest('.call')) return;
     var b = e.target.closest('.island');
     if (b) islandSheet(+b.dataset.i);
+  });
+  grid.addEventListener('keydown', function (e) {
+    var b = e.target.closest('.island');
+    if (b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); islandSheet(+b.dataset.i); }
   });
 
   /* ---------- Roles (org structure) ---------- */

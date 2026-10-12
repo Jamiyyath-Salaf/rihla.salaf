@@ -80,21 +80,76 @@ a { color: var(--accent); }
 .none { color: var(--muted); text-align: center; margin: 1rem 0; }
 
 /* Islands */
-.island-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .6rem; }
-.island {
-  display: flex; flex-direction: column; align-items: flex-start; gap: .15rem; text-align: right;
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: .9rem 1.1rem; font: inherit; color: var(--text); cursor: pointer;
-  transition: border-color .15s, transform .15s;
+.island-summary {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-bottom: 1rem;
 }
-.island:hover { border-color: var(--accent); transform: translateY(-1px); }
-.island-name { font-weight: 700; font-size: 1.15rem; }
-.island-focal { display: flex; align-items: center; gap: .35rem; color: var(--muted); font-size: .9rem; }
-.island-phone { color: var(--muted); font-size: .85rem; font-family: system-ui, sans-serif; }
-.island-phone:empty { display: none; }
-.badge {
+.island-summary div {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: .6rem .5rem; text-align: center; display: flex; flex-direction: column; line-height: 1.4;
+}
+.island-summary strong { font-family: system-ui, sans-serif; font-size: 1.6rem; color: var(--accent); }
+.island-summary span { color: var(--muted); font-size: .85rem; }
+.island-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: .8rem; }
+.island {
+  display: flex; flex-direction: column; text-align: right; overflow: hidden;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  transition: transform .18s, box-shadow .18s;
+}
+.island:hover, .island:focus-visible { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(20,60,30,.14); outline: none; }
+.island-head {
+  position: relative; display: flex; align-items: baseline; gap: .35rem;
+  padding: 1rem 1.1rem .9rem; color: #fff; overflow: hidden;
+  background:
+    radial-gradient(120px 80px at 0% 100%, rgba(255,255,255,.18), transparent 70%),
+    linear-gradient(135deg, #1f7a35, #2a9d6a);
+}
+.island-head::after {
+  /* soft wave at the bottom of the band */
+  content: ""; position: absolute; inset: auto 0 -1px 0; height: 14px;
+  background: radial-gradient(14px 10px at 50% 100%, var(--surface) 98%, transparent) 0 0 / 28px 14px repeat-x;
+  opacity: .9;
+}
+.island-num {
+  position: absolute; left: .7rem; top: -.4rem; font-family: system-ui, sans-serif;
+  font-size: 3.4rem; font-weight: 800; color: rgba(255,255,255,.16); line-height: 1;
+}
+.island-atoll { font-size: .95rem; opacity: .8; }
+.island-name { font-size: 1.35rem; font-weight: 900; line-height: 1.5; }
+.island-body { padding: .9rem 1.1rem .4rem; display: grid; gap: .7rem; }
+.focal { display: flex; align-items: center; gap: .6rem; }
+.avatar {
+  flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
   background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent);
-  border-radius: 999px; padding: 0 .7rem; font-size: .82rem;
+  font-weight: 900; font-size: 1.15rem;
+}
+.focal-text { display: flex; flex-direction: column; line-height: 1.45; min-width: 0; }
+.focal-label { color: var(--muted); font-size: .78rem; }
+.focal-name { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.call {
+  display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); color: var(--accent);
+  border-radius: 999px; padding: .3rem .8rem; text-decoration: none;
+  font-family: system-ui, sans-serif; font-weight: 600; font-size: .95rem; letter-spacing: .03em;
+}
+.call:hover { background: var(--accent); color: var(--surface); }
+.island-stats {
+  display: flex; justify-content: space-between; gap: .3rem; margin-top: auto;
+  padding: .6rem 1.1rem .75rem; border-top: 1px dashed var(--line);
+}
+.stat { display: inline-flex; align-items: center; gap: .25rem; font-size: .8rem; color: var(--text); }
+.stat .icon { color: var(--accent); }
+.stat b { font-family: system-ui, sans-serif; }
+.stat-zero { color: var(--muted); opacity: .75; }
+.stat-zero .icon { color: var(--muted); }
+@media (max-width: 480px) {
+  .island-cards { grid-template-columns: 1fr 1fr; gap: .6rem; }
+  .island-head { padding: .8rem .8rem .8rem; }
+  .island-name { font-size: 1.15rem; }
+  .island-body { padding: .7rem .8rem .3rem; }
+  .avatar { width: 34px; height: 34px; font-size: 1rem; }
+  .island-stats { padding: .5rem .8rem .6rem; flex-wrap: wrap; }
+  .stat { font-size: .72rem; }
 }
 
 /* Org structure */
