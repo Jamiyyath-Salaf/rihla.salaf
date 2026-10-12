@@ -64,6 +64,9 @@ input[type=text], input[type=password], textarea {
   width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: .4rem .7rem; outline: none;
 }
 input:focus, textarea:focus { border-color: var(--accent); }
+input[type=date] { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: .35rem .7rem; }
+label.check { display: inline-flex; align-items: center; gap: .5rem; cursor: pointer; font-weight: 700; }
+label.check input { width: 22px; height: 22px; accent-color: var(--accent); }
 input.ltr { direction: ltr; text-align: left; font-family: system-ui, sans-serif; font-size: .95rem; }
 textarea { min-height: 5.5rem; resize: vertical; line-height: 1.8; }
 fieldset { border: 1px solid var(--line); border-radius: 10px; padding: .5rem .8rem .8rem; margin: 0; }
@@ -224,6 +227,21 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
     ta.value = lines(obj[key]);
     ta.addEventListener('input', function () { obj[key] = fromLines(ta.value); markDirty(); });
     return el('label', { class: 'f' }, [el('span', { html: label + ' <em>(ކޮންމެ އެއްޗެއް ވަކި ލައިނެއްގައި)</em>' }), ta]);
+  }
+  function areaField(obj, key, label) {
+    var ta = el('textarea'); ta.value = obj[key] || '';
+    ta.addEventListener('input', function () { obj[key] = ta.value; markDirty(); });
+    return el('label', { class: 'f' }, [el('span', { text: label }), ta]);
+  }
+  function dateField(obj, key, label, onchange) {
+    var inp = el('input', { type: 'date', class: 'ltr' }); inp.value = obj[key] || '';
+    inp.addEventListener('input', function () { obj[key] = inp.value; markDirty(); if (onchange) onchange(); });
+    return el('label', { class: 'f' }, [el('span', { text: label }), inp]);
+  }
+  function checkField(obj, key, label, onchange) {
+    var inp = el('input', { type: 'checkbox' }); inp.checked = !!obj[key];
+    inp.addEventListener('change', function () { obj[key] = inp.checked; markDirty(); if (onchange) onchange(); });
+    return el('label', { class: 'check' }, [inp, el('span', { text: label })]);
   }
   function rowsField(obj, key, legend, cols, addLabel) {
     if (!Array.isArray(obj[key])) obj[key] = [];
@@ -398,32 +416,37 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
         itemList(F.others, { heading: 'އެހެނިހެން', addLabel: 'މީހަކު', titleKey: 'name', sub: sub, blank: blank, fields: facFields })
       ]);
     } },
-    updates: { label: 'އަޕްޑޭޓްތައް', render: function () {
-      var wrap = el('div');
-      function render() {
-        wrap.innerHTML = '';
-        updates.forEach(function (u, i) {
-          var box = el('div', { class: 'item' });
-          var body = el('div', { class: 'item-body', style: 'border-top:0;padding-top:1rem' });
-          body.appendChild(textField(u, 'date', 'ތާރީޚު', { which: 'event' }));
-          var ta = el('textarea'); ta.value = u.text;
-          ta.addEventListener('input', function () { u.text = ta.value; markDirty('event'); });
-          body.appendChild(el('label', { class: 'f' }, [el('span', { text: 'ލިޔުން' }), ta]));
-          body.appendChild(el('div', { class: 'item-tools' }, [el('button', { class: 'btn btn-del btn-small', type: 'button', text: 'ފޮހެލާ', onclick: function () {
-            if (confirm('މި އަޕްޑޭޓް ފޮހެލަންވީތަ؟')) { updates.splice(i, 1); markDirty('event'); render(); }
-          } })]));
-          box.appendChild(body); wrap.appendChild(box);
-        });
-      }
-      render();
+    tasks: { label: 'މަސައްކަތްތައް', render: function () {
+      data.tasks = data.tasks || [];
+      return itemList(data.tasks, { heading: 'މަސައްކަތްތައް', addLabel: 'މަސައްކަތެއް', titleKey: 'task',
+        sub: function (t) { return (t.done ? '✓ ' : '') + [t.assignee, t.due].filter(Boolean).join(' · '); },
+        blank: function () { return { task: '', assignee: '', due: '', details: '', done: false }; },
+        fields: function (t, b, r) {
+          b.appendChild(textField(t, 'task', 'މަސައްކަތް', { onchange: r }));
+          b.appendChild(el('div', { class: 'grid2' }, [textField(t, 'assignee', 'ޒިންމާ ހަވާލުވާ މީހާ', { onchange: r }), dateField(t, 'due', 'ނިންމަންޖެހޭ ތާރީޚު', r)]));
+          b.appendChild(areaField(t, 'details', 'ތަފްޞީލު'));
+          b.appendChild(checkField(t, 'done', 'ނިމިއްޖެ', r));
+        } });
+    } },
+    sponsors: { label: 'ސްޕޮންސާ + ހަދިޔާ', render: function () {
+      data.sponsors = data.sponsors || []; data.gifts = data.gifts || [];
       return el('div', null, [
-        el('div', { class: 'section-head' }, [el('h2', { text: 'އަޕްޑޭޓްތައް' }),
-          el('button', { class: 'btn btn-add btn-small', type: 'button', text: '+ އަޕްޑޭޓެއް', onclick: function () {
-            updates.unshift({ date: todayDv(), text: '' }); markDirty('event'); render();
-            wrap.querySelector('textarea').focus();
-          } })]),
-        el('p', { class: 'hint', text: 'އާ އަޕްޑޭޓްތައް ދައްކާނީ އެންމެ މަތީގައި.' }),
-        wrap
+        itemList(data.sponsors, { heading: 'ސްޕޮންސަރުން', addLabel: 'ސްޕޮންސަރެއް', titleKey: 'name',
+          sub: function (x) { return x.contribution || ''; },
+          blank: function () { return { name: '', contribution: '', contact: '', phone: '', notes: '' }; },
+          fields: function (x, b, r) {
+            b.appendChild(el('div', { class: 'grid2' }, [textField(x, 'name', 'ނަން', { onchange: r }), textField(x, 'contribution', 'ދީފައިވާ އެހީ', { onchange: r })]));
+            b.appendChild(el('div', { class: 'grid2' }, [textField(x, 'contact', 'ގުޅޭނެ މީހާ'), textField(x, 'phone', 'ނަންބަރު', { ltr: true })]));
+            b.appendChild(areaField(x, 'notes', 'ނޯޓު'));
+          } }),
+        itemList(data.gifts, { heading: 'ހަދިޔާ', addLabel: 'ހަދިޔާއެއް', titleKey: 'item',
+          sub: function (g) { return [g.qty ? '× ' + g.qty : '', g['for']].filter(Boolean).join(' · '); },
+          blank: function () { return { item: '', qty: '', 'for': '', from: '', notes: '' }; },
+          fields: function (g, b, r) {
+            b.appendChild(el('div', { class: 'grid2' }, [textField(g, 'item', 'ހަދިޔާ', { onchange: r }), textField(g, 'qty', 'އަދަދު', { onchange: r })]));
+            b.appendChild(el('div', { class: 'grid2' }, [textField(g, 'for', 'ދެވޭނީ (ރަށް / މީހުން)', { onchange: r }), textField(g, 'from', 'ސްޕޮންސާ')]));
+            b.appendChild(areaField(g, 'notes', 'ނޯޓު'));
+          } })
       ]);
     } }
   };
@@ -473,7 +496,7 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
     // drop empty rows so the data file stays tidy
     if (Array.isArray(v)) return v.map(clean).filter(function (x) {
       return !(x && typeof x === 'object' && !Array.isArray(x) && Object.keys(x).every(function (k) {
-        var y = x[k]; return y === '' || y == null || (Array.isArray(y) && !y.length) || (typeof y === 'object' && !Array.isArray(y) && !Object.keys(y).length);
+        var y = x[k]; return y === '' || y == null || y === false || (Array.isArray(y) && !y.length) || (typeof y === 'object' && !Array.isArray(y) && !Object.keys(y).length);
       }));
     });
     if (v && typeof v === 'object') { var o = {}; Object.keys(v).forEach(function (k) { o[k] = clean(v[k]); }); return o; }

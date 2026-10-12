@@ -254,6 +254,74 @@
     });
   }
 
+  /* ---------- Tasks ---------- */
+  var MONTHS = ['ޖަނަވަރީ', 'ފެބްރުއަރީ', 'މާރިޗު', 'އޭޕްރީލް', 'މެއި', 'ޖޫން', 'ޖުލައި', 'އޮގަސްޓު', 'ސެޕްޓެމްބަރު', 'އޮކްޓޫބަރު', 'ނޮވެންބަރު', 'ޑިސެމްބަރު'];
+  function dvDate(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
+    return m ? (+m[3]) + ' ' + MONTHS[+m[2] - 1] + ' ' + m[1] : esc(iso || '');
+  }
+  var tasksEl = document.getElementById('tasks');
+  if (tasksEl) {
+    var today = new Date(); today = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    var tasks = (T.tasks || []).map(function (t, i) { return Object.assign({ _i: i }, t); });
+    // open tasks first, by due date (no date last); finished tasks at the bottom
+    tasks.sort(function (a, b) {
+      if (!!a.done !== !!b.done) return a.done ? 1 : -1;
+      var ad = a.due || '9999', bd = b.due || '9999';
+      return ad < bd ? -1 : ad > bd ? 1 : a._i - b._i;
+    });
+    var openN = tasks.filter(function (t) { return !t.done; }).length;
+    var lateN = tasks.filter(function (t) { return !t.done && t.due && t.due < today; }).length;
+    tasksEl.innerHTML = tasks.length
+      ? '<div class="island-summary">' +
+          '<div><strong>' + openN + '</strong><span>ބާކީ</span></div>' +
+          '<div><strong class="' + (lateN ? 'late-n' : '') + '">' + lateN + '</strong><span>ލަސްވެފައި</span></div>' +
+          '<div><strong>' + (tasks.length - openN) + '</strong><span>ނިމިފައި</span></div></div>' +
+        '<div class="task-list">' + tasks.map(function (t) {
+          var late = !t.done && t.due && t.due < today;
+          return '<div class="task' + (t.done ? ' is-done' : '') + (late ? ' is-late' : '') + '">' +
+            '<span class="task-check">' + (t.done ? '✓' : '') + '</span>' +
+            '<div class="task-main"><div class="task-title">' + esc(t.task || '—') + '</div>' +
+              '<div class="task-meta">' +
+                (t.assignee ? '<span>' + ICON.user + esc(t.assignee) + '</span>' : '') +
+                (t.due ? '<span class="task-due">' + ICON.clock + dvDate(t.due) + (late ? ' · ލަސްވެފައި' : '') + '</span>' : '') +
+              '</div>' +
+              (t.details ? '<p class="task-details">' + esc(t.details).replace(/\n/g, '<br>') + '</p>' : '') +
+            '</div></div>';
+        }).join('') + '</div>'
+      : '<p class="none">' + EMPTY + '</p>';
+  }
+
+  /* ---------- Sponsors + gifts ---------- */
+  var spEl = document.getElementById('sponsors');
+  if (spEl) {
+    var sponsors = T.sponsors || [], gifts = T.gifts || [];
+    var GIFT = '<svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="11" rx="1.5"/><path d="M2.5 9h19v-1a1 1 0 0 0-1-1h-17a1 1 0 0 0-1 1zM12 7v13"/><path d="M12 7c-1.5-3-5-3.5-5-1.2C7 7 9.5 7 12 7zm0 0c1.5-3 5-3.5 5-1.2C17 7 14.5 7 12 7z"/></svg>';
+    var h = '<h2 class="group-title">ސްޕޮންސަރުން <span class="group-count">' + sponsors.length + '</span></h2>';
+    h += sponsors.length ? '<div class="sp-cards">' + sponsors.map(function (s) {
+      return '<div class="sp">' +
+        '<div class="sp-name">' + esc(s.name || '—') + '</div>' +
+        (s.contribution ? '<div class="sp-contrib">' + esc(s.contribution) + '</div>' : '') +
+        ((s.contact || s.phone) ? '<div class="sp-contact">' + ICON.user + '<span>' + esc(s.contact || '') + '</span>' +
+          (s.phone ? '<a class="call" href="tel:' + esc(String(s.phone).replace(/\s/g, '')) + '">' + ICON.phone + '<span dir="ltr">' + esc(s.phone) + '</span></a>' : '') + '</div>' : '') +
+        (s.notes ? '<p class="task-details">' + esc(s.notes).replace(/\n/g, '<br>') + '</p>' : '') +
+        '</div>';
+    }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';
+    h += '<h2 class="group-title">ހަދިޔާ <span class="group-count">' + gifts.length + '</span></h2>';
+    h += gifts.length ? '<div class="gift-list">' + gifts.map(function (g) {
+      return '<div class="gift"><span class="gift-icon">' + GIFT + '</span>' +
+        '<div class="gift-main"><div class="gift-title">' + esc(g.item || '—') +
+          (g.qty ? ' <span class="gift-qty">× ' + esc(g.qty) + '</span>' : '') + '</div>' +
+          '<div class="task-meta">' +
+            (g['for'] ? '<span>ދެވޭނީ: ' + esc(g['for']) + '</span>' : '') +
+            (g.from ? '<span>ސްޕޮންސާ: ' + esc(g.from) + '</span>' : '') +
+          '</div>' +
+          (g.notes ? '<p class="task-details">' + esc(g.notes).replace(/\n/g, '<br>') + '</p>' : '') +
+        '</div></div>';
+    }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';
+    spEl.innerHTML = h;
+  }
+
   /* ---------- Tabs ---------- */
   var tabs = document.querySelectorAll('.tabs [data-tab]');
   var panels = document.querySelectorAll('.panel');
