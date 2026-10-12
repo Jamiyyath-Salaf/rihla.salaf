@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="dv" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>އެޑްމިން · ޖަމްޢިއްޔަތުއް ސަލަފް</title>
+<link rel="icon" href="../assets/logo.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+<style>
+@font-face { font-family: "MV Funa"; src: url("../assets/fonts/mvfuna-regular.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "MV Funa"; src: url("../assets/fonts/mvfuna-bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "MV Funa"; src: url("../assets/fonts/mvfuna-black.ttf") format("truetype"); font-weight: 900; font-display: swap; }
+:root {
+  --bg: #f4f1ea; --surface: #fff; --text: #1f2a24; --muted: #5c6b62; --line: #e1d9ca;
+  --accent: #1f7a35; --accent-soft: #e3f0e6; --warm: #c8743a; --danger: #b3261e; --radius: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #111613; --surface: #1c2420; --text: #e9efe9; --muted: #a3b2a9; --line: #2e3a34;
+          --accent: #7fd18f; --accent-soft: #233a2a; --warm: #e39a64; --danger: #ff8a80; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 18px/1.8 "MV Funa", Faruma, system-ui, sans-serif; }
+h1, h2, h3 { font-weight: 900; line-height: 1.5; margin: 0; }
+button, input, textarea, select { font: inherit; color: inherit; }
+.wrap { width: min(980px, 100% - 24px); margin-inline: auto; padding-bottom: 6rem; }
+
+/* Top bar */
+.top { position: sticky; top: 0; z-index: 10; background: var(--surface); border-bottom: 1px solid var(--line); }
+.top-inner { width: min(980px, 100% - 24px); margin-inline: auto; display: flex; align-items: center; gap: .8rem; padding: .6rem 0; }
+.top img { width: 40px; height: 40px; object-fit: contain; background: #fff; border-radius: 8px; padding: 3px; }
+.top h1 { font-size: 1.15rem; flex: 1; }
+.top h1 small { display: block; font-weight: 400; color: var(--muted); font-size: .8rem; line-height: 1.3; }
+.btn { border: 0; border-radius: 999px; padding: .45rem 1.2rem; cursor: pointer; background: var(--accent); color: #fff; font-weight: 700; }
+@media (prefers-color-scheme: dark) { .btn { color: #0f1a14; } }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); font-weight: 400; }
+.btn-small { padding: .15rem .8rem; font-size: .9rem; }
+.btn-add { background: var(--accent-soft); color: var(--accent); }
+.btn-del { background: transparent; color: var(--danger); border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent); font-weight: 400; }
+
+/* Tabs */
+.tabs { display: flex; gap: .3rem; overflow-x: auto; padding: .8rem 0; scrollbar-width: none; }
+.tabs button { flex: none; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: .3rem 1rem; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+@media (prefers-color-scheme: dark) { .tabs button[aria-selected="true"] { color: #0f1a14; } }
+
+/* Items */
+.item { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: .7rem; }
+.item > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: .6rem; padding: .7rem 1rem; }
+.item > summary::-webkit-details-marker { display: none; }
+.item > summary::before { content: "◂"; color: var(--muted); transition: transform .15s; }
+.item[open] > summary::before { transform: rotate(-90deg); }
+.item-title { font-weight: 900; flex: 1; }
+.item-sub { color: var(--muted); font-size: .85rem; }
+.item-body { padding: .2rem 1rem 1rem; border-top: 1px dashed var(--line); display: grid; gap: .8rem; }
+.item-tools { display: flex; gap: .4rem; flex-wrap: wrap; justify-content: flex-end; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+@media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+label.f { display: grid; gap: .15rem; }
+label.f > span { color: var(--muted); font-size: .85rem; }
+label.f > span em { font-style: normal; opacity: .75; }
+input[type=text], input[type=password], textarea {
+  width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: .4rem .7rem; outline: none;
+}
+input:focus, textarea:focus { border-color: var(--accent); }
+input.ltr { direction: ltr; text-align: left; font-family: system-ui, sans-serif; font-size: .95rem; }
+textarea { min-height: 5.5rem; resize: vertical; line-height: 1.8; }
+fieldset { border: 1px solid var(--line); border-radius: 10px; padding: .5rem .8rem .8rem; margin: 0; }
+legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95rem; }
+.row { display: flex; gap: .4rem; align-items: center; margin-top: .4rem; }
+.row input { flex: 1; min-width: 0; }
+.row input.narrow { flex: 0 0 6rem; }
+.row .x { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: transparent; cursor: pointer; color: var(--danger); }
+.section-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 1rem 0 .7rem; }
+.section-head h2 { font-size: 1.3rem; }
+.hint { color: var(--muted); font-size: .85rem; margin: 0; }
+
+/* Roles tree */
+.role-children { margin-right: 1.2rem; padding-right: .8rem; border-right: 2px solid var(--line); margin-top: .5rem; }
+
+/* Login */
+.login { max-width: 520px; margin: 3rem auto; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 1.6rem; text-align: center; }
+.login img { width: 96px; background: #fff; border-radius: 14px; padding: 8px; }
+.login h1 { font-size: 1.5rem; margin: .5rem 0; }
+.login form { display: grid; gap: .7rem; margin-top: 1rem; }
+.login details { text-align: right; margin-top: 1.2rem; color: var(--muted); font-size: .9rem; }
+.login ol { padding-right: 1.2rem; }
+.err { color: var(--danger); min-height: 1.5em; margin: 0; }
+
+/* Toast */
+.toast { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg);
+  padding: .5rem 1.2rem; border-radius: 999px; z-index: 20; max-width: calc(100% - 24px); text-align: center; }
+.toast[hidden] { display: none; }
+.dirty-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--warm); margin-left: .3rem; }
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="login" class="wrap" hidden>
+  <div class="login">
+    <img src="../assets/logo.png" alt="">
+    <h1>އެޑްމިން ޕެނަލް</h1>
+    <p class="hint">ވަދެލުމަށް ގިޓްހަބް ޓޯކަން ޖައްސަވާ</p>
+    <form id="login-form">
+      <input type="password" id="token" class="ltr" placeholder="github_pat_..." autocomplete="off" required>
+      <button class="btn" type="submit">ވަދެލާ</button>
+      <p class="err" id="login-err"></p>
+    </form>
+    <details>
+      <summary>ޓޯކަން ހަދާނީ ކިހިނެއް؟</summary>
+      <ol>
+        <li>github.com އަށް ލޮގިން ކުރައްވާ.</li>
+        <li><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" dir="ltr">github.com/settings/personal-access-tokens/new</a> ހުޅުއްވާ.</li>
+        <li><b>Resource owner</b>: <span dir="ltr">Jamiyyath-Salaf</span></li>
+        <li><b>Repository access</b>: Only select repositories → <span dir="ltr">rihla.salaf-source</span></li>
+        <li><b>Permissions → Contents</b>: Read and write</li>
+        <li><b>Generate token</b> އަށް ފިތާލައިގެން ލިބޭ ޓޯކަން މިތަނަށް ޖައްސަވާ.</li>
+      </ol>
+    </details>
+  </div>
+</div>
+
+<!-- ================= EDITOR ================= -->
+<div id="app" hidden>
+  <header class="top">
+    <div class="top-inner">
+      <img src="../assets/logo.png" alt="">
+      <h1>އެޑްމިން ޕެނަލް <small id="trip-name"></small></h1>
+      <a class="btn btn-ghost btn-small" href="../" target="_blank" rel="noopener">ސައިޓް</a>
+      <button class="btn" id="save" disabled>ސޭވް</button>
+    </div>
+  </header>
+  <div class="wrap">
+    <nav class="tabs" id="tabs"></nav>
+    <div id="panel"></div>
+    <p class="hint" style="margin-top:2rem;text-align:center">
+      <button class="btn btn-ghost btn-small" id="logout">ލޮގްއައުޓް</button>
+    </p>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function () {
+  /* ---------- Settings ---------- */
+  var REPO = 'Jamiyyath-Salaf/rihla.salaf-source';
+  var BRANCH = 'main';
+  var DATA_PATH = '_data/b_atoll_2026.yml';
+  var EVENT_PATH = '_events/b-atoll-trip-2026.md';
+  var TOKEN_KEY = 'salaf_admin_token';
+
+  var token = null;
+  var data = null, dataSha = null;
+  var eventFront = '', updates = [], eventSha = null;
+  var dirtyData = false, dirtyEvent = false;
+  var currentTab = 'islands';
+
+  /* ---------- Helpers ---------- */
+  function $(s, el) { return (el || document).querySelector(s); }
+  function el(tag, attrs, kids) {
+    var e = document.createElement(tag);
+    if (attrs) for (var k in attrs) {
+      if (k === 'text') e.textContent = attrs[k];
+      else if (k === 'html') e.innerHTML = attrs[k];
+      else if (k.slice(0, 2) === 'on') e.addEventListener(k.slice(2), attrs[k]);
+      else e.setAttribute(k, attrs[k]);
+    }
+    (kids || []).forEach(function (c) { if (c != null) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return e;
+  }
+  function store(get, set) {
+    try { return get ? localStorage.getItem(TOKEN_KEY) : (set === null ? localStorage.removeItem(TOKEN_KEY) : localStorage.setItem(TOKEN_KEY, set)); }
+    catch (e) { return null; }
+  }
+  function toast(msg, ms) {
+    var t = $('#toast'); t.textContent = msg; t.hidden = false;
+    clearTimeout(toast._t); toast._t = setTimeout(function () { t.hidden = true; }, ms || 3500);
+  }
+  function b64decode(s) {
+    var bin = atob(s.replace(/\n/g, '')); var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+  function b64encode(str) {
+    var bytes = new TextEncoder().encode(str); var bin = '';
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin);
+  }
+  function api(path, opts) {
+    opts = opts || {};
+    return fetch('https://api.github.com/repos/' + REPO + '/contents/' + path + (opts.method ? '' : '?ref=' + BRANCH), {
+      method: opts.method || 'GET',
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' },
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    }).then(function (r) {
+      if (!r.ok) { var e = new Error('HTTP ' + r.status); e.status = r.status; throw e; }
+      return r.json();
+    });
+  }
+  function markDirty(which) {
+    if (which === 'event') dirtyEvent = true; else dirtyData = true;
+    $('#save').disabled = false;
+    $('#save').innerHTML = '<span class="dirty-dot"></span>ސޭވް';
+  }
+  function lines(arr) { return (arr || []).join('\n'); }
+  function fromLines(s) { return s.split('\n').map(function (x) { return x.trim(); }).filter(Boolean); }
+
+  /* ---------- Field builders (all bind straight to the data object) ---------- */
+  function textField(obj, key, label, opts) {
+    opts = opts || {};
+    var inp = el('input', { type: 'text', class: opts.ltr ? 'ltr' : '' });
+    inp.value = obj[key] == null ? '' : obj[key];
+    inp.addEventListener('input', function () {
+      obj[key] = inp.value; markDirty(opts.which);
+      if (opts.onchange) opts.onchange();
+    });
+    return el('label', { class: 'f' }, [el('span', { html: label }), inp]);
+  }
+  function listField(obj, key, label) {
+    var ta = el('textarea');
+    ta.value = lines(obj[key]);
+    ta.addEventListener('input', function () { obj[key] = fromLines(ta.value); markDirty(); });
+    return el('label', { class: 'f' }, [el('span', { html: label + ' <em>(ކޮންމެ އެއްޗެއް ވަކި ލައިނެއްގައި)</em>' }), ta]);
+  }
+  function rowsField(obj, key, legend, cols, addLabel) {
+    if (!Array.isArray(obj[key])) obj[key] = [];
+    var box = el('div');
+    function render() {
+      box.innerHTML = '';
+      obj[key].forEach(function (rowObj, i) {
+        var row = el('div', { class: 'row' });
+        cols.forEach(function (c) {
+          var inp = el('input', { type: 'text', placeholder: c.ph, class: (c.narrow ? 'narrow ' : '') + (c.ltr ? 'ltr' : '') });
+          inp.value = rowObj[c.key] == null ? '' : rowObj[c.key];
+          inp.addEventListener('input', function () { rowObj[c.key] = inp.value; markDirty(); });
+          row.appendChild(inp);
+        });
+        row.appendChild(el('button', { class: 'x', type: 'button', title: 'ފޮހެލާ', text: '✕', onclick: function () {
+          obj[key].splice(i, 1); markDirty(); render();
+        } }));
+        box.appendChild(row);
+      });
+    }
+    render();
+    var add = el('button', { class: 'btn btn-add btn-small', type: 'button', text: '+ ' + addLabel, style: 'margin-top:.5rem', onclick: function () {
+      var o = {}; cols.forEach(function (c) { o[c.key] = ''; }); obj[key].push(o); markDirty(); render();
+      var inputs = box.querySelectorAll('input'); if (inputs.length) inputs[inputs.length - cols.length].focus();
+    } });
+    return el('fieldset', null, [el('legend', { text: legend }), box, add]);
+  }
+  function infoField(obj) {
+    // info is a key/value map; edit it as rows
+    var rows = Object.keys(obj.info || {}).map(function (k) { return { k: k, v: obj.info[k] }; });
+    var holder = { rows: rows };
+    var fs = rowsField(holder, 'rows', 'އިތުރު މައުލޫމާތު', [
+      { key: 'k', ph: 'ސުރުޚީ' }, { key: 'v', ph: 'މައުލޫމާތު' }
+    ], 'މައުލޫމާތު');
+    fs.addEventListener('input', sync); fs.addEventListener('click', function () { setTimeout(sync); });
+    function sync() {
+      var o = {}; holder.rows.forEach(function (r) { if (String(r.k || '').trim()) o[String(r.k).trim()] = r.v || ''; });
+      obj.info = o;
+    }
+    return fs;
+  }
+
+  /* ---------- Generic list-of-items section ---------- */
+  function itemList(arr, opts) {
+    var wrap = el('div');
+    function render(openIdx) {
+      wrap.innerHTML = '';
+      arr.forEach(function (it, i) {
+        var title = el('span', { class: 'item-title', text: it[opts.titleKey] || '—' });
+        var sub = el('span', { class: 'item-sub', text: opts.sub ? opts.sub(it) : '' });
+        var d = el('details', { class: 'item' }, [el('summary', null, [title, sub])]);
+        if (i === openIdx) d.open = true;
+        var body = el('div', { class: 'item-body' });
+        var tools = el('div', { class: 'item-tools' }, [
+          i > 0 ? el('button', { class: 'btn btn-ghost btn-small', type: 'button', text: '▲ މައްޗަށް', onclick: function () {
+            arr.splice(i - 1, 0, arr.splice(i, 1)[0]); markDirty(); render(i - 1);
+          } }) : null,
+          i < arr.length - 1 ? el('button', { class: 'btn btn-ghost btn-small', type: 'button', text: '▼ ތިރިއަށް', onclick: function () {
+            arr.splice(i + 1, 0, arr.splice(i, 1)[0]); markDirty(); render(i + 1);
+          } }) : null,
+          el('button', { class: 'btn btn-del btn-small', type: 'button', text: 'ފޮހެލާ', onclick: function () {
+            if (confirm('"' + (it[opts.titleKey] || '') + '" ފޮހެލަންވީތަ؟')) { arr.splice(i, 1); markDirty(); render(); }
+          } })
+        ]);
+        opts.fields(it, body, function () { title.textContent = it[opts.titleKey] || '—'; sub.textContent = opts.sub ? opts.sub(it) : ''; });
+        body.appendChild(tools);
+        d.appendChild(body);
+        wrap.appendChild(d);
+      });
+      if (!arr.length) wrap.appendChild(el('p', { class: 'hint', text: 'އަދި އެއްވެސް އެއްޗެއް ނެތް.' }));
+    }
+    render();
+    var head = el('div', { class: 'section-head' }, [
+      el('h2', { text: opts.heading }),
+      el('button', { class: 'btn btn-add btn-small', type: 'button', text: '+ ' + opts.addLabel, onclick: function () {
+        arr.push(opts.blank()); markDirty(); render(arr.length - 1);
+        wrap.lastChild.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } })
+    ]);
+    return el('div', null, [head, opts.hint ? el('p', { class: 'hint', text: opts.hint }) : null, wrap]);
+  }
+
+  function placeFields(it, body, refresh, withTitleEmail) {
+    body.appendChild(el('div', { class: 'grid2' }, [
+      textField(it, 'name', 'ނަން', { onchange: refresh }),
+      textField(it, 'focal', 'ފޯކަލް ޕޮއިންޓް', { onchange: refresh })
+    ]));
+    body.appendChild(el('div', { class: 'grid2' }, [
+      textField(it, 'phone', 'ނަންބަރު', { ltr: true }),
+      withTitleEmail ? textField(it, 'email', 'އީމެއިލް', { ltr: true }) : null
+    ]));
+    if (withTitleEmail) body.appendChild(textField(it, 'title', 'މަޤާމް'));
+    body.appendChild(listField(it, 'activities', 'އެދިފައިވާ ހަރަކާތްތައް'));
+    body.appendChild(rowsField(it, 'team', 'ޓީމް', [{ key: 'name', ph: 'ނަން' }, { key: 'role', ph: 'މަސައްކަތް' }], 'މެމްބަރެއް'));
+    body.appendChild(rowsField(it, 'schedule', 'ހަރަކާތްތަކުގެ ޝެޑިއުލް', [
+      { key: 'day', ph: 'ދުވަސް (މިސާލު: 12 ނޮވެންބަރު)' }, { key: 'time', ph: '09:00', narrow: true, ltr: true }, { key: 'activity', ph: 'ހަރަކާތް' }
+    ], 'ހަރަކާތެއް'));
+    body.appendChild(infoField(it));
+  }
+  function blankPlace() { return { name: '', focal: '', phone: '', activities: [], team: [], schedule: [], info: {} }; }
+  function placeSub(it) { return [it.focal, it.phone].filter(Boolean).join(' · '); }
+
+  /* ---------- Tabs ---------- */
+  var TABS = {
+    islands: { label: 'ރަށްތައް', render: function () {
+      data.islands = data.islands || [];
+      return itemList(data.islands, { heading: 'ރަށްތައް', addLabel: 'ރަށެއް', titleKey: 'name', sub: placeSub,
+        hint: 'ހަރަކާތްތަކުގެ ނަންތައް ކޮންމެ ރަށަކަށް ވެސް އެއް ގޮތަކަށް ލިޔުއްވާ، ދެން "ހަރަކާތްތައް" ޓެބުގައި ގުނާނީ އެކުގައި.',
+        blank: blankPlace, fields: function (it, b, r) { placeFields(it, b, r, false); } });
+    } },
+    participants: { label: 'އެހެނިހެން ބައިވެރިން', render: function () {
+      data.participants = data.participants || [];
+      return itemList(data.participants, { heading: 'އެހެނިހެން ބައިވެރިން', addLabel: 'ބައިވެރިއެއް', titleKey: 'name', sub: placeSub,
+        blank: function () { var o = blankPlace(); o.title = ''; o.email = ''; return o; },
+        fields: function (it, b, r) { placeFields(it, b, r, true); } });
+    } },
+    roles: { label: 'ޒިންމާތައް', render: function () {
+      data.roles = data.roles || [];
+      var box = el('div');
+      function renderRoles() { box.innerHTML = ''; box.appendChild(roleList(data.roles, 0)); }
+      function roleList(arr, depth) {
+        var wrap = el('div');
+        arr.forEach(function (r, i) {
+          r.team = r.team || []; r.responsibilities = r.responsibilities || [];
+          var title = el('span', { class: 'item-title', text: (r.role || '—') });
+          var sub = el('span', { class: 'item-sub', text: r.name || '' });
+          var d = el('details', { class: 'item' }, [el('summary', null, [title, sub])]);
+          var body = el('div', { class: 'item-body' });
+          var refresh = function () { title.textContent = r.role || '—'; sub.textContent = r.name || ''; };
+          body.appendChild(el('div', { class: 'grid2' }, [
+            textField(r, 'role', 'މަޤާމް', { onchange: refresh }), textField(r, 'name', 'ނަން', { onchange: refresh })
+          ]));
+          body.appendChild(listField(r, 'responsibilities', 'ޒިންމާތައް'));
+          body.appendChild(el('div', { class: 'item-tools' }, [
+            el('button', { class: 'btn btn-add btn-small', type: 'button', text: '+ މީނާގެ ދަށުން މީހަކު', onclick: function () {
+              r.team.push({ role: '', name: '', responsibilities: [] }); markDirty(); renderRoles();
+            } }),
+            el('button', { class: 'btn btn-del btn-small', type: 'button', text: 'ފޮހެލާ', onclick: function () {
+              if (confirm('"' + (r.role || '') + '" ފޮހެލަންވީތަ؟ (މީނާގެ ދަށުގައިވާ މީހުން ވެސް ފޮހެވޭނެ)')) { arr.splice(i, 1); markDirty(); renderRoles(); }
+            } })
+          ]));
+          d.appendChild(body);
+          wrap.appendChild(d);
+          if (r.team.length) wrap.appendChild(el('div', { class: 'role-children' }, [roleList(r.team, depth + 1)]));
+        });
+        return wrap;
+      }
+      renderRoles();
+      return el('div', null, [
+        el('div', { class: 'section-head' }, [el('h2', { text: 'ޒިންމާތައް' }),
+          el('button', { class: 'btn btn-add btn-small', type: 'button', text: '+ މައި މަޤާމެއް', onclick: function () {
+            data.roles.push({ role: '', name: '', responsibilities: [], team: [] }); markDirty(); renderRoles();
+          } })]),
+        el('p', { class: 'hint', text: 'ކޮންމެ މީހެއްގެ ދަށުގައި މީހުން އިތުރުކުރުމަށް "+ މީނާގެ ދަށުން މީހަކު" އަށް ފިއްތަވާ.' }),
+        box
+      ]);
+    } },
+    facilitators: { label: 'ފެސިލިޓޭޓަރުން', render: function () {
+      data.facilitators = data.facilitators || {};
+      var F = data.facilitators; F.sheikhs = F.sheikhs || []; F.others = F.others || [];
+      function facFields(it, b, r) {
+        b.appendChild(el('div', { class: 'grid2' }, [textField(it, 'name', 'ނަން', { onchange: r }), textField(it, 'island', 'ރަށް', { onchange: r })]));
+        b.appendChild(el('div', { class: 'grid2' }, [textField(it, 'phone', 'ނަންބަރު', { ltr: true }), textField(it, 'email', 'އީމެއިލް', { ltr: true })]));
+        b.appendChild(listField(it, 'route', 'ދަތުރުގެ މަގު — މާލެ އަށް އަންނަ މަގު، ފަށާ ތަނުން ފެށިގެން. މާލޭގައި ހުންނަ މީހުންނަށް ހުސްކޮށް ބާއްވާ'));
+        b.appendChild(listField(it, 'activities', 'ކުރެވޭނެ ހަރަކާތްތައް'));
+        b.appendChild(listField(it, 'workshops', 'ވޯކްޝޮޕްތައް'));
+      }
+      function blank() { return { name: '', island: '', phone: '', email: '', route: [], activities: [], workshops: [] }; }
+      function sub(it) { return it.island || ''; }
+      return el('div', null, [
+        itemList(F.sheikhs, { heading: 'ޝައިޚުން', addLabel: 'ޝައިޚަކު', titleKey: 'name', sub: sub, blank: blank, fields: facFields }),
+        itemList(F.others, { heading: 'އެހެނިހެން', addLabel: 'މީހަކު', titleKey: 'name', sub: sub, blank: blank, fields: facFields })
+      ]);
+    } },
+    updates: { label: 'އަޕްޑޭޓްތައް', render: function () {
+      var wrap = el('div');
+      function render() {
+        wrap.innerHTML = '';
+        updates.forEach(function (u, i) {
+          var box = el('div', { class: 'item' });
+          var body = el('div', { class: 'item-body', style: 'border-top:0;padding-top:1rem' });
+          body.appendChild(textField(u, 'date', 'ތާރީޚު', { which: 'event' }));
+          var ta = el('textarea'); ta.value = u.text;
+          ta.addEventListener('input', function () { u.text = ta.value; markDirty('event'); });
+          body.appendChild(el('label', { class: 'f' }, [el('span', { text: 'ލިޔުން' }), ta]));
+          body.appendChild(el('div', { class: 'item-tools' }, [el('button', { class: 'btn btn-del btn-small', type: 'button', text: 'ފޮހެލާ', onclick: function () {
+            if (confirm('މި އަޕްޑޭޓް ފޮހެލަންވީތަ؟')) { updates.splice(i, 1); markDirty('event'); render(); }
+          } })]));
+          box.appendChild(body); wrap.appendChild(box);
+        });
+      }
+      render();
+      return el('div', null, [
+        el('div', { class: 'section-head' }, [el('h2', { text: 'އަޕްޑޭޓްތައް' }),
+          el('button', { class: 'btn btn-add btn-small', type: 'button', text: '+ އަޕްޑޭޓެއް', onclick: function () {
+            updates.unshift({ date: todayDv(), text: '' }); markDirty('event'); render();
+            wrap.querySelector('textarea').focus();
+          } })]),
+        el('p', { class: 'hint', text: 'އާ އަޕްޑޭޓްތައް ދައްކާނީ އެންމެ މަތީގައި.' }),
+        wrap
+      ]);
+    } }
+  };
+  var MONTHS = ['ޖަނަވަރީ', 'ފެބްރުއަރީ', 'މާރިޗު', 'އޭޕްރީލް', 'މެއި', 'ޖޫން', 'ޖުލައި', 'އޮގަސްޓު', 'ސެޕްޓެމްބަރު', 'އޮކްޓޫބަރު', 'ނޮވެންބަރު', 'ޑިސެމްބަރު'];
+  function todayDv() { var d = new Date(); return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear(); }
+
+  function renderTabs() {
+    var nav = $('#tabs'); nav.innerHTML = '';
+    Object.keys(TABS).forEach(function (k) {
+      nav.appendChild(el('button', { type: 'button', 'aria-selected': k === currentTab, text: TABS[k].label, onclick: function () {
+        currentTab = k; renderTabs(); renderPanel();
+      } }));
+    });
+  }
+  function renderPanel() { var p = $('#panel'); p.innerHTML = ''; p.appendChild(TABS[currentTab].render()); }
+
+  /* ---------- Updates (event markdown) ---------- */
+  function parseEvent(md) {
+    var m = md.match(/^(---\n[\s\S]*?\n---\n)([\s\S]*)$/);
+    eventFront = m ? m[1] : '';
+    var body = m ? m[2] : md;
+    updates = [];
+    body.split(/^### /m).slice(1).forEach(function (chunk) {
+      var nl = chunk.indexOf('\n');
+      updates.push({ date: (nl < 0 ? chunk : chunk.slice(0, nl)).trim(), text: nl < 0 ? '' : chunk.slice(nl + 1).trim() });
+    });
+    var title = (eventFront.match(/^title:\s*(.*)$/m) || [])[1];
+    if (title) $('#trip-name').textContent = title;
+  }
+  function buildEvent() {
+    return eventFront + '\n<!-- Add new updates at the top. Each update starts with ### and the date. -->\n\n' +
+      updates.filter(function (u) { return (u.date || '').trim() || (u.text || '').trim(); })
+        .map(function (u) { return '### ' + u.date.trim() + '\n' + u.text.trim() + '\n'; }).join('\n');
+  }
+
+  /* ---------- Load / save ---------- */
+  function load() {
+    return Promise.all([api(DATA_PATH), api(EVENT_PATH)]).then(function (res) {
+      data = jsyaml.load(b64decode(res[0].content)) || {}; dataSha = res[0].sha;
+      parseEvent(b64decode(res[1].content)); eventSha = res[1].sha;
+      dirtyData = dirtyEvent = false;
+      $('#save').disabled = true; $('#save').textContent = 'ސޭވް';
+      renderTabs(); renderPanel();
+    });
+  }
+  function clean(v) {
+    // drop empty rows so the data file stays tidy
+    if (Array.isArray(v)) return v.map(clean).filter(function (x) {
+      return !(x && typeof x === 'object' && !Array.isArray(x) && Object.keys(x).every(function (k) {
+        var y = x[k]; return y === '' || y == null || (Array.isArray(y) && !y.length) || (typeof y === 'object' && !Array.isArray(y) && !Object.keys(y).length);
+      }));
+    });
+    if (v && typeof v === 'object') { var o = {}; Object.keys(v).forEach(function (k) { o[k] = clean(v[k]); }); return o; }
+    return typeof v === 'string' ? v.trim() : v;
+  }
+  var HEADER = '# ސަލަފް ރިޙްލާ 2026 — trip information.\n# Edited from the admin panel: ' + location.origin + location.pathname + '\n\n';
+  function save() {
+    var btn = $('#save'); btn.disabled = true; btn.textContent = 'ސޭވް ކުރަނީ...';
+    var jobs = [];
+    if (dirtyData) {
+      var yml = HEADER + jsyaml.dump(clean(data), { lineWidth: -1, noRefs: true, quotingType: '"' });
+      jobs.push(api(DATA_PATH, { method: 'PUT', body: { message: 'Update trip info from admin panel', content: b64encode(yml), sha: dataSha, branch: BRANCH } })
+        .then(function (r) { dataSha = r.content.sha; dirtyData = false; }));
+    }
+    var chain = Promise.all(jobs);
+    if (dirtyEvent) {
+      chain = chain.then(function () {
+        return api(EVENT_PATH, { method: 'PUT', body: { message: 'Update trip updates from admin panel', content: b64encode(buildEvent()), sha: eventSha, branch: BRANCH } })
+          .then(function (r) { eventSha = r.content.sha; dirtyEvent = false; });
+      });
+    }
+    chain.then(function () {
+      btn.textContent = 'ސޭވް';
+      toast('ސޭވް ވެއްޖެ ✓ ސައިޓް އަޕްޑޭޓް ވާނީ ގާތްގަނޑަކަށް 1 މިނިޓުން', 5000);
+    }).catch(function (e) {
+      btn.disabled = false; btn.innerHTML = '<span class="dirty-dot"></span>ސޭވް';
+      if (e.status === 409) toast('އެހެން މީހަކު ވެސް ބަދަލު ގެނެސްފި. ޕޭޖް ރިފްރެޝް ކުރައްވާ.', 7000);
+      else if (e.status === 401 || e.status === 403) toast('ސޭވް ނުވި: ޓޯކަނަށް ލިޔުމުގެ ހުއްދަ ނެތް (Contents: Read and write).', 7000);
+      else toast('ސޭވް ނުވި (' + e.message + ')', 6000);
+    });
+  }
+
+  /* ---------- Start ---------- */
+  function showLogin(msg) { $('#app').hidden = true; $('#login').hidden = false; $('#login-err').textContent = msg || ''; }
+  function start() {
+    $('#login').hidden = true; $('#app').hidden = false;
+    $('#panel').innerHTML = '<p class="hint">ލޯޑް ކުރަނީ...</p>';
+    load().catch(function (e) {
+      store(false, null);
+      showLogin(e.status === 401 ? 'ޓޯކަން ރަނގަޅެއް ނޫން.' : e.status === 404 ? 'ޓޯކަނަށް rihla.salaf-source ރިޕޮއަށް ހުއްދަ ނެތް.' : 'ލޯޑް ނުވި (' + e.message + ')');
+    });
+  }
+  $('#login-form').addEventListener('submit', function (e) {
+    e.preventDefault(); token = $('#token').value.trim(); if (!token) return;
+    store(false, token); $('#token').value = ''; start();
+  });
+  $('#save').addEventListener('click', save);
+  $('#logout').addEventListener('click', function () {
+    if ((dirtyData || dirtyEvent) && !confirm('ސޭވް ނުކޮށް ބަދަލުތައް ހުރި. ލޮގްއައުޓް ވާންވީތަ؟')) return;
+    store(false, null); token = null; dirtyData = dirtyEvent = false; showLogin();
+  });
+  window.addEventListener('beforeunload', function (e) { if (dirtyData || dirtyEvent) { e.preventDefault(); e.returnValue = ''; } });
+
+  token = store(true);
+  if (token) start(); else showLogin();
+})();
+</script>
+</body>
+</html>
