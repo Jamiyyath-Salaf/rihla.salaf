@@ -416,3 +416,11 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .act-sources .chip { flex: none; }
 .act-sources span { font-size: .95rem; }
 #activity-list { max-width: 1040px; }
+
+/* Facilitator popup: activities and workshops side by side */
+.side-by-side { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.side-by-side h3 { margin-top: 1rem; }
+.side-by-side .none { text-align: right; margin: .3rem 0; }
+.tag-list { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .3rem; }
+.tag-list span { background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: .05rem .7rem; font-size: .9rem; }
+.side-by-side > div:last-child .tag-list span { background: color-mix(in srgb, var(--warm) 12%, transparent); border-color: transparent; }

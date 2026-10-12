@@ -257,8 +257,13 @@
     h += inMale(p) && !p.island ? '<p class="none">' + EMPTY + '</p>' : inMale(p)
       ? '<p><span class="route-chip route-male">މާލޭގައި</span></p>'
       : '<ol class="route-steps">' + p.route.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ol>';
-    h += '<h3>ކުރެވޭނެ ހަރަކާތްތައް</h3>' + list(p.activities);
-    h += '<h3>ވޯކްޝޮޕްތައް</h3>' + list(p.workshops);
+    function tags(arr) {
+      return arr && arr.length ? '<div class="tag-list">' + arr.map(function (a) { return '<span>' + esc(a) + '</span>'; }).join('') + '</div>'
+        : '<p class="none">' + EMPTY + '</p>';
+    }
+    h += '<div class="side-by-side">' +
+      '<div><h3>ކުރެވޭނެ ހަރަކާތްތައް</h3>' + tags(p.activities) + '</div>' +
+      '<div><h3>ވޯކްޝޮޕްތައް</h3>' + tags(p.workshops) + '</div></div>';
     openSheet(h);
   }
   var facEl = document.getElementById('facilitators');
