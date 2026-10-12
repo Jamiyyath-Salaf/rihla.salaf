@@ -216,28 +216,30 @@
         '</section>';
     }
     var totalActs = all.reduce(function (n, x) { return n + (x.activities || []).length; }, 0);
-    var html =
-      '<header class="p-head">' + (logo ? '<img src="' + logo.href + '" alt="">' : '') +
-        '<div><h1>' + esc(title).replace(/(\d+)/g, num('$1')) + '</h1><p>' + esc(sub).replace(/(\d+)/g, num('$1')) + '</p></div></header>' +
-      '<h2>' + num('1.') + ' ރަށްތަކުން އެދިފައިވާ ހަރަކާތްތައް</h2>' +
-      '<p class="p-sum">' + num(islandsOnly.length) + ' ރަށް · ' + num(totalActs) + ' ހަރަކާތް</p>' +
-      '<div class="p-grid">' + islandsOnly.map(function (x, i) { return block(x, i + 1); }).join('') + '</div>' +
-      (others.length ? '<h2 class="p-sub">އެހެނިހެން ބައިވެރިން</h2><div class="p-grid">' + others.map(function (x) { return block(x); }).join('') + '</div>' : '') +
-      '<div class="html2pdf__page-break"></div><h2 class="p-break">' + num('2.') + ' ހަރަކާތްތަކަށް އެދިފައިވާ ރަށްތައް</h2>' +
-      '<p class="p-sum">' + num(actNames.length) + ' ހަރަކާތް · ބޮޑު އަދަދަކުން އެދިފައިވާ ހަރަކާތްތައް މަތީގައި</p>' +
-      '<table class="p-table"><thead><tr><th>#</th><th>ހަރަކާތް</th><th>އަދަދު</th><th>ރަށްތައް</th></tr></thead><tbody>' +
+    // Blocks in reading order. Islands go two to a row; 'break' starts a new page.
+    var blocks = [];
+    blocks.push('<header class="p-head">' + (logo ? '<img src="' + logo.href + '" alt="">' : '') +
+      '<div><h1>' + esc(title).replace(/(\d+)/g, num('$1')) + '</h1><p>' + esc(sub).replace(/(\d+)/g, num('$1')) + '</p></div></header>');
+    blocks.push('<h2>' + num('1.') + ' ރަށްތަކުން އެދިފައިވާ ހަރަކާތްތައް</h2><p class="p-sum">' + num(islandsOnly.length) + ' ރަށް · ' + num(totalActs) + ' ހަރަކާތް</p>');
+    for (var r = 0; r < islandsOnly.length; r += 2)
+      blocks.push('<div class="p-row2">' + block(islandsOnly[r], r + 1) + (islandsOnly[r + 1] ? block(islandsOnly[r + 1], r + 2) : '') + '</div>');
+    if (others.length) {
+      blocks.push('<h2>އެހެނިހެން ބައިވެރިން</h2>');
+      for (var o = 0; o < others.length; o += 2) blocks.push('<div class="p-row2">' + block(others[o]) + (others[o + 1] ? block(others[o + 1]) : '') + '</div>');
+    }
+    blocks.push('break');
+    blocks.push('<h2>' + num('2.') + ' ހަރަކާތްތަކަށް އެދިފައިވާ ރަށްތައް</h2><p class="p-sum">' + num(actNames.length) + ' ހަރަކާތް · ބޮޑު އަދަދަކުން އެދިފައިވާ ހަރަކާތްތައް މަތީގައި</p>');
+    blocks.push('table');
+    blocks.push('<p class="p-foot">ތައްޔާރުކުރި ތާރީޚު: ' + dvDate(today).replace(/(\d+)/g, num('$1')) + '</p>');
+    var tableHtml = '<table class="p-table"><thead><tr><th>#</th><th>ހަރަކާތް</th><th>އަދަދު</th><th>ރަށްތައް</th></tr></thead><tbody>' +
       actNames.map(function (a, i) {
         var who = uniq(acts[a]);
         return '<tr><td>' + (i + 1) + '</td><td>' + esc(a) + '</td><td class="p-c">' + who.length + '</td><td>' +
           who.map(function (k) { return esc(all[k].name); }).join('، ') + '</td></tr>';
-      }).join('') + '</tbody></table>' +
-      '<p class="p-foot">ތައްޔާރުކުރި ތާރީޚު: ' + dvDate(today).replace(/(\d+)/g, num('$1')) + '</p>';
-    var btn = printBtn.querySelector('button'), label = btn.querySelector('span');
-    var doc = document.createElement('div');
-    doc.className = 'pdf-doc';
-    doc.innerHTML = html;
+      }).join('') + '</tbody></table>';
+
     // The PDF engine loses spaces between right-to-left words, so give every word its own box
-    (function wordify(root) {
+    function wordify(root) {
       var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
       while (walker.nextNode()) if (/\S\s+\S/.test(walker.currentNode.nodeValue)) nodes.push(walker.currentNode);
       nodes.forEach(function (n) {
@@ -245,22 +247,76 @@
         n.nodeValue.split(/\s+/).forEach(function (w, i, arr) {
           if (!w) return;
           // right-to-left marks keep brackets and commas on the correct side
-          var sp = document.createElement('span'); sp.className = 'w'; sp.textContent = /[\u0780-\u07BF]/.test(w) ? '\u200F' + w + '\u200F' : w; frag.appendChild(sp);
+          var sp = document.createElement('span'); sp.className = 'w'; sp.textContent = /[ހ-޿]/.test(w) ? '‏' + w + '‏' : w; frag.appendChild(sp);
           if (i < arr.length - 1) frag.appendChild(document.createTextNode(' '));
         });
         n.parentNode.replaceChild(frag, n);
       });
-    })(doc);
+    }
+
+    // Lay the blocks out on A4 pages ourselves, so no island box or table row is ever cut in half
+    function buildPages() {
+      var meas = document.createElement('div');
+      meas.className = 'pdf-doc pdf-measure';
+      var mpage = document.createElement('div'); mpage.className = 'p-page';
+      meas.appendChild(mpage); document.body.appendChild(meas);
+      var nodes = blocks.map(function (b) {
+        if (b === 'break') return 'break';
+        var d = document.createElement('div'); d.className = 'blk';
+        d.innerHTML = b === 'table' ? tableHtml : b;
+        mpage.appendChild(d); return d;
+      });
+      wordify(mpage);
+      var cs = getComputedStyle(mpage);
+      var avail = mpage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - 4;
+      var pages = [[]], used = 0;
+      function place(node, h) {
+        if (used + h > avail && pages[pages.length - 1].length) { pages.push([]); used = 0; }
+        pages[pages.length - 1].push(node); used += h;
+      }
+      nodes.forEach(function (n) {
+        if (n === 'break') { if (pages[pages.length - 1].length) { pages.push([]); used = 0; } return; }
+        var table = n.querySelector('table');
+        if (!table) { place(n, n.offsetHeight); return; }
+        // split the table into page-sized pieces, repeating the header row
+        var headH = table.tHead.offsetHeight, rows = [].slice.call(table.tBodies[0].rows), chunk = null;
+        rows.forEach(function (tr) {
+          var h = tr.offsetHeight;
+          if (!chunk || used + h > avail) {
+            if (chunk && used + h > avail) { pages.push([]); used = 0; }
+            var d = document.createElement('div'); d.className = 'blk';
+            var t = document.createElement('table'); t.className = 'p-table';
+            t.appendChild(table.tHead.cloneNode(true)); t.appendChild(document.createElement('tbody'));
+            d.appendChild(t); chunk = t.tBodies[0];
+            if (used + headH + h > avail && pages[pages.length - 1].length) { pages.push([]); used = 0; }
+            pages[pages.length - 1].push(d); used += headH;
+          }
+          chunk.appendChild(tr.cloneNode(true)); used += h;
+        });
+      });
+      document.body.removeChild(meas);
+      var doc = document.createElement('div'); doc.className = 'pdf-doc';
+      pages.forEach(function (list, i) {
+        var pg = document.createElement('div'); pg.className = 'p-page';
+        list.forEach(function (n) { pg.appendChild(n.cloneNode(true)); });
+        var no = document.createElement('div'); no.className = 'p-pageno'; no.textContent = (i + 1) + ' / ' + pages.length;
+        pg.appendChild(no); doc.appendChild(pg);
+      });
+      return doc;
+    }
+
+    var btn = printBtn.querySelector('button'), label = btn.querySelector('span');
     function save() {
       label.textContent = 'ތައްޔާރުކުރަނީ...'; btn.disabled = true;
       document.fonts.ready.then(function () {
+        var doc = buildPages();
         return window.html2pdf().set({
-          margin: [10, 10, 12, 10],
+          margin: 0,
           filename: (title || 'activities').trim() + ' - ހަރަކާތްތައް.pdf',
           image: { type: 'jpeg', quality: 0.95 },
           html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak: { mode: ['css', 'legacy'], avoid: ['.p-island', 'tr', '.p-head'] }
+          pagebreak: { mode: [] }
         }).from(doc).save();
       }).catch(function () { alert('PDF ހެދިއެއް ނުދިޔައީ. އަލުން މަސައްކަތްކުރައްވާ.'); })
         .then(function () { label.textContent = 'ޑައުންލޯޑް (PDF)'; btn.disabled = false; });
