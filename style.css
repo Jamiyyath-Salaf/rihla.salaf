@@ -588,3 +588,8 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .fac .fac-call { margin-top: auto; }
 .fac .island-stats { margin-top: 0; }
 .fac-id .rel { align-self: flex-start; margin-top: .3rem; }
+
+/* Facilitator cards: route label and route on one line */
+.fac-route { flex-direction: row; align-items: center; flex-wrap: wrap; gap: .3rem .6rem; }
+.fac-route .fac-label { flex: none; }
+.fac-route .route-chip { align-self: center; }
