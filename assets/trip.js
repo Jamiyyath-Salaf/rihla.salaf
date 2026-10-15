@@ -381,7 +381,7 @@
       '<div class="fac-top"><span class="fac-avatar">' + (p.name ? esc(p.name.charAt(0)) : ICON.user) + '</span>' +
         '<div class="fac-id"><span class="fac-name">' + (p.name ? esc(p.name) : '—') + '</span>' +
         (p.island ? '<span class="fac-island">' + PIN + esc(p.island) + '</span>' : '') +
-        (p.workplace ? '<span class="fac-island">' + esc(p.workplace) + '</span>' : '') + '</div>' + releaseTag(p) + '</div>' +
+        (p.workplace ? '<span class="fac-island">' + esc(p.workplace) + '</span>' : '') + releaseTag(p) + '</div></div>' +
       '<div class="fac-route"><span class="fac-label">ދަތުރުގެ މަގު</span>' + routeChain(p) + '</div>' +
       (p.phone ? '<a class="call fac-call" href="tel:' + esc(String(p.phone).replace(/\s/g, '')) + '">' + ICON.phone + '<span dir="ltr">' + esc(p.phone) + '</span></a>' : '') +
       '<div class="island-stats">' +
