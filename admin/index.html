@@ -64,6 +64,7 @@ input[type=text], input[type=password], textarea {
   width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: .4rem .7rem; outline: none;
 }
 input:focus, textarea:focus { border-color: var(--accent); }
+select { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: .35rem .7rem; }
 input[type=date] { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: .35rem .7rem; }
 label.check { display: inline-flex; align-items: center; gap: .5rem; cursor: pointer; font-weight: 700; }
 label.check input { width: 22px; height: 22px; accent-color: var(--accent); }
@@ -240,6 +241,12 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
     inp.addEventListener('input', function () { obj[key] = inp.value; markDirty(); if (onchange) onchange(); });
     return el('label', { class: 'f' }, [el('span', { text: label }), inp]);
   }
+  function choiceField(obj, key, label, options, onchange) {
+    var sel = el('select');
+    options.forEach(function (o) { var op = el('option', { value: o[0], text: o[1] }); if ((obj[key] || '') === o[0]) op.selected = true; sel.appendChild(op); });
+    sel.addEventListener('change', function () { obj[key] = sel.value; markDirty(); if (onchange) onchange(); });
+    return el('label', { class: 'f' }, [el('span', { text: label }), sel]);
+  }
   function checkField(obj, key, label, onchange) {
     var inp = el('input', { type: 'checkbox' }); inp.checked = !!obj[key];
     inp.addEventListener('change', function () { obj[key] = inp.checked; markDirty(); if (onchange) onchange(); });
@@ -400,9 +407,12 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
         b.appendChild(listField(it, 'route', 'ދަތުރުގެ މަގު — މާލެ އަށް އަންނަ މަގު، ފަށާ ތަނުން ފެށިގެން. މާލޭގައި ހުންނަ މީހުންނަށް ހުސްކޮށް ބާއްވާ'));
         b.appendChild(listField(it, 'activities', 'ކުރެވޭނެ ހަރަކާތްތައް'));
         b.appendChild(listField(it, 'workshops', 'ވޯކްޝޮޕްތައް'));
+        b.appendChild(el('div', { class: 'grid2' }, [textField(it, 'workplace', 'މަސައްކަތްކުރާ ތަން'),
+          choiceField(it, 'release', 'ވަޒީފާއިން ރިލީސް ބޭނުންތަ؟', [['', '—'], ['yes', 'އާނ'], ['no', 'ނޫން']], r)]));
+        b.appendChild(areaField(it, 'notes', 'ނޯޓު'));
       }
-      function blank() { return { name: '', island: '', phone: '', email: '', route: [], activities: [], workshops: [] }; }
-      function sub(it) { return it.island || ''; }
+      function blank() { return { name: '', island: '', phone: '', email: '', route: [], activities: [], workshops: [], release: '', workplace: '', notes: '' }; }
+      function sub(it) { return [it.island, it.release === 'yes' ? 'ރިލީސް ބޭނުން' : ''].filter(Boolean).join(' · '); }
       return el('div', null, [
         itemList(F.sheikhs, { heading: 'ޝައިޚުން', addLabel: 'ޝައިޚަކު', titleKey: 'name', sub: sub, blank: blank, fields: facFields }),
         itemList(F.others, { heading: 'އެހެނިހެން', addLabel: 'މީހަކު', titleKey: 'name', sub: sub, blank: blank, fields: facFields })

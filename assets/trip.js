@@ -372,11 +372,16 @@
     if (inMale(p)) return '<span class="route-chip route-male">މާލޭގައި</span>';
     return '<span class="route-chain">' + p.route.map(function (r) { return '<span>' + esc(r) + '</span>'; }).join('<i>←</i>') + '</span>';
   }
+  function releaseTag(p) {
+    return p.release === 'yes' ? '<span class="rel rel-yes">ރިލީސް ބޭނުން</span>'
+      : p.release === 'no' ? '<span class="rel rel-no">ރިލީސް ނުލާ</span>' : '';
+  }
   function facCard(p, i) {
     return '<div class="fac" role="button" tabindex="0" data-f="' + i + '">' +
       '<div class="fac-top"><span class="fac-avatar">' + (p.name ? esc(p.name.charAt(0)) : ICON.user) + '</span>' +
         '<div class="fac-id"><span class="fac-name">' + (p.name ? esc(p.name) : '—') + '</span>' +
-        (p.island ? '<span class="fac-island">' + PIN + esc(p.island) + '</span>' : '') + '</div></div>' +
+        (p.island ? '<span class="fac-island">' + PIN + esc(p.island) + '</span>' : '') +
+        (p.workplace ? '<span class="fac-island">' + esc(p.workplace) + '</span>' : '') + '</div>' + releaseTag(p) + '</div>' +
       '<div class="fac-route"><span class="fac-label">ދަތުރުގެ މަގު</span>' + routeChain(p) + '</div>' +
       (p.phone ? '<a class="call fac-call" href="tel:' + esc(String(p.phone).replace(/\s/g, '')) + '">' + ICON.phone + '<span dir="ltr">' + esc(p.phone) + '</span></a>' : '') +
       '<div class="island-stats">' +
@@ -392,6 +397,9 @@
     if (p.phone) h += '<div>' + ICON.phone + '<span class="lbl">ނަންބަރު</span><a href="tel:' + esc(String(p.phone).replace(/\s/g, '')) + '" dir="ltr"><strong>' + esc(p.phone) + '</strong></a></div>';
     h += '</div>';
     if (p.email) h = h.replace(/<\/div>$/, '') + '<div>' + ICON.mail + '<span class="lbl">އީމެއިލް</span><a href="mailto:' + esc(p.email) + '" dir="ltr"><strong>' + esc(p.email) + '</strong></a></div></div>';
+    if (p.workplace) h = h.replace(/<\/div>$/, '') + '<div><span class="lbl">މަސައްކަތްކުރާ ތަން</span><strong>' + esc(p.workplace) + '</strong></div></div>';
+    h = h.replace(/<\/div>$/, '') + '<div><span class="lbl">ވަޒީފާއިން ރިލީސް</span><strong>' +
+      (p.release === 'yes' ? 'ބޭނުން' : p.release === 'no' ? 'ނުލާ' : '—') + '</strong></div></div>';
     h += '<h3>ދަތުރުގެ މަގު</h3>';
     h += inMale(p) && !p.island ? '<p class="none">' + EMPTY + '</p>' : inMale(p)
       ? '<p><span class="route-chip route-male">މާލޭގައި</span></p>'
@@ -403,11 +411,13 @@
     h += '<div class="side-by-side">' +
       '<div><h3>ކުރެވޭނެ ހަރަކާތްތައް</h3>' + tags(p.activities) + '</div>' +
       '<div><h3>ވޯކްޝޮޕްތައް</h3>' + tags(p.workshops) + '</div></div>';
+    if (p.notes) h += '<h3>ނޯޓު</h3><p class="fac-notes">' + esc(p.notes).replace(/\n/g, '<br>') + '</p>';
     openSheet(h);
   }
   var facEl = document.getElementById('facilitators');
   if (facEl) {
-    facEl.innerHTML = facGroups.map(function (g) {
+    var relN = facGroups.reduce(function (n, g) { return n + g.people.filter(function (p) { return p.release === 'yes'; }).length; }, 0);
+    facEl.innerHTML = (relN ? '<p class="rel-summary"><span class="rel rel-yes">ރިލީސް ބޭނުން</span> ' + relN + ' މީހުން</p>' : '') + facGroups.map(function (g) {
       var cards = g.people.map(function (p) {
         var i = facAll.push(Object.assign({ _group: g.title }, p)) - 1;
         return facCard(p, i);
