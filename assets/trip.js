@@ -291,7 +291,7 @@
   if (pend.length) actEl.innerHTML = '<div class="pending-box"><span>ހަރަކާތްތައް އަދި ނުލިބޭ:</span><div class="chips">' +
     pend.map(function (i) { return '<button class="chip" data-i="' + i + '">' + esc(all[i].name) + '</button>'; }).join('') + '</div></div>' + actEl.innerHTML;
   /* ---------- PDF download (shared by the activities and schools tabs) ---------- */
-  var DL_LABEL = 'ޑައުންލޯޑް (PDF)';
+  var DL_LABEL = 'PDF ބަލާ';
   function dlButton() {
     var bar = document.createElement('div'); bar.className = 'print-bar';
     bar.innerHTML = '<button type="button" class="print-btn"><svg class="icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg><span>' + DL_LABEL + '</span></button>';
@@ -304,6 +304,31 @@
     var logo = document.querySelector('link[rel="icon"]');
     return '<header class="p-head">' + (logo ? '<img src="' + logo.href + '" alt="">' : '') +
       '<div><h1>' + esc(title).replace(/(\d+)/g, pdfNum('$1')) + '</h1><p>' + esc(sub).replace(/(\d+)/g, pdfNum('$1')) + '</p></div></header>';
+  }
+  // Show the finished PDF as page images first; download only when asked
+  function pdfPreview(pdf, canvas, filename) {
+    var pageH = Math.floor(canvas.width * 297 / 210), n = pdf.internal.getNumberOfPages();
+    var dlg = document.getElementById('pdf-preview');
+    if (!dlg) {
+      dlg = document.createElement('dialog'); dlg.id = 'pdf-preview'; dlg.className = 'pdf-preview';
+      document.body.appendChild(dlg);
+      dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+    }
+    var bar = '<div class="pv-bar"><span class="pv-title">' + esc(filename.replace(/\.pdf$/, '')) + ' <small dir="ltr">' + n + ' pages</small></span>' +
+      '<button type="button" class="btn-dl"><svg class="icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg>ޑައުންލޯޑް</button>' +
+      '<button type="button" class="btn-close" aria-label="ބަންދުކުރޭ">✕</button></div>';
+    var pages = '';
+    for (var i = 0; i < n; i++) {
+      var t = document.createElement('canvas'); t.width = canvas.width; t.height = pageH;
+      var g = t.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, t.width, t.height);
+      g.drawImage(canvas, 0, i * pageH, canvas.width, pageH, 0, 0, canvas.width, pageH);
+      pages += '<img src="' + t.toDataURL('image/jpeg', 0.85) + '" alt="' + (i + 1) + '">';
+    }
+    dlg.innerHTML = bar + '<div class="pv-pages">' + pages + '</div>';
+    dlg.querySelector('.btn-dl').addEventListener('click', function () { pdf.save(filename); });
+    dlg.querySelector('.btn-close').addEventListener('click', function () { dlg.close(); });
+    if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+    dlg.querySelector('.pv-pages').scrollTop = 0;
   }
   // blocks: html strings in reading order; 'break' starts a new page, 'table' places tableHtml (split across pages if needed)
   function pdfDownload(btn, blocks, tableHtml, filename) {
@@ -389,7 +414,7 @@
           html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
           pagebreak: { mode: [] }
-        }).from(doc).save();
+        }).from(doc).toPdf().then(function () { pdfPreview(this.prop.pdf, this.prop.canvas, filename); });
       }).catch(function () { alert('PDF ހެދިއެއް ނުދިޔައީ. އަލުން މަސައްކަތްކުރައްވާ.'); })
         .then(function () { window.scrollTo(0, sy); label.textContent = DL_LABEL; btn.disabled = false; });
     }
