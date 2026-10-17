@@ -67,7 +67,6 @@
     if (!sc) return h + '<p><span class="pending-tag">ސްކޫލު ސެޝަންތައް ފޯމު ނުފުރާ</span></p>';
     return h + '<div class="school" dir="ltr">' +
       '<div class="school-name">' + esc(sc.name || '') + '</div>' +
-      (sc.submitted ? '<div class="school-meta">' + esc(sc.submitted) + '</div>' : '') +
       ((sc.sessions || []).length ? '<div class="tag-list">' + sc.sessions.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>' : '') +
       (sc.topics ? '<div class="school-topics">' + esc(sc.topics) + '</div>' : '') +
       (sc.focal ? '<div class="school-focal">' + ICON.user + '<span>' + esc(sc.focal) + '</span></div>' : '') +
