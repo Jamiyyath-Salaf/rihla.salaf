@@ -59,6 +59,20 @@
       '<div class="pop-legend"><span><i class="f"></i>އަންހެން <span dir="ltr">' + fp + '%</span></span><span><i class="m"></i>ފިރިހެން <span dir="ltr">' + (100 - fp) + '%</span></span></div>';
     return h;
   }
+  // School sessions form, shown exactly as the school wrote it (English text, left-to-right)
+  function schoolHtml(isl) {
+    if (isl.kind !== 'island') return '';
+    var sc = isl.school;
+    var h = '<h3>ސްކޫލު ސެޝަންތައް</h3>';
+    if (!sc) return h + '<p><span class="pending-tag">ސްކޫލު ސެޝަންތައް ފޯމު ނުފުރާ</span></p>';
+    return h + '<div class="school" dir="ltr">' +
+      '<div class="school-name">' + esc(sc.name || '') + '</div>' +
+      (sc.submitted ? '<div class="school-meta">' + esc(sc.submitted) + '</div>' : '') +
+      ((sc.sessions || []).length ? '<div class="tag-list">' + sc.sessions.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>' : '') +
+      (sc.topics ? '<div class="school-topics">' + esc(sc.topics) + '</div>' : '') +
+      (sc.focal ? '<div class="school-focal">' + ICON.user + '<span>' + esc(sc.focal) + '</span></div>' : '') +
+      '</div>';
+  }
   function issuesHtml(isl) {
     if (isl.kind !== 'island' || isl.profile_pending) return '';
     var p = isl.profile || {};
@@ -85,6 +99,7 @@
     h += popHtml(isl);
     h += '<h3>އެދިފައިވާ ހަރަކާތްތައް</h3>' + (isl.pending ? '<p>' + '<span class="pending-tag">ހަރަކާތްތައް އަދި ނުލިބޭ</span>' + '</p>' : list(isl.activities));
     h += issuesHtml(isl);
+    h += schoolHtml(isl);
 
     var team = isl.team || [];
     h += '<h3>ޓީމް</h3>';
