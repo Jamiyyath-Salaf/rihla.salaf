@@ -654,7 +654,8 @@
   var tabs = document.querySelectorAll('.tabs [data-tab]');
   var panels = document.querySelectorAll('.panel');
   function show(name) {
-    if (!document.querySelector('[data-panel="' + name + '"]')) name = 'islands';
+    // no tab chosen yet: open the first tab
+    if (!document.querySelector('[data-panel="' + name + '"]')) name = tabs[0].dataset.tab;
     tabs.forEach(function (t) { t.setAttribute('aria-selected', t.dataset.tab === name); });
     panels.forEach(function (p) { p.hidden = p.dataset.panel !== name; });
   }
