@@ -648,3 +648,31 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .school .tag-list span { background: var(--surface); font-size: .82rem; }
 .school-topics { margin-top: .6rem; border-left: 3px solid var(--warm); padding-left: .6rem; }
 .school-focal { display: flex; align-items: center; gap: .4rem; margin-top: .6rem; font-weight: 700; }
+
+/* Eight tabs: one row on desktop, two rows of four on phones */
+.tabs, .event .tabs { grid-template-columns: repeat(8, 1fr); max-width: 1180px; }
+@media (max-width: 900px) { .tabs, .event .tabs { grid-template-columns: repeat(4, 1fr); } }
+
+/* Schools tab */
+#schools { max-width: 1040px; margin-inline: auto; }
+.sess-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: .7rem; }
+@media (max-width: 560px) { .sess-list { grid-template-columns: 1fr; } }
+.sess { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: .7rem .9rem; display: grid; gap: .4rem; }
+.sess-head { display: flex; justify-content: space-between; align-items: center; gap: .6rem; }
+.sess-name { font-family: system-ui, sans-serif; font-weight: 700; font-size: .95rem; }
+.sess-head b { font-family: system-ui, sans-serif; color: var(--accent); font-size: 1.3rem; }
+.sess .chips { margin-top: 0; }
+.school-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: .8rem; }
+.school-card {
+  display: flex; flex-direction: column; gap: .5rem; cursor: pointer; text-align: right;
+  background: var(--surface); border: 1px solid var(--line); border-top: 4px solid #2b7a9e; border-radius: 16px; overflow: hidden;
+  transition: transform .18s, box-shadow .18s;
+}
+.school-card:hover, .school-card:focus-visible { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(20,60,90,.12); outline: none; }
+.school-card-head { display: flex; gap: .7rem; align-items: center; padding: .9rem 1rem 0; }
+.school-ico { flex: none; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, #2b7a9e 14%, transparent); color: #2b7a9e; }
+.school-island { font-weight: 900; font-size: 1.1rem; }
+.school-card .school-name { font-family: system-ui, sans-serif; font-size: .85rem; color: var(--muted); font-weight: 600; text-align: right; }
+.school-card .school-focal { padding: 0 1rem; font-family: system-ui, sans-serif; font-size: .85rem; color: var(--text); justify-content: flex-end; }
+.school-card .island-stats { margin-top: auto; }
+.sess-name { line-height: 1.4; }

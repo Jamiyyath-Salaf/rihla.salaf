@@ -665,6 +665,57 @@
     spEl.innerHTML = h;
   }
 
+  /* ---------- Schools (school sessions form) ---------- */
+  var scEl = document.getElementById('schools');
+  if (scEl) {
+    var schoolIsl = all.filter(function (x) { return x.kind === 'island'; });
+    var withForm = schoolIsl.filter(function (x) { return x.school; });
+    var without = schoolIsl.filter(function (x) { return !x.school; });
+    // how many schools asked for each session (spelling kept exactly as in the form)
+    var sess = {};
+    withForm.forEach(function (x) { (x.school.sessions || []).forEach(function (s) { (sess[s] = sess[s] || []).push(all.indexOf(x)); }); });
+    var sessNames = Object.keys(sess).sort(function (a, b) { return sess[b].length - sess[a].length; });
+    var SCHOOL = '<svg class="icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10l7-4 7 4v11"/><path d="M12 6V2.5l3 1.2-3 1.2"/><path d="M10 21v-4h4v4"/></svg>';
+    var h = '<div class="island-summary">' +
+      '<div><strong>' + withForm.length + '</strong><span>ފޯމު ފުރާ</span></div>' +
+      '<div><strong class="' + (without.length ? 'late-n' : '') + '">' + without.length + '</strong><span>ފޯމު ނުފުރާ</span></div>' +
+      '<div><strong>' + sessNames.length + '</strong><span>ސެޝަން</span></div></div>';
+    if (without.length) h += '<div class="pending-box"><span>ސްކޫލު ސެޝަންތައް ފޯމު ނުފުރާ:</span><div class="chips">' +
+      without.map(function (x) { return '<button class="chip" data-i="' + all.indexOf(x) + '">' + esc(x.name) + '</button>'; }).join('') + '</div></div>';
+    if (sessNames.length) {
+      h += '<h2 class="group-title">ސެޝަންތަކަށް އެދިފައިވާ ސްކޫލުތައް</h2><div class="sess-list">' + sessNames.map(function (s) {
+        var pct = Math.round(sess[s].length / withForm.length * 100);
+        return '<div class="sess"><div class="sess-head"><span class="sess-name" dir="ltr">' + esc(s) + '</span><b>' + sess[s].length + '</b></div>' +
+          '<div class="att-bar"><i style="width:' + pct + '%"></i></div>' +
+          '<div class="chips">' + sess[s].map(function (i) { return '<button class="chip" data-i="' + i + '">' + esc(all[i].name) + '</button>'; }).join('') + '</div></div>';
+      }).join('') + '</div>';
+    }
+    h += '<h2 class="group-title">ސްކޫލުތައް <span class="group-count">' + withForm.length + '</span></h2>';
+    h += withForm.length ? '<div class="school-cards">' + withForm.map(function (x) {
+      var sc = x.school;
+      return '<div class="school-card" role="button" tabindex="0" data-s="' + all.indexOf(x) + '">' +
+        '<div class="school-card-head"><span class="school-ico">' + SCHOOL + '</span><div><div class="school-island">ބ. ' + esc(x.name) + '</div>' +
+          '<div class="school-name" dir="ltr">' + esc(sc.name || '') + '</div></div></div>' +
+        (sc.focal ? '<div class="school-focal" dir="ltr">' + ICON.user + '<span>' + esc(sc.focal) + '</span></div>' : '') +
+        '<div class="island-stats"><span class="stat">' + ICON.list + '<b>' + (sc.sessions || []).length + '</b> ސެޝަން</span></div></div>';
+    }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';
+    scEl.innerHTML = h;
+    function schoolSheet(i) {
+      var x = all[i];
+      openSheet('<p class="sheet-kicker">ބ. ' + esc(x.name) + '</p><h2>ސްކޫލު ސެޝަންތައް</h2>' + schoolHtml(x).replace('<h3>ސްކޫލު ސެޝަންތައް</h3>', ''));
+    }
+    scEl.addEventListener('click', function (e) {
+      var c = e.target.closest('.chip');
+      if (c) { islandSheet(+c.dataset.i); return; }
+      var k = e.target.closest('.school-card');
+      if (k) schoolSheet(+k.dataset.s);
+    });
+    scEl.addEventListener('keydown', function (e) {
+      var k = e.target.closest('.school-card');
+      if (k && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); schoolSheet(+k.dataset.s); }
+    });
+  }
+
   /* ---------- Tabs ---------- */
   var tabs = document.querySelectorAll('.tabs [data-tab]');
   var panels = document.querySelectorAll('.panel');
