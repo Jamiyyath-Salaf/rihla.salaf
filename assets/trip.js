@@ -228,20 +228,30 @@
     return (li ? '<div class="org-link" aria-hidden="true"></div>' : '') +
       '<div class="org-level' + (li ? '' : ' org-top') + '" style="--n:' + l.people.length + '">' + l.people.map(function (p) {
         var id = flatRoles.push(p) - 1;
-        return '<div class="org-node">' +
+        var resp = p.responsibilities || [];
+        return '<div class="org-node" role="button" tabindex="0" data-r="' + id + '">' +
+          '<div class="org-band"></div>' +
           '<span class="org-avatar">' + (p.name ? esc(p.name.charAt(0)) : ICON.user) + '</span>' +
           '<span class="org-name">' + (p.name ? esc(p.name) : '—') + '</span>' +
           (p.role ? '<span class="org-role">' + esc(p.role) + '</span>' : '') +
-          '<button class="info-btn" data-r="' + id + '" aria-label="ޒިންމާތައް">' + ICON.info + '</button>' +
+          (resp.length ? '<ul class="org-preview">' + resp.slice(0, 2).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') +
+            (resp.length > 2 ? '<li class="org-more">+ ' + (resp.length - 2) + ' އިތުރު</li>' : '') + '</ul>' : '') +
+          '<span class="org-btn">' + ICON.list + 'ޒިންމާތައް' + (resp.length ? ' <b>' + resp.length + '</b>' : '') + '</span>' +
           '</div>';
       }).join('') + '</div>';
   }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';
-  org.addEventListener('click', function (e) {
-    var b = e.target.closest('.info-btn');
-    if (!b) return;
-    var r = flatRoles[+b.dataset.r];
+  function roleSheet(id) {
+    var r = flatRoles[id];
     openSheet((r.role ? '<p class="sheet-kicker">' + esc(r.role) + '</p>' : '') + '<h2>' + (r.name ? esc(r.name) : '—') + '</h2>' +
       '<h3>ޒިންމާތައް</h3>' + list(r.responsibilities));
+  }
+  org.addEventListener('click', function (e) {
+    var n = e.target.closest('.org-node');
+    if (n) roleSheet(+n.dataset.r);
+  });
+  org.addEventListener('keydown', function (e) {
+    var n = e.target.closest('.org-node');
+    if (n && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); roleSheet(+n.dataset.r); }
   });
 
   /* ---------- Activities (grouped across islands) ---------- */

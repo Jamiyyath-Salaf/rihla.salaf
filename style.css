@@ -676,3 +676,58 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .school-card .school-focal { padding: 0 1rem; font-family: system-ui, sans-serif; font-size: .85rem; color: var(--text); justify-content: flex-end; }
 .school-card .island-stats { margin-top: auto; }
 .sess-name { line-height: 1.4; }
+
+/* Org chart, refreshed */
+.org { max-width: 1000px; }
+.org-link { height: 2.6rem; }
+.org-level:not(.org-top)::before, .org-level:not(:last-child)::after { border-top: 3px solid color-mix(in srgb, var(--accent) 35%, transparent); }
+.org-level:not(.org-top)::before { top: -1.3rem; }
+.org-level:not(:last-child)::after { bottom: -1.3rem; }
+.org-level:not(.org-top) .org-node::before, .org-level:not(:last-child) .org-node::after { border-left: 3px solid color-mix(in srgb, var(--accent) 35%, transparent); height: 1.3rem; }
+.org-level:not(.org-top) .org-node::before { top: -1.3rem; }
+.org-level:not(:last-child) .org-node::after { bottom: -1.3rem; }
+.org-level { gap: 1.2rem; align-items: stretch; }
+.org-node {
+  padding: 0 0 .9rem; overflow: visible; gap: .35rem; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 20px; background: var(--surface);
+  box-shadow: 0 2px 6px rgba(0,0,0,.04); transition: transform .18s, box-shadow .18s;
+}
+.org-node:hover, .org-node:focus-visible { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(20,60,30,.14); outline: none; }
+.org-top .org-node { border: 1px solid var(--line); box-shadow: 0 6px 18px rgba(20,60,30,.10); }
+.org-band { align-self: stretch; height: 58px; border-radius: 19px 19px 0 0; background: linear-gradient(135deg, #2b7a9e, #4aa3c4); }
+.org-top .org-band { background: linear-gradient(135deg, #1f7a35, #2a9d6a); height: 64px; }
+.org-avatar, .org-top .org-avatar {
+  width: 70px; height: 70px; margin-top: -38px; font-size: 1.7rem; border: 4px solid var(--surface);
+  background: color-mix(in srgb, #2b7a9e 16%, var(--surface)); color: #1d5f8f; box-shadow: 0 4px 10px rgba(0,0,0,.08);
+}
+.org-top .org-avatar { width: 78px; height: 78px; margin-top: -42px; font-size: 1.9rem; background: #1f7a35; color: #fff; }
+@media (prefers-color-scheme: dark) { .org-top .org-avatar { color: #0f1a14; } .org-avatar { color: #8cc8e4; } }
+.org-name { font-size: 1.2rem; padding: 0 .6rem; }
+.org-role {
+  margin: 0 .7rem; padding: .05rem .8rem; border-radius: 999px; line-height: 1.7;
+  background: color-mix(in srgb, var(--warm) 13%, transparent); color: #a8601f; font-size: .82rem; font-weight: 700;
+}
+@media (prefers-color-scheme: dark) { .org-role { color: #f0b46a; } }
+.org-preview { list-style: none; margin: .3rem 0 0; padding: 0 1rem; text-align: right; align-self: stretch; color: var(--muted); font-size: .82rem; line-height: 1.7; }
+.org-preview li { position: relative; padding-right: .9rem; }
+.org-preview li::before { content: ""; position: absolute; right: 0; top: .75em; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: .6; }
+.org-preview .org-more { color: var(--accent); font-weight: 700; }
+.org-preview .org-more::before { display: none; }
+.org-btn {
+  margin-top: auto; display: inline-flex; align-items: center; gap: .35rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); color: var(--accent); border-radius: 999px; padding: .15rem .9rem; font-size: .85rem; font-weight: 700;
+}
+.org-btn b { font-family: system-ui, sans-serif; background: var(--accent); color: #fff; border-radius: 999px; padding: 0 .45rem; font-size: .75rem; }
+@media (prefers-color-scheme: dark) { .org-btn b { color: #0f1a14; } }
+.org-node:hover .org-btn { background: var(--accent); color: #fff; }
+.org-node .info-btn { display: none; }
+@media (max-width: 600px) {
+  .org-level { gap: .5rem; }
+  .org-band, .org-top .org-band { height: 42px; }
+  .org-avatar, .org-top .org-avatar { width: 52px; height: 52px; margin-top: -28px; font-size: 1.25rem; border-width: 3px; }
+  .org-name { font-size: .95rem; }
+  .org-role { font-size: .7rem; padding: 0 .5rem; margin: 0 .3rem; }
+  .org-preview { display: none; }
+  .org-btn { font-size: .72rem; padding: .1rem .5rem; }
+  .org-btn .icon { display: none; }
+}
