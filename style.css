@@ -731,3 +731,12 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
   .org-btn { font-size: .72rem; padding: .1rem .5rem; }
   .org-btn .icon { display: none; }
 }
+
+/* Bell as the first box in the islands summary row */
+.island-summary.has-bell { grid-template-columns: auto repeat(3, 1fr); }
+.upd-tile {
+  flex-direction: column; justify-content: center; gap: .15rem; border-radius: var(--radius); padding: .5rem 1rem;
+  background: var(--surface); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); font-size: .82rem;
+}
+.upd-tile .icon { width: 26px; height: 26px; }
+.upd-tile .upd-badge { top: -8px; left: -8px; }

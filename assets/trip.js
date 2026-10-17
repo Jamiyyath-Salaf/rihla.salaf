@@ -169,11 +169,11 @@
   var html = '';
   var islandList = all.filter(function (x) { return x.kind === 'island'; });
   var missingN = islandList.filter(function (x) { return x.profile_pending || !x.school_form || x.pending; }).length;
-  html += '<div class="upd-bar"><button type="button" class="upd-btn" id="upd-btn">' +
+  var bellHtml = '<button type="button" class="upd-btn upd-tile" id="upd-btn">' +
     '<svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>' +
-    '<span>އަޕްޑޭޓްތައް</span>' + (missingN ? '<b class="upd-badge">' + missingN + '</b>' : '') + '</button></div>';
+    '<span>އަޕްޑޭޓްތައް</span>' + (missingN ? '<b class="upd-badge">' + missingN + '</b>' : '') + '</button>';
   if (islands.length) {
-    html += summary + '<div class="island-cards">' +
+    html += summary.replace('<div class="island-summary">', '<div class="island-summary has-bell">' + bellHtml) + '<div class="island-cards">' +
       all.filter(function (x) { return x.kind === 'island'; }).map(function (x, n) { return card(x, n, n + 1); }).join('') + '</div>';
   }
   if (others.length) {
