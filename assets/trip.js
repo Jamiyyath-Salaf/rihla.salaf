@@ -139,9 +139,14 @@
   var grid = document.getElementById('island-grid');
   var totalActs = 0, totalTeam = 0;
   all.forEach(function (x) { totalActs += (x.activities || []).length; totalTeam += (x.team || []).length; });
+  // total population of the islands whose information has come in
+  var popKnown = islands.filter(function (x) { return !x.profile_pending && x.profile && +x.profile.total; });
+  var popTotal = popKnown.reduce(function (n, x) { return n + (+x.profile.total); }, 0);
   var summary = '<div class="island-summary">' +
     '<div><strong>' + islands.length + '</strong><span>ރަށް</span></div>' +
     '<div><strong>' + totalActs + '</strong><span>ހަރަކާތް</span></div>' +
+    '<div class="sum-pop"><strong>' + popTotal.toLocaleString('en-US') + '</strong><span>ޖުމްލަ އާބާދީ</span>' +
+      (popKnown.length < islands.length ? '<small><span dir="ltr">' + popKnown.length + '/' + islands.length + '</span> ރަށުގެ</small>' : '') + '</div>' +
     '<div><strong>' + totalTeam + '</strong><span>ޓީމު މެމްބަރުން</span></div></div>';
 
   function stat(icon, n, label) {
@@ -231,8 +236,7 @@
         var resp = p.responsibilities || [];
         return '<div class="org-node" role="button" tabindex="0" data-r="' + id + '">' +
           '<div class="org-band"></div>' +
-          '<span class="org-avatar">' + (p.name ? esc(p.name.charAt(0)) : ICON.user) + '</span>' +
-          '<span class="org-name">' + (p.name ? esc(p.name) : '—') + '</span>' +
+          '<span class="org-namebox">' + (p.name ? esc(p.name) : '—') + '</span>' +
           (p.role ? '<span class="org-role">' + esc(p.role) + '</span>' : '') +
           (resp.length ? '<ul class="org-preview">' + resp.slice(0, 2).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') +
             (resp.length > 2 ? '<li class="org-more">+ ' + (resp.length - 2) + ' އިތުރު</li>' : '') + '</ul>' : '') +
@@ -286,49 +290,24 @@
   var pend = all.map(function (x, i) { return x.pending ? i : -1; }).filter(function (i) { return i >= 0; });
   if (pend.length) actEl.innerHTML = '<div class="pending-box"><span>ހަރަކާތްތައް އަދި ނުލިބޭ:</span><div class="chips">' +
     pend.map(function (i) { return '<button class="chip" data-i="' + i + '">' + esc(all[i].name) + '</button>'; }).join('') + '</div></div>' + actEl.innerHTML;
-  /* ---------- Print: activities by island, then by activity ---------- */
-  var printBtn = document.createElement('div');
-  printBtn.className = 'print-bar';
-  printBtn.innerHTML = '<button type="button" class="print-btn"><svg class="icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg><span>ޑައުންލޯޑް (PDF)</span></button>';
-  actEl.insertBefore(printBtn, actEl.firstChild);
-  printBtn.querySelector('button').addEventListener('click', function () {
+  /* ---------- PDF download (shared by the activities and schools tabs) ---------- */
+  var DL_LABEL = 'ޑައުންލޯޑް (PDF)';
+  function dlButton() {
+    var bar = document.createElement('div'); bar.className = 'print-bar';
+    bar.innerHTML = '<button type="button" class="print-btn"><svg class="icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg><span>' + DL_LABEL + '</span></button>';
+    return bar;
+  }
+  function pdfNum(v) { return '<span class="p-num">' + v + '</span>'; }
+  function pdfHeader() {
     var title = (document.querySelector('.event h1') || {}).textContent || '';
     var sub = (document.querySelector('.event-sub') || {}).textContent || '';
     var logo = document.querySelector('link[rel="icon"]');
-    var islandsOnly = all.filter(function (x) { return x.kind === 'island'; });
-    var others = all.filter(function (x) { return x.kind !== 'island'; });
-    function num(v) { return '<span class="p-num">' + v + '</span>'; }
-    function block(x, n) {
-      var acts = x.activities || [];
-      return '<section class="p-island"><h3>' + (n ? '<span class="p-n">' + n + '</span>' : '') + (x.kind === 'island' ? 'ބ. ' : '') + esc(x.name) +
-        (x.focal ? '<small>' + esc(x.focal) + (x.phone ? ' · ' + num(esc(x.phone)) : '') + '</small>' : '') + '</h3>' +
-        (x.pending ? '<p class="p-pending">ހަރަކާތްތައް އަދި ނުލިބޭ</p>'
-          : acts.length ? '<div class="p-list">' + acts.map(function (a, k) { return '<div class="p-row"><span class="p-k">' + (k + 1) + '.</span><span>' + esc(a) + '</span></div>'; }).join('') + '</div>' : '<p class="p-pending">—</p>') +
-        '</section>';
-    }
-    var totalActs = all.reduce(function (n, x) { return n + (x.activities || []).length; }, 0);
-    // Blocks in reading order. Islands go two to a row; 'break' starts a new page.
-    var blocks = [];
-    blocks.push('<header class="p-head">' + (logo ? '<img src="' + logo.href + '" alt="">' : '') +
-      '<div><h1>' + esc(title).replace(/(\d+)/g, num('$1')) + '</h1><p>' + esc(sub).replace(/(\d+)/g, num('$1')) + '</p></div></header>');
-    blocks.push('<h2>' + num('1.') + ' ރަށްތަކުން އެދިފައިވާ ހަރަކާތްތައް</h2><p class="p-sum">' + num(islandsOnly.length) + ' ރަށް · ' + num(totalActs) + ' ހަރަކާތް</p>');
-    for (var r = 0; r < islandsOnly.length; r += 2)
-      blocks.push('<div class="p-row2">' + block(islandsOnly[r], r + 1) + (islandsOnly[r + 1] ? block(islandsOnly[r + 1], r + 2) : '') + '</div>');
-    if (others.length) {
-      blocks.push('<h2>އެހެނިހެން ބައިވެރިން</h2>');
-      for (var o = 0; o < others.length; o += 2) blocks.push('<div class="p-row2">' + block(others[o]) + (others[o + 1] ? block(others[o + 1]) : '') + '</div>');
-    }
-    blocks.push('break');
-    blocks.push('<h2>' + num('2.') + ' ހަރަކާތްތަކަށް އެދިފައިވާ ރަށްތައް</h2><p class="p-sum">' + num(actNames.length) + ' ހަރަކާތް · ބޮޑު އަދަދަކުން އެދިފައިވާ ހަރަކާތްތައް މަތީގައި</p>');
-    blocks.push('table');
-    blocks.push('<p class="p-foot">ތައްޔާރުކުރި ތާރީޚު: ' + dvDate(today).replace(/(\d+)/g, num('$1')) + '</p>');
-    var tableHtml = '<table class="p-table"><thead><tr><th>#</th><th>ހަރަކާތް</th><th>އަދަދު</th><th>ރަށްތައް</th></tr></thead><tbody>' +
-      actNames.map(function (a, i) {
-        var who = uniq(acts[a]);
-        return '<tr><td>' + (i + 1) + '</td><td>' + esc(a) + '</td><td class="p-c">' + who.length + '</td><td>' +
-          who.map(function (k) { return esc(all[k].name); }).join('، ') + '</td></tr>';
-      }).join('') + '</tbody></table>';
-
+    return '<header class="p-head">' + (logo ? '<img src="' + logo.href + '" alt="">' : '') +
+      '<div><h1>' + esc(title).replace(/(\d+)/g, pdfNum('$1')) + '</h1><p>' + esc(sub).replace(/(\d+)/g, pdfNum('$1')) + '</p></div></header>';
+  }
+  // blocks: html strings in reading order; 'break' starts a new page, 'table' places tableHtml (split across pages if needed)
+  function pdfDownload(btn, blocks, tableHtml, filename) {
+    var label = btn.querySelector('span');
     // The PDF engine loses spaces between right-to-left words, so give every word its own box
     function wordify(root) {
       var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
@@ -396,21 +375,23 @@
       return doc;
     }
 
-    var btn = printBtn.querySelector('button'), label = btn.querySelector('span');
     function save() {
       label.textContent = 'ތައްޔާރުކުރަނީ...'; btn.disabled = true;
+      // the PDF engine shifts the page down by the current scroll position, so render from the top
+      var sy = window.scrollY;
       document.fonts.ready.then(function () {
+        window.scrollTo(0, 0);
         var doc = buildPages();
         return window.html2pdf().set({
           margin: 0,
-          filename: (title || 'activities').trim() + ' - ހަރަކާތްތައް.pdf',
+          filename: filename,
           image: { type: 'jpeg', quality: 0.95 },
           html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
           pagebreak: { mode: [] }
         }).from(doc).save();
       }).catch(function () { alert('PDF ހެދިއެއް ނުދިޔައީ. އަލުން މަސައްކަތްކުރައްވާ.'); })
-        .then(function () { label.textContent = 'ޑައުންލޯޑް (PDF)'; btn.disabled = false; });
+        .then(function () { window.scrollTo(0, sy); label.textContent = DL_LABEL; btn.disabled = false; });
     }
     if (window.html2pdf) save();
     else {
@@ -418,9 +399,53 @@
       var sc = document.createElement('script');
       sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
       sc.onload = save;
-      sc.onerror = function () { label.textContent = 'ޑައުންލޯޑް (PDF)'; alert('PDF ހެދިއެއް ނުދިޔައީ. އިންޓަނެޓް ޗެކްކުރައްވާ.'); };
+      sc.onerror = function () { label.textContent = DL_LABEL; alert('PDF ހެދިއެއް ނުދިޔައީ. އިންޓަނެޓް ޗެކްކުރައްވާ.'); };
       document.head.appendChild(sc);
     }
+  }
+
+  /* ---------- Print: activities by island, then by activity ---------- */
+  var printBtn = dlButton();
+  actEl.insertBefore(printBtn, actEl.firstChild);
+  printBtn.querySelector('button').addEventListener('click', function () {
+    var title = (document.querySelector('.event h1') || {}).textContent || '';
+    var sub = (document.querySelector('.event-sub') || {}).textContent || '';
+    var logo = document.querySelector('link[rel="icon"]');
+    var islandsOnly = all.filter(function (x) { return x.kind === 'island'; });
+    var others = all.filter(function (x) { return x.kind !== 'island'; });
+    function num(v) { return '<span class="p-num">' + v + '</span>'; }
+    function block(x, n) {
+      var acts = x.activities || [];
+      return '<section class="p-island"><h3>' + (n ? '<span class="p-n">' + n + '</span>' : '') + (x.kind === 'island' ? 'ބ. ' : '') + esc(x.name) +
+        (x.focal ? '<small>' + esc(x.focal) + (x.phone ? ' · ' + num(esc(x.phone)) : '') + '</small>' : '') + '</h3>' +
+        (x.pending ? '<p class="p-pending">ހަރަކާތްތައް އަދި ނުލިބޭ</p>'
+          : acts.length ? '<div class="p-list">' + acts.map(function (a, k) { return '<div class="p-row"><span class="p-k">' + (k + 1) + '.</span><span>' + esc(a) + '</span></div>'; }).join('') + '</div>' : '<p class="p-pending">—</p>') +
+        '</section>';
+    }
+    var totalActs = all.reduce(function (n, x) { return n + (x.activities || []).length; }, 0);
+    // Blocks in reading order. Islands go two to a row; 'break' starts a new page.
+    var blocks = [];
+    blocks.push('<header class="p-head">' + (logo ? '<img src="' + logo.href + '" alt="">' : '') +
+      '<div><h1>' + esc(title).replace(/(\d+)/g, num('$1')) + '</h1><p>' + esc(sub).replace(/(\d+)/g, num('$1')) + '</p></div></header>');
+    blocks.push('<h2>' + num('1.') + ' ރަށްތަކުން އެދިފައިވާ ހަރަކާތްތައް</h2><p class="p-sum">' + num(islandsOnly.length) + ' ރަށް · ' + num(totalActs) + ' ހަރަކާތް</p>');
+    for (var r = 0; r < islandsOnly.length; r += 2)
+      blocks.push('<div class="p-row2">' + block(islandsOnly[r], r + 1) + (islandsOnly[r + 1] ? block(islandsOnly[r + 1], r + 2) : '') + '</div>');
+    if (others.length) {
+      blocks.push('<h2>އެހެނިހެން ބައިވެރިން</h2>');
+      for (var o = 0; o < others.length; o += 2) blocks.push('<div class="p-row2">' + block(others[o]) + (others[o + 1] ? block(others[o + 1]) : '') + '</div>');
+    }
+    blocks.push('break');
+    blocks.push('<h2>' + num('2.') + ' ހަރަކާތްތަކަށް އެދިފައިވާ ރަށްތައް</h2><p class="p-sum">' + num(actNames.length) + ' ހަރަކާތް · ބޮޑު އަދަދަކުން އެދިފައިވާ ހަރަކާތްތައް މަތީގައި</p>');
+    blocks.push('table');
+    blocks.push('<p class="p-foot">ތައްޔާރުކުރި ތާރީޚު: ' + dvDate(today).replace(/(\d+)/g, num('$1')) + '</p>');
+    var tableHtml = '<table class="p-table"><thead><tr><th>#</th><th>ހަރަކާތް</th><th>އަދަދު</th><th>ރަށްތައް</th></tr></thead><tbody>' +
+      actNames.map(function (a, i) {
+        var who = uniq(acts[a]);
+        return '<tr><td>' + (i + 1) + '</td><td>' + esc(a) + '</td><td class="p-c">' + who.length + '</td><td>' +
+          who.map(function (k) { return esc(all[k].name); }).join('، ') + '</td></tr>';
+      }).join('') + '</tbody></table>';
+
+    pdfDownload(printBtn.querySelector('button'), blocks, tableHtml, (title || 'activities').trim() + ' - ހަރަކާތްތައް.pdf');
   });
 
   function actSheet(n) {
@@ -710,6 +735,38 @@
         '<div class="island-stats"><span class="stat">' + ICON.list + '<b>' + (sc.sessions || []).length + '</b> ސެޝަން</span></div></div>';
     }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';
     scEl.innerHTML = h;
+
+    // PDF: each school's requested sessions, then which schools asked for each session
+    var scBtn = dlButton();
+    scEl.insertBefore(scBtn, scEl.firstChild);
+    scBtn.querySelector('button').addEventListener('click', function () {
+      var title = (document.querySelector('.event h1') || {}).textContent || '';
+      function box(x, n) {
+        var sc = x.school;
+        return '<section class="p-island"><h3><span class="p-n">' + n + '</span>ބ. ' + esc(x.name) + '</h3>' +
+          '<div class="p-ltr" dir="ltr">' +
+            '<div class="p-school">' + esc(sc.name || '') + '</div>' +
+            '<div class="p-list">' + (sc.sessions || []).map(function (t, k) { return '<div class="p-row"><span class="p-k">' + (k + 1) + '.</span><span>' + esc(t) + '</span></div>'; }).join('') + '</div>' +
+            (sc.topics ? '<div class="p-topics">' + esc(sc.topics) + '</div>' : '') +
+            (sc.focal ? '<div class="p-focal">Focal: ' + esc(sc.focal) + '</div>' : '') +
+          '</div></section>';
+      }
+      var blocks = [pdfHeader()];
+      blocks.push('<h2>' + pdfNum('1.') + ' ސްކޫލުތަކުން އެދިފައިވާ ސެޝަންތައް</h2><p class="p-sum">' + pdfNum(withForm.length) + ' ސްކޫލު · ' + pdfNum(sessNames.length) + ' ސެޝަން</p>');
+      for (var r = 0; r < withForm.length; r += 2)
+        blocks.push('<div class="p-row2">' + box(withForm[r], r + 1) + (withForm[r + 1] ? box(withForm[r + 1], r + 2) : '') + '</div>');
+      if (without.length) blocks.push('<p class="p-pending">ސްކޫލު ސެޝަންތައް ފޯމު ނުފުރާ (' + pdfNum(without.length) + '): ' + without.map(function (x) { return esc(x.name); }).join('، ') + '</p>');
+      blocks.push('break');
+      blocks.push('<h2>' + pdfNum('2.') + ' ސެޝަންތަކަށް އެދިފައިވާ ސްކޫލުތައް</h2><p class="p-sum">' + pdfNum(sessNames.length) + ' ސެޝަން · ބޮޑު އަދަދަކުން އެދިފައިވާ ސެޝަންތައް މަތީގައި</p>');
+      blocks.push('table');
+      blocks.push('<p class="p-foot">ތައްޔާރުކުރި ތާރީޚު: ' + dvDate(today).replace(/(\d+)/g, pdfNum('$1')) + '</p>');
+      var tableHtml = '<table class="p-table"><thead><tr><th>#</th><th>ސެޝަން</th><th>އަދަދު</th><th>ރަށްތައް</th></tr></thead><tbody>' +
+        sessNames.map(function (t, i) {
+          return '<tr><td>' + (i + 1) + '</td><td class="p-ltr-cell" dir="ltr">' + esc(t) + '</td><td class="p-c">' + sess[t].length + '</td><td>' +
+            sess[t].map(function (k) { return esc(all[k].name); }).join('، ') + '</td></tr>';
+        }).join('') + '</tbody></table>';
+      pdfDownload(scBtn.querySelector('button'), blocks, tableHtml, title.trim() + ' - ސްކޫލު ސެޝަންތައް.pdf');
+    });
     function schoolSheet(i) {
       var x = all[i];
       openSheet('<p class="sheet-kicker">ބ. ' + esc(x.name) + '</p><h2>ސްކޫލު ސެޝަންތައް</h2>' + schoolHtml(x).replace('<h3>ސްކޫލު ސެޝަންތައް</h3>', ''));

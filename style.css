@@ -740,3 +740,36 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 }
 .upd-tile .icon { width: 26px; height: 26px; }
 .upd-tile .upd-badge { top: -8px; left: -8px; }
+
+/* Schools PDF: English parts stay left-to-right */
+.pdf-doc .p-ltr { direction: ltr; text-align: left; font-family: system-ui, sans-serif; font-size: 11.5px; line-height: 1.55; }
+.pdf-doc .p-ltr .p-k { text-align: right; }
+.pdf-doc .p-school { font-weight: 700; margin-bottom: 3px; }
+.pdf-doc .p-topics { margin-top: 5px; border-left: 3px solid #c8743a; padding-left: 6px; color: #333; }
+.pdf-doc .p-focal { margin-top: 4px; font-weight: 700; }
+.pdf-doc .p-ltr-cell { direction: ltr; text-align: left; font-family: system-ui, sans-serif; }
+#schools .print-bar { margin-bottom: .8rem; }
+
+/* Org chart: full name in a box on the band (instead of a letter in a circle) */
+.org-namebox {
+  margin: -30px .8rem 0; max-width: calc(100% - 1.6rem); padding: .35rem 1.1rem; border-radius: 14px;
+  border: 3px solid var(--surface); box-shadow: 0 4px 12px rgba(0,0,0,.10);
+  background: color-mix(in srgb, #2b7a9e 14%, var(--surface)); color: #1d5f8f;
+  font-weight: 900; font-size: 1.2rem; line-height: 1.6; text-align: center;
+}
+.org-top .org-namebox { margin-top: -34px; background: #1f7a35; color: #fff; font-size: 1.3rem; }
+@media (prefers-color-scheme: dark) { .org-top .org-namebox { color: #0f1a14; } .org-namebox { color: #8cc8e4; } }
+.org-namebox + .org-role { margin-top: .3rem; }
+@media (max-width: 600px) {
+  .org-namebox, .org-top .org-namebox { margin: -22px .3rem 0; max-width: calc(100% - .6rem); padding: .2rem .45rem; font-size: .88rem; border-width: 2px; border-radius: 10px; }
+}
+
+/* Islands summary: bell + 4 boxes */
+.island-summary.has-bell { grid-template-columns: auto repeat(4, 1fr); max-width: 900px; }
+.sum-pop small { color: var(--muted); font-size: .72rem; line-height: 1.3; }
+@media (max-width: 480px) {
+  .island-summary.has-bell { gap: .35rem; }
+  .island-summary.has-bell > div strong { font-size: 1.15rem; }
+  .island-summary.has-bell > div span { font-size: .72rem; }
+  .upd-tile { padding: .4rem .5rem; }
+}
