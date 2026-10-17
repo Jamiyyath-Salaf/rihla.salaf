@@ -51,6 +51,9 @@
       var parts = String(txt || '').split('،').map(function (x) { return x.trim(); }).filter(Boolean);
       return parts.length ? '<div class="tag-list">' + parts.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>' : '<p class="none" style="text-align:right;margin:.2rem 0">—</p>';
     }
+    h += '<div class="prof-row"><div class="prof-label">އިޖްތިމާޢީ މައްސަލަތައް</div>' + tags(p.issues) + '</div>';
+    h += '<div class="prof-row"><div class="prof-label">އިތުރަށް އަލިއަޅުވާލަން ބޭނުންވާ</div>' + tags(p.focus) + '</div>';
+    h += '<div class="prof-row"><div class="prof-label">ސޯޝަލް މީޑިއަރ އިންފުލުއެންޒަރ</div><div class="prof-val">' + (p.influencer ? esc(p.influencer) : '—') + '</div></div>';
     var f = +p.female || 0, m = +p.male || 0, fp = f + m ? Math.round(f / (f + m) * 100) : 50;
     h += '<div class="pop">' +
       '<div class="pop-total"><b>' + n(p.total) + '</b><span>ޖުމްލަ އާބާދީ</span></div>' +
@@ -60,9 +63,6 @@
       '</div>';
     if (f + m) h += '<div class="pop-bar" title="އަންހެން / ފިރިހެން"><i class="f" style="width:' + fp + '%"></i><i class="m" style="width:' + (100 - fp) + '%"></i></div>' +
       '<div class="pop-legend"><span><i class="f"></i>އަންހެން <span dir="ltr">' + fp + '%</span></span><span><i class="m"></i>ފިރިހެން <span dir="ltr">' + (100 - fp) + '%</span></span></div>';
-    h += '<div class="prof-row"><div class="prof-label">އިޖްތިމާޢީ މައްސަލަތައް</div>' + tags(p.issues) + '</div>';
-    h += '<div class="prof-row"><div class="prof-label">އިތުރަށް އަލިއަޅުވާލަން ބޭނުންވާ</div>' + tags(p.focus) + '</div>';
-    h += '<div class="prof-row"><div class="prof-label">ސޯޝަލް މީޑިއަރ އިންފުލުއެންޒަރ</div><div class="prof-val">' + (p.influencer ? esc(p.influencer) : '—') + '</div></div>';
     return h;
   }
   function islandSheet(i) {
@@ -77,8 +77,8 @@
       (isl.phone ? '<a href="tel:' + esc(String(isl.phone).replace(/\s/g, '')) + '" dir="ltr"><strong>' + esc(isl.phone) + '</strong></a>' : '<strong>—</strong>') + '</div>';
     if (isl.email) h += '<div>' + ICON.mail + '<span class="lbl">އީމެއިލް</span><a href="mailto:' + esc(isl.email) + '" dir="ltr"><strong>' + esc(isl.email) + '</strong></a></div>';
     h += '</div>';
-    h += profileHtml(isl);
     h += '<h3>އެދިފައިވާ ހަރަކާތްތައް</h3>' + (isl.pending ? '<p>' + '<span class="pending-tag">ހަރަކާތްތައް އަދި ނުލިބޭ</span>' + '</p>' : list(isl.activities));
+    h += profileHtml(isl);
 
     var team = isl.team || [];
     h += '<h3>ޓީމް</h3>';
