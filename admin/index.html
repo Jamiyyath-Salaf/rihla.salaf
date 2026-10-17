@@ -343,7 +343,19 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
       withTitleEmail ? textField(it, 'email', 'އީމެއިލް', { ltr: true }) : null
     ]));
     if (withTitleEmail) body.appendChild(textField(it, 'title', 'މަޤާމް'));
-    if (!withTitleEmail) body.appendChild(checkField(it, 'pending', 'ހަރަކާތްތައް އަދި ނުލިބޭ'));
+    if (!withTitleEmail) {
+      // ރަށުގެ މަޢުލޫމާތު
+      if (!it.profile || typeof it.profile !== 'object') it.profile = {};
+      var pr = it.profile;
+      body.appendChild(el('fieldset', null, [el('legend', { text: 'ރަށުގެ މަޢުލޫމާތު' }),
+        checkField(it, 'profile_pending', 'ރަށުގެ މަޢުލޫމާތު އަދި ނުލިބޭ'),
+        el('div', { class: 'grid2', style: 'margin-top:.5rem' }, [textField(pr, 'female', 'އަންހެން', { ltr: true }), textField(pr, 'male', 'ފިރިހެން', { ltr: true })]),
+        el('div', { class: 'grid2' }, [textField(pr, 'total', 'ޖުމްލަ', { ltr: true }), textField(pr, 'students', 'ސްކޫލު ދަރިވަރުން', { ltr: true })]),
+        textField(pr, 'issues', 'އިޖްތިމާޢީ މައްސަލަތައް (، ޖަހާ ވަކިކުރައްވާ)'),
+        textField(pr, 'focus', 'އިތުރަށް އަލިއަޅުވާލަން ބޭނުންވާ (، ޖަހާ ވަކިކުރައްވާ)'),
+        textField(pr, 'influencer', 'ސޯޝަލް މީޑިއަރ އިންފުލުއެންޒަރ')]));
+      body.appendChild(checkField(it, 'pending', 'ހަރަކާތްތައް އަދި ނުލިބޭ'));
+    }
     body.appendChild(listField(it, 'activities', 'އެދިފައިވާ ހަރަކާތްތައް'));
     body.appendChild(rowsField(it, 'team', 'ޓީމް', [{ key: 'name', ph: 'ނަން' }, { key: 'role', ph: 'މަސައްކަތް' }], 'މެމްބަރެއް'));
     body.appendChild(rowsField(it, 'schedule', 'ހަރަކާތްތަކުގެ ޝެޑިއުލް', [
