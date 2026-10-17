@@ -444,7 +444,20 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
       function sub(it) { return [it.island, it.release === 'yes' ? 'ރިލީސް ބޭނުން' : ''].filter(Boolean).join(' · '); }
       return el('div', null, [
         itemList(F.sheikhs, { heading: 'ޝައިޚުން', addLabel: 'ޝައިޚަކު', titleKey: 'name', sub: sub, blank: blank, fields: facFields }),
-        itemList(F.others, { heading: 'އެހެނިހެން', addLabel: 'މީހަކު', titleKey: 'name', sub: sub, blank: blank, fields: facFields })
+        itemList(F.others, { heading: 'އެހެނިހެން', addLabel: 'މީހަކު', titleKey: 'name', sub: sub, blank: blank, fields: facFields }),
+        (function () {
+          data.volunteers = data.volunteers || [];
+          return itemList(data.volunteers, { heading: 'ވޮލަންޓިއަރުން', addLabel: 'ވޮލަންޓިއަރެއް', titleKey: 'name',
+            sub: function (v) { return [v.island, v.role].filter(Boolean).join(' · '); },
+            blank: function () { return { name: '', island: '', phone: '', email: '', role: '', skills: [], notes: '' }; },
+            fields: function (v, b, r) {
+              b.appendChild(el('div', { class: 'grid2' }, [textField(v, 'name', 'ނަން', { onchange: r }), textField(v, 'island', 'ރަށް', { onchange: r })]));
+              b.appendChild(el('div', { class: 'grid2' }, [textField(v, 'phone', 'ނަންބަރު', { ltr: true }), textField(v, 'email', 'އީމެއިލް', { ltr: true })]));
+              b.appendChild(textField(v, 'role', 'މަސައްކަތް', { onchange: r }));
+              b.appendChild(listField(v, 'skills', 'ކުރެވޭނެ ކަންތައް'));
+              b.appendChild(areaField(v, 'notes', 'ނޯޓު'));
+            } });
+        })()
       ]);
     } },
     tasks: { label: 'މަސައްކަތްތައް', render: function () {

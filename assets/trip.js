@@ -566,6 +566,33 @@
       return '<h2 class="group-title">' + g.title + ' <span class="group-count">' + g.people.length + '</span></h2>' +
         (cards ? '<div class="fac-cards">' + cards + '</div>' : '<p class="none">' + EMPTY + '</p>');
     }).join('');
+    // Volunteers, below the facilitators
+    var vols = T.volunteers || [];
+    facEl.insertAdjacentHTML('beforeend', '<h2 class="group-title">ވޮލަންޓިއަރުން <span class="group-count">' + vols.length + '</span></h2>' +
+      (vols.length ? '<div class="vol-cards">' + vols.map(function (v, i) {
+        return '<div class="vol" role="button" tabindex="0" data-v="' + i + '">' +
+          '<span class="vol-avatar">' + (v.name ? esc(v.name.charAt(0)) : ICON.user) + '</span>' +
+          '<div class="vol-main"><div class="vol-name">' + (v.name ? esc(v.name) : '—') + '</div>' +
+            '<div class="task-meta">' + (v.island ? '<span>' + PIN + esc(v.island) + '</span>' : '') + (v.role ? '<span>' + esc(v.role) + '</span>' : '') + '</div></div>' +
+          (v.phone ? '<a class="call" href="tel:' + esc(String(v.phone).replace(/\s/g, '')) + '">' + ICON.phone + '<span dir="ltr">' + esc(v.phone) + '</span></a>' : '') +
+          '</div>';
+      }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>'));
+    function volSheet(i) {
+      var v = vols[i];
+      var h = '<p class="sheet-kicker">ވޮލަންޓިއަރު</p><h2>' + (v.name ? esc(v.name) : '—') + '</h2><div class="contact-card">' +
+        '<div>' + PIN + '<span class="lbl">ރަށް</span><strong>' + (v.island ? esc(v.island) : '—') + '</strong></div>' +
+        (v.phone ? '<div>' + ICON.phone + '<span class="lbl">ނަންބަރު</span><a href="tel:' + esc(String(v.phone).replace(/\s/g, '')) + '" dir="ltr"><strong>' + esc(v.phone) + '</strong></a></div>' : '') +
+        (v.email ? '<div>' + ICON.mail + '<span class="lbl">އީމެއިލް</span><a href="mailto:' + esc(v.email) + '" dir="ltr"><strong>' + esc(v.email) + '</strong></a></div>' : '') +
+        (v.role ? '<div><span class="lbl">މަސައްކަތް</span><strong>' + esc(v.role) + '</strong></div>' : '') + '</div>';
+      if ((v.skills || []).length) h += '<h3>ކުރެވޭނެ ކަންތައް</h3><div class="tag-list">' + v.skills.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>';
+      if (v.notes) h += '<h3>ނޯޓު</h3><p class="fac-notes">' + esc(v.notes).replace(/\n/g, '<br>') + '</p>';
+      openSheet(h);
+    }
+    facEl.addEventListener('click', function (e) {
+      if (e.target.closest('.call')) return;
+      var vv = e.target.closest('.vol');
+      if (vv) { volSheet(+vv.dataset.v); return; }
+    });
     facEl.addEventListener('click', function (e) {
       if (e.target.closest('.call')) return;
       var b = e.target.closest('.fac');

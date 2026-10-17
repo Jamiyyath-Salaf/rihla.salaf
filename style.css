@@ -787,3 +787,13 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .pv-pages { flex: 1; overflow: auto; padding: 1rem; display: grid; gap: 1rem; justify-items: center; }
 .pv-pages img { width: 100%; max-width: 760px; height: auto; background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,.18); border-radius: 2px; }
 @media (max-width: 600px) { .pdf-preview { height: 100%; border-radius: 0; } .pv-pages { padding: .6rem; gap: .6rem; } }
+
+/* Volunteers (below facilitators) */
+.vol-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: .7rem; }
+.vol { display: flex; align-items: center; gap: .7rem; cursor: pointer; text-align: right; background: var(--surface); border: 1px solid var(--line); border-right: 4px solid #2b7a9e; border-radius: 14px; padding: .7rem .9rem; transition: transform .15s, box-shadow .15s; }
+.vol:hover, .vol:focus-visible { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(20,60,90,.12); outline: none; }
+.vol-avatar { flex: none; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, #2b7a9e 14%, transparent); color: #1d5f8f; font-weight: 900; }
+@media (prefers-color-scheme: dark) { .vol-avatar { color: #8cc8e4; } }
+.vol-main { flex: 1; min-width: 0; }
+.vol-name { font-weight: 900; font-size: 1.05rem; }
+.vol .call { flex: none; font-size: .85rem; padding: .15rem .7rem; }
