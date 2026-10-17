@@ -152,6 +152,11 @@
   }
 
   var html = '';
+  var islandList = all.filter(function (x) { return x.kind === 'island'; });
+  var missingN = islandList.filter(function (x) { return x.profile_pending || !x.school_form || x.pending; }).length;
+  html += '<div class="upd-bar"><button type="button" class="upd-btn" id="upd-btn">' +
+    '<svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>' +
+    '<span>އަޕްޑޭޓްތައް</span>' + (missingN ? '<b class="upd-badge">' + missingN + '</b>' : '') + '</button></div>';
   if (islands.length) {
     html += summary + '<div class="island-cards">' +
       all.filter(function (x) { return x.kind === 'island'; }).map(function (x, n) { return card(x, n, n + 1); }).join('') + '</div>';
@@ -161,7 +166,36 @@
       others.map(function (x, n) { return card(all[islands.length + n], islands.length + n); }).join('') + '</div>';
   }
   grid.innerHTML = html || '<p class="none">' + EMPTY + '</p>';
+  function updatesSheet() {
+    var MON = ['ޖަނަވަރީ', 'ފެބްރުއަރީ', 'މާރިޗު', 'އޭޕްރީލް', 'މެއި', 'ޖޫން', 'ޖުލައި', 'އޮގަސްޓު', 'ސެޕްޓެމްބަރު', 'އޮކްޓޫބަރު', 'ނޮވެންބަރު', 'ޑިސެމްބަރު'];
+    function d(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? (+m[3]) + ' ' + MON[+m[2] - 1] + ' ' + m[1] : esc(iso || ''); }
+    function chips(list) {
+      return '<div class="chips">' + list.map(function (x) { return '<button class="chip" data-i="' + all.indexOf(x) + '">' + esc(x.name) + '</button>'; }).join('') + '</div>';
+    }
+    function status(title, list, cls) {
+      return '<div class="upd-status ' + cls + '"><div class="upd-status-head"><span>' + title + '</span><b>' + list.length + ' ރަށް</b></div>' +
+        (list.length ? chips(list) : '<p class="upd-done">✓ ހުރިހާ ރަށެއް ފުރިއްޖެ</p>') + '</div>';
+    }
+    var ups = (T.island_updates || []).slice().sort(function (a, b) { return (b.date || '') < (a.date || '') ? -1 : 1; });
+    var h = '<h2>އަޕްޑޭޓްތައް</h2>';
+    h += '<h3>ފަހުގެ އަޕްޑޭޓްތައް</h3>';
+    h += ups.length ? '<div class="upd-list">' + ups.map(function (u) {
+      var names = (u.islands || []).map(function (n) { return all.filter(function (x) { return x.name === n; })[0]; }).filter(Boolean);
+      return '<div class="upd-item"><time>' + d(u.date) + '</time><div class="upd-text">' + esc(u.text || '') +
+        (names.length ? ' <span class="upd-count nowrap">· ' + names.length + ' ރަށް</span>' + chips(names) : '') + '</div></div>';
+    }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>';
+    h += '<h3>ނުފުރާ ރަށްތައް</h3>';
+    h += status('ރަށުގެ މަޢުލޫމާތު ނުފުރާ', islandList.filter(function (x) { return x.profile_pending; }), 'warn');
+    h += status('ސްކޫލު ސެޝަންތައް ފޯމު ނުފުރާ', islandList.filter(function (x) { return !x.school_form; }), 'warn');
+    h += status('ހަރަކާތްތައް ނުފޮނުވާ', islandList.filter(function (x) { return x.pending; }), 'warn');
+    openSheet(h);
+  }
+  sheet.addEventListener('click', function (e) {
+    var c = e.target.closest('.upd-status .chip, .upd-item .chip');
+    if (c) islandSheet(+c.dataset.i);
+  });
   grid.addEventListener('click', function (e) {
+    if (e.target.closest('#upd-btn')) { updatesSheet(); return; }
     if (e.target.closest('.call')) return;
     var b = e.target.closest('.island');
     if (b) islandSheet(+b.dataset.i);

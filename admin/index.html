@@ -355,6 +355,7 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
         textField(pr, 'focus', 'އިތުރަށް އަލިއަޅުވާލަން ބޭނުންވާ (، ޖަހާ ވަކިކުރައްވާ)'),
         textField(pr, 'influencer', 'ސޯޝަލް މީޑިއަރ އިންފުލުއެންޒަރ')]));
       body.appendChild(checkField(it, 'pending', 'ހަރަކާތްތައް އަދި ނުލިބޭ'));
+      body.appendChild(checkField(it, 'school_form', 'ސްކޫލު ސެޝަންތައް ފޯމު ފުރާފައި'));
     }
     body.appendChild(listField(it, 'activities', 'އެދިފައިވާ ހަރަކާތްތައް'));
     body.appendChild(rowsField(it, 'team', 'ޓީމް', [{ key: 'name', ph: 'ނަން' }, { key: 'role', ph: 'މަސައްކަތް' }], 'މެމްބަރެއް'));
@@ -369,10 +370,20 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
   /* ---------- Tabs ---------- */
   var TABS = {
     islands: { label: 'ރަށްތައް', render: function () {
-      data.islands = data.islands || [];
-      return itemList(data.islands, { heading: 'ރަށްތައް', addLabel: 'ރަށެއް', titleKey: 'name', sub: placeSub,
-        hint: 'ހަރަކާތްތަކުގެ ނަންތައް ކޮންމެ ރަށަކަށް ވެސް އެއް ގޮތަކަށް ލިޔުއްވާ، ދެން "ހަރަކާތްތައް" ޓެބުގައި ގުނާނީ އެކުގައި.',
-        blank: blankPlace, fields: function (it, b, r) { placeFields(it, b, r, false); } });
+      data.islands = data.islands || []; data.island_updates = data.island_updates || [];
+      return el('div', null, [
+        itemList(data.islands, { heading: 'ރަށްތައް', addLabel: 'ރަށެއް', titleKey: 'name', sub: placeSub,
+          hint: 'ހަރަކާތްތަކުގެ ނަންތައް ކޮންމެ ރަށަކަށް ވެސް އެއް ގޮތަކަށް ލިޔުއްވާ، ދެން "ހަރަކާތްތައް" ޓެބުގައި ގުނާނީ އެކުގައި.',
+          blank: blankPlace, fields: function (it, b, r) { placeFields(it, b, r, false); } }),
+        itemList(data.island_updates, { heading: 'ރަށްތަކުގެ އަޕްޑޭޓްތައް', addLabel: 'އަޕްޑޭޓެއް', titleKey: 'text',
+          sub: function (u) { return [u.date, (u.islands || []).length ? (u.islands || []).length + ' ރަށް' : ''].filter(Boolean).join(' · '); },
+          hint: 'ރަށްތައް ޓެބުގެ 🔔 ގައި ދައްކާނީ މި އަޕްޑޭޓްތައް.',
+          blank: function () { var t = new Date(); return { date: t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'), text: '', islands: [] }; },
+          fields: function (u, b, r) {
+            b.appendChild(el('div', { class: 'grid2' }, [dateField(u, 'date', 'ތާރީޚު', r), textField(u, 'text', 'އަޕްޑޭޓް', { onchange: r })]));
+            b.appendChild(listField(u, 'islands', 'ގުޅޭ ރަށްތައް'));
+          } })
+      ]);
     } },
     participants: { label: 'އެހެނިހެން ބައިވެރިން', render: function () {
       data.participants = data.participants || [];

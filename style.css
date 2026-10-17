@@ -614,3 +614,29 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .prof-val { font-size: 1rem; }
 .prof-row .tag-list span { background: var(--bg); }
 .prof-row + .pop { margin-top: 1rem; } .prof-row:first-of-type { margin-top: .2rem; }
+
+/* Islands tab: updates bell and panel */
+.upd-bar { max-width: 760px; margin: 0 auto .8rem; display: flex; justify-content: flex-start; }
+.upd-btn {
+  position: relative; display: inline-flex; align-items: center; gap: .4rem; cursor: pointer; font: inherit; font-size: .95rem; font-weight: 700;
+  background: var(--surface); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 999px; padding: .3rem 1rem;
+}
+.upd-btn:hover { border-color: var(--accent); }
+.upd-badge {
+  position: absolute; top: -7px; left: -7px; min-width: 22px; height: 22px; border-radius: 999px; padding: 0 5px;
+  background: #c0392b; color: #fff; font-family: system-ui, sans-serif; font-size: .75rem; display: grid; place-items: center;
+}
+.upd-status { border-radius: 14px; padding: .7rem .9rem; margin: .6rem 0; background: var(--bg); }
+.upd-status.warn { border-right: 4px solid #e0a54a; }
+.upd-status-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; font-weight: 700; }
+.upd-status-head b { font-family: system-ui, sans-serif; color: #b5701c; white-space: nowrap; }
+@media (prefers-color-scheme: dark) { .upd-status-head b { color: #f0b46a; } }
+.upd-status .chips { margin-top: .4rem; }
+.upd-done { margin: .3rem 0 0; color: var(--accent); font-weight: 700; }
+.upd-list { display: grid; gap: .6rem; }
+.upd-item { display: flex; gap: .8rem; align-items: flex-start; border-top: 1px solid var(--line); padding-top: .6rem; }
+.upd-item:first-child { border-top: 0; padding-top: 0; }
+.upd-item time { flex: none; color: var(--warm); font-size: .85rem; font-weight: 700; min-width: 6.5rem; }
+.upd-text { flex: 1; min-width: 0; }
+.upd-count { color: var(--muted); font-size: .88rem; }
+.upd-text .chips { margin-top: .3rem; }
