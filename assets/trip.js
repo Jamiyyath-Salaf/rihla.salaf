@@ -322,7 +322,6 @@
   (function () {
     var byType = actEl.innerHTML;
     var islOnly = all.filter(function (x) { return x.kind === 'island'; });
-    var others = all.filter(function (x) { return x.kind !== 'island'; });
     function box(x, n) {
       var acts = x.activities || [], sc = x.school;
       var h = '<div class="ai" role="button" tabindex="0" title="ބޮޑުކޮށް ބަލާ"><div class="ai-head">' + (n ? '<span class="ai-n">' + n + '</span>' : '') +
@@ -337,8 +336,7 @@
             : '<span class="pending-tag">ސްކޫލު ސެޝަންތައް ފޯމު ނުފުރާ</span>') + '</div>';
       return h + '</div>';
     }
-    var byIsland = '<div class="ai-grid">' + islOnly.map(function (x, i) { return box(x, i + 1); }).join('') + '</div>' +
-      (others.length ? '<h2 class="group-title">އެހެނިހެން ބައިވެރިން</h2><div class="ai-grid">' + others.map(function (x) { return box(x); }).join('') + '</div>' : '');
+    var byIsland = '<div class="ai-grid">' + islOnly.map(function (x, i) { return box(x, i + 1); }).join('') + '</div>';
     actEl.innerHTML = '<div class="seg" role="tablist"><button type="button" data-v="island" aria-selected="true">ރަށްތަކުގެ ގޮތުން</button>' +
       '<button type="button" data-v="type" aria-selected="false">ހަރަކާތްތަކުގެ ގޮތުން</button></div>' +
       '<div class="act-view" data-view="island">' + byIsland + '</div><div class="act-view" data-view="type" hidden>' + byType + '</div>';
