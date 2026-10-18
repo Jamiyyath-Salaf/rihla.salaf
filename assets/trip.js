@@ -325,7 +325,7 @@
     var others = all.filter(function (x) { return x.kind !== 'island'; });
     function box(x, n) {
       var acts = x.activities || [], sc = x.school;
-      var h = '<div class="ai"><div class="ai-head">' + (n ? '<span class="ai-n">' + n + '</span>' : '') +
+      var h = '<div class="ai" role="button" tabindex="0" title="ބޮޑުކޮށް ބަލާ"><div class="ai-head">' + (n ? '<span class="ai-n">' + n + '</span>' : '') +
         '<button class="ai-name" data-i="' + all.indexOf(x) + '">' + (x.kind === 'island' ? 'ބ. ' : '') + esc(x.name) + '</button>' +
         '<span class="ai-count">' + (acts.length + (sc ? (sc.sessions || []).length : 0)) + '</span></div>';
       h += '<div class="ai-sec"><div class="ai-label">ރަށުން އެދިފައިވާ</div>' +
@@ -532,6 +532,17 @@
     pdfDownload(printBtn.querySelector('button'), blocks, tableHtml, (title || 'activities').trim() + ' - ހަރަކާތްތައް.pdf');
   });
 
+  function goToIsland(i) {
+    var t = document.querySelector('.tabs [data-tab="islands"]');
+    if (t) t.click();
+    var card = document.querySelector('#island-grid .island[data-i="' + i + '"]');
+    if (!card) return;
+    setTimeout(function () {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.add('flash');
+      setTimeout(function () { card.classList.remove('flash'); }, 1800);
+    }, 50);
+  }
   function actSheet(n) {
     var a = actNames[n];
     openSheet('<p class="sheet-kicker">ހަރަކާތް</p><h2>' + esc(a) + '</h2>' +
@@ -542,7 +553,14 @@
   }
   actEl.addEventListener('click', function (e) {
     var nb = e.target.closest('.ai-name');
-    if (nb) { islandSheet(+nb.dataset.i); return; }
+    if (nb) { goToIsland(+nb.dataset.i); return; }
+    var box = e.target.closest('.ai');
+    if (box && !e.target.closest('.chip')) {
+      var open = !box.classList.contains('ai-open');
+      actEl.querySelectorAll('.ai.ai-open').forEach(function (b) { b.classList.remove('ai-open'); });
+      if (open) { box.classList.add('ai-open'); box.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      return;
+    }
     var c = e.target.closest('.chip');
     if (c) { islandSheet(+c.dataset.i); return; }
     var g = e.target.closest('.act');

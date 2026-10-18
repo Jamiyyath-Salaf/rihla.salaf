@@ -882,3 +882,18 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .ai-list { margin: 0; padding-right: 1.3rem; font-size: .95rem; line-height: 1.75; }
 .ai-list.ai-en { padding-right: 0; padding-left: 1.3rem; text-align: left; font-family: system-ui, sans-serif; font-size: .88rem; line-height: 1.6; }
 .ai-topics { text-align: left; font-family: system-ui, sans-serif; font-size: .82rem; color: var(--muted); border-left: 3px solid var(--warm); padding-left: .5rem; margin-top: .3rem; }
+
+/* By-island activities: tap a box to enlarge it */
+.ai { cursor: pointer; transition: box-shadow .18s, border-color .18s; scroll-margin-top: 110px; }
+.ai:hover { border-color: var(--accent); }
+.ai.ai-open { grid-column: 1 / -1; border: 2px solid var(--accent); box-shadow: 0 10px 28px rgba(20,60,30,.14); padding: 1.2rem 1.4rem; }
+.ai.ai-open .ai-name { font-size: 1.6rem; }
+.ai.ai-open .ai-list { font-size: 1.15rem; line-height: 2; }
+.ai.ai-open .ai-list.ai-en { font-size: 1.02rem; line-height: 1.9; }
+.ai.ai-open .ai-topics { font-size: .95rem; }
+.ai.ai-open .ai-label { font-size: .95rem; }
+.ai.ai-open .ai-sec { padding-top: .7rem; }
+@media (min-width: 760px) { .ai.ai-open .ai-body2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; } }
+.ai-name { text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent); text-underline-offset: 4px; }
+/* island card highlight after jumping from the activities tab */
+.island.flash { outline: 3px solid var(--warm); outline-offset: 3px; transition: outline-color .3s; }
