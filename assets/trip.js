@@ -317,6 +317,37 @@
   var pend = all.map(function (x, i) { return x.pending ? i : -1; }).filter(function (i) { return i >= 0; });
   if (pend.length) actEl.innerHTML = '<div class="pending-box"><span>ހަރަކާތްތައް އަދި ނުލިބޭ:</span><div class="chips">' +
     pend.map(function (i) { return '<button class="chip" data-i="' + i + '">' + esc(all[i].name) + '</button>'; }).join('') + '</div></div>' + actEl.innerHTML;
+
+  // Two views: by island (every activity each island and its school asked for) and by activity (grouped)
+  (function () {
+    var byType = actEl.innerHTML;
+    var islOnly = all.filter(function (x) { return x.kind === 'island'; });
+    var others = all.filter(function (x) { return x.kind !== 'island'; });
+    function box(x, n) {
+      var acts = x.activities || [], sc = x.school;
+      var h = '<div class="ai"><div class="ai-head">' + (n ? '<span class="ai-n">' + n + '</span>' : '') +
+        '<button class="ai-name" data-i="' + all.indexOf(x) + '">' + (x.kind === 'island' ? 'ބ. ' : '') + esc(x.name) + '</button>' +
+        '<span class="ai-count">' + (acts.length + (sc ? (sc.sessions || []).length : 0)) + '</span></div>';
+      h += '<div class="ai-sec"><div class="ai-label">ރަށުން އެދިފައިވާ</div>' +
+        (x.pending ? '<span class="pending-tag">ހަރަކާތްތައް އަދި ނުލިބޭ</span>'
+          : acts.length ? '<ol class="ai-list">' + acts.map(function (a) { return '<li>' + esc(a) + '</li>'; }).join('') + '</ol>' : '<p class="none" style="text-align:right;margin:0">—</p>') + '</div>';
+      if (x.kind === 'island') h += '<div class="ai-sec"><div class="ai-label">ސްކޫލުން އެދިފައިވާ</div>' +
+        (sc ? '<ol class="ai-list ai-en" dir="ltr">' + (sc.sessions || []).map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol>' +
+              (sc.topics ? '<div class="ai-topics" dir="ltr">' + esc(sc.topics) + '</div>' : '')
+            : '<span class="pending-tag">ސްކޫލު ސެޝަންތައް ފޯމު ނުފުރާ</span>') + '</div>';
+      return h + '</div>';
+    }
+    var byIsland = '<div class="ai-grid">' + islOnly.map(function (x, i) { return box(x, i + 1); }).join('') + '</div>' +
+      (others.length ? '<h2 class="group-title">އެހެނިހެން ބައިވެރިން</h2><div class="ai-grid">' + others.map(function (x) { return box(x); }).join('') + '</div>' : '');
+    actEl.innerHTML = '<div class="seg" role="tablist"><button type="button" data-v="island" aria-selected="true">ރަށްތަކުގެ ގޮތުން</button>' +
+      '<button type="button" data-v="type" aria-selected="false">ހަރަކާތްތަކުގެ ގޮތުން</button></div>' +
+      '<div class="act-view" data-view="island">' + byIsland + '</div><div class="act-view" data-view="type" hidden>' + byType + '</div>';
+    actEl.querySelector('.seg').addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      actEl.querySelectorAll('.seg button').forEach(function (x) { x.setAttribute('aria-selected', x === b); });
+      actEl.querySelectorAll('.act-view').forEach(function (v) { v.hidden = v.dataset.view !== b.dataset.v; });
+    });
+  })();
   /* ---------- PDF download (shared by the activities and schools tabs) ---------- */
   var DL_LABEL = 'PDF ބަލާ';
   function dlButton() {
@@ -510,6 +541,8 @@
       }).join('') + '</ul>');
   }
   actEl.addEventListener('click', function (e) {
+    var nb = e.target.closest('.ai-name');
+    if (nb) { islandSheet(+nb.dataset.i); return; }
     var c = e.target.closest('.chip');
     if (c) { islandSheet(+c.dataset.i); return; }
     var g = e.target.closest('.act');

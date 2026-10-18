@@ -863,3 +863,22 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .pg-people div { display: flex; flex-wrap: wrap; gap: .1rem .6rem; align-items: baseline; background: var(--bg); border-radius: 10px; padding: .3rem .7rem; }
 .pg-people span { color: var(--muted); font-size: .88rem; }
 .pg-chip b { font-family: system-ui, sans-serif; color: var(--accent); }
+
+/* Activities tab: view switch and by-island view */
+.seg { display: flex; gap: .3rem; max-width: 520px; margin: 0 auto 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: .25rem; }
+.seg button { flex: 1; font: inherit; font-size: .92rem; border: 0; background: none; border-radius: 999px; padding: .3rem .8rem; cursor: pointer; color: var(--muted); }
+.seg button[aria-selected="true"] { background: var(--accent); color: #fff; font-weight: 700; }
+@media (prefers-color-scheme: dark) { .seg button[aria-selected="true"] { color: #0f1a14; } }
+.ai-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: .8rem; max-width: 1040px; margin-inline: auto; align-items: start; }
+.ai { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: .8rem 1rem; text-align: right; display: grid; gap: .5rem; }
+.ai-head { display: flex; align-items: center; gap: .5rem; }
+.ai-n { flex: none; min-width: 26px; height: 26px; border-radius: 8px; background: var(--accent); color: #fff; display: grid; place-items: center; font-family: system-ui, sans-serif; font-weight: 700; font-size: .85rem; }
+@media (prefers-color-scheme: dark) { .ai-n { color: #0f1a14; } }
+.ai-name { flex: 1; text-align: right; font: inherit; font-weight: 900; font-size: 1.15rem; background: none; border: 0; padding: 0; cursor: pointer; color: var(--text); }
+.ai-name:hover { color: var(--accent); }
+.ai-count { font-family: system-ui, sans-serif; font-weight: 700; color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 999px; padding: 0 .6rem; font-size: .85rem; }
+.ai-sec { border-top: 1px dashed var(--line); padding-top: .4rem; }
+.ai-label { color: var(--warm); font-size: .82rem; font-weight: 700; margin-bottom: .2rem; }
+.ai-list { margin: 0; padding-right: 1.3rem; font-size: .95rem; line-height: 1.75; }
+.ai-list.ai-en { padding-right: 0; padding-left: 1.3rem; text-align: left; font-family: system-ui, sans-serif; font-size: .88rem; line-height: 1.6; }
+.ai-topics { text-align: left; font-family: system-ui, sans-serif; font-size: .82rem; color: var(--muted); border-left: 3px solid var(--warm); padding-left: .5rem; margin-top: .3rem; }
