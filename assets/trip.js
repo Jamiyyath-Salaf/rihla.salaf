@@ -964,6 +964,10 @@
       if (s.key === 'arrive') extra = outside.length ? '<div class="pg-people">' + outside.map(function (p) {
         return '<div><b>' + esc(p.name) + '</b><span>' + esc(p.route.join(' ← ')) + '</span></div>';
       }).join('') + '</div>' : '';
+      // going home: the same people, route reversed (Malé → their island)
+      if (s.key === 'home') extra = outside.length ? '<div class="pg-people">' + outside.map(function (p) {
+        return '<div><b>' + esc(p.name) + '</b><span>' + esc(p.route.slice().reverse().join(' ← ')) + '</span></div>';
+      }).join('') + '</div>' : '';
       if (s.key === 'islands') extra = islandChips('schedule');
       if (s.key === 'to_eydh') extra = islandChips('to_eydhafushi');
       var has = s.date || s.time || s.details || extra;
