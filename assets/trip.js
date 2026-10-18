@@ -94,6 +94,11 @@
     h += '<div>' + ICON.phone + '<span class="lbl">ނަންބަރު</span>' +
       (isl.phone ? '<a href="tel:' + esc(String(isl.phone).replace(/\s/g, '')) + '" dir="ltr"><strong>' + esc(isl.phone) + '</strong></a>' : '<strong>—</strong>') + '</div>';
     if (isl.email) h += '<div>' + ICON.mail + '<span class="lbl">އީމެއިލް</span><a href="mailto:' + esc(isl.email) + '" dir="ltr"><strong>' + esc(isl.email) + '</strong></a></div>';
+    if (isl.kind === 'island') {
+      var v = isl.volunteer || {};
+      h += '<div class="cc-sep">' + ICON.user + '<span class="lbl">ވޮލަންޓިއަރު</span><strong dir="auto">' + (v.name ? esc(v.name) : 'ނުލިބޭ') + '</strong></div>';
+      if (v.phone) h += '<div>' + ICON.phone + '<span class="lbl">ނަންބަރު</span><a href="tel:' + esc(String(v.phone).replace(/\s/g, '')) + '" dir="ltr"><strong>' + esc(v.phone) + '</strong></a></div>';
+    }
     h += '</div>';
     h += popHtml(isl);
     h += '<h3>އެދިފައިވާ ހަރަކާތްތައް</h3>' + (isl.pending ? '<p>' + '<span class="pending-tag">ހަރަކާތްތައް އަދި ނުލިބޭ</span>' + '</p>' : list(isl.activities));
@@ -138,6 +143,8 @@
   var grid = document.getElementById('island-grid');
   var totalActs = 0, totalTeam = 0;
   all.forEach(function (x) { totalActs += (x.activities || []).length; totalTeam += (x.team || []).length; });
+  // islands that have / haven't sent a volunteer
+  var volHave = islands.filter(function (x) { return hasVol(x); }), volMissing = islands.filter(function (x) { return !hasVol(x); });
   // total population of the islands whose information has come in
   var popKnown = islands.filter(function (x) { return !x.profile_pending && x.profile && +x.profile.total; });
   var popTotal = popKnown.reduce(function (n, x) { return n + (+x.profile.total); }, 0);
@@ -146,11 +153,14 @@
     '<div><strong>' + totalActs + '</strong><span>ހަރަކާތް</span></div>' +
     '<div class="sum-pop"><strong>' + popTotal.toLocaleString('en-US') + '</strong><span>ޖުމްލަ އާބާދީ</span>' +
       (popKnown.length < islands.length ? '<small><span dir="ltr">' + popKnown.length + '/' + islands.length + '</span> ރަށުގެ</small>' : '') + '</div>' +
-    '<div><strong>' + totalTeam + '</strong><span>ޓީމު މެމްބަރުން</span></div></div>';
+    '<div><strong>' + totalTeam + '</strong><span>ޓީމު މެމްބަރުން</span></div>' +
+    '<button type="button" class="vol-tile' + (volMissing.length ? ' has-missing' : '') + '" id="vol-btn"><strong><span dir="ltr">' + volHave.length + '/' + islands.length + '</span></strong><span>ވޮލަންޓިއަރުން</span>' +
+      (volMissing.length ? '<small>' + volMissing.length + ' ރަށުން ނުލިބޭ</small>' : '') + '</button></div>';
 
   function stat(icon, n, label) {
     return '<span class="stat' + (n ? '' : ' stat-zero') + '">' + icon + '<b>' + n + '</b> ' + label + '</span>';
   }
+  function hasVol(x) { return !!(x.volunteer && String(x.volunteer.name || '').trim()); }
   function card(x, i, num) {
     var island = x.kind === 'island';
     return '<div class="island' + (island ? '' : ' island-other') + '" role="button" tabindex="0" data-i="' + i + '">' +
@@ -162,6 +172,10 @@
           '<span class="focal-text"><span class="focal-label">ފޯކަލް ޕޮއިންޓް</span><span class="focal-name">' + (x.focal ? esc(x.focal) : '—') + '</span>' +
           (x.title ? '<span class="focal-title">' + esc(x.title) + '</span>' : '') + '</span></div>' +
         (x.phone ? '<a class="call" href="tel:' + esc(String(x.phone).replace(/\s/g, '')) + '">' + ICON.phone + '<span dir="ltr">' + esc(x.phone) + '</span></a>' : '') +
+        (island ? '<div class="card-vol' + (hasVol(x) ? '' : ' none-yet') + '"><span class="focal-label">ވޮލަންޓިއަރު</span>' +
+          (hasVol(x) ? '<span class="cv-name" dir="auto">' + esc(x.volunteer.name) + '</span>' +
+            (x.volunteer.phone ? '<a class="cv-phone" href="tel:' + esc(String(x.volunteer.phone).replace(/\s/g, '')) + '" dir="ltr">' + esc(x.volunteer.phone) + '</a>' : '')
+            : '<span class="cv-name">ނުލިބޭ</span>') + '</div>' : '') +
       '</div>' +
       '<div class="island-stats">' +
         (x.pending ? '<span class="pending-tag">ހަރަކާތްތައް އަދި ނުލިބޭ</span>' : stat(ICON.list, (x.activities || []).length, 'ހަރަކާތް')) +
@@ -185,6 +199,17 @@
       others.map(function (x, n) { return card(all[islands.length + n], islands.length + n); }).join('') + '</div>';
   }
   grid.innerHTML = html || '<p class="none">' + EMPTY + '</p>';
+  function volStatusSheet() {
+    function chips(list) { return '<div class="chips">' + list.map(function (x) { return '<button class="chip" data-i="' + all.indexOf(x) + '">' + esc(x.name) + '</button>'; }).join('') + '</div>'; }
+    var h = '<h2>ވޮލަންޓިއަރުން</h2>';
+    h += '<div class="upd-status warn"><div class="upd-status-head"><span>ނުލިބޭ</span><b>' + volMissing.length + ' ރަށް</b></div>' + (volMissing.length ? chips(volMissing) : '<p class="upd-done">✓ ހުރިހާ ރަށަކުން ލިބިއްޖެ</p>') + '</div>';
+    h += '<div class="upd-status ok"><div class="upd-status-head"><span>ލިބިފައި</span><b>' + volHave.length + ' ރަށް</b></div>' +
+      (volHave.length ? '<div class="vol-got">' + volHave.map(function (x) {
+        return '<button class="chip" data-i="' + all.indexOf(x) + '">' + esc(x.name) + '</button><span dir="auto">' + esc(x.volunteer.name) + '</span>' +
+          (x.volunteer.phone ? '<a href="tel:' + esc(String(x.volunteer.phone).replace(/\s/g, '')) + '" dir="ltr">' + esc(x.volunteer.phone) + '</a>' : '<span></span>');
+      }).join('') + '</div>' : '<p class="none" style="text-align:right">—</p>') + '</div>';
+    openSheet(h);
+  }
   function updatesSheet() {
     var MON = ['ޖަނަވަރީ', 'ފެބްރުއަރީ', 'މާރިޗު', 'އޭޕްރީލް', 'މެއި', 'ޖޫން', 'ޖުލައި', 'އޮގަސްޓު', 'ސެޕްޓެމްބަރު', 'އޮކްޓޫބަރު', 'ނޮވެންބަރު', 'ޑިސެމްބަރު'];
     function d(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? (+m[3]) + ' ' + MON[+m[2] - 1] + ' ' + m[1] : esc(iso || ''); }
@@ -207,14 +232,17 @@
     h += status('ރަށުގެ މަޢުލޫމާތު ނުފުރާ', islandList.filter(function (x) { return x.profile_pending; }), 'warn');
     h += status('ސްކޫލު ސެޝަންތައް ފޯމު ނުފުރާ', islandList.filter(function (x) { return !x.school_form; }), 'warn');
     h += status('ހަރަކާތްތައް ނުފޮނުވާ', islandList.filter(function (x) { return x.pending; }), 'warn');
+    h += status('ވޮލަންޓިއަރު ނުލިބޭ', volMissing, 'warn');
     openSheet(h);
   }
   sheet.addEventListener('click', function (e) {
-    var c = e.target.closest('.upd-status .chip, .upd-item .chip');
+    var c = e.target.closest('.upd-status .chip, .upd-item .chip, .vol-got .chip');
     if (c) islandSheet(+c.dataset.i);
   });
   grid.addEventListener('click', function (e) {
     if (e.target.closest('#upd-btn')) { updatesSheet(); return; }
+    if (e.target.closest('#vol-btn')) { volStatusSheet(); return; }
+    if (e.target.closest('.cv-phone')) return;
     if (e.target.closest('.call')) return;
     var b = e.target.closest('.island');
     if (b) islandSheet(+b.dataset.i);

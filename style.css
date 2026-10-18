@@ -818,3 +818,28 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .pdf-doc .p-acts tr.p-first td { border-top: 1.5px solid #bcd9c4; }
 .pdf-doc .p-need { margin-top: 5px; font-size: 11px; display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
 .pdf-doc .p-need span { background: #e3f0e6; color: #1f7a35; border-radius: 999px; padding: 0 7px; font-weight: 700; }
+
+/* Island volunteer */
+.card-vol { display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .5rem; border-top: 1px dashed var(--line); padding-top: .5rem; font-size: .9rem; }
+.card-vol .focal-label { flex-basis: 100%; }
+.card-vol .cv-name { font-weight: 700; font-family: system-ui, "MV Funa", sans-serif; }
+.card-vol .cv-phone { font-family: system-ui, sans-serif; text-decoration: none; font-weight: 600; font-size: .88rem; }
+.card-vol.none-yet .cv-name { color: var(--muted); font-weight: 400; font-family: inherit; font-size: .85rem; }
+.contact-card .cc-sep { border-top: 1px dashed var(--line); padding-top: .4rem; margin-top: .2rem; }
+.contact-card strong[dir="auto"] { font-family: system-ui, "MV Funa", sans-serif; }
+/* Volunteers tile in the summary row */
+.island-summary.has-bell { grid-template-columns: auto repeat(5, 1fr); max-width: 1040px; }
+.vol-tile { font: inherit; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: .6rem .5rem; text-align: center; display: flex; flex-direction: column; line-height: 1.4; color: var(--text); }
+.vol-tile strong { font-family: system-ui, sans-serif; font-size: 1.6rem; color: var(--accent); }
+.vol-tile span { color: var(--muted); font-size: .85rem; }
+.vol-tile small { color: #b5701c; font-size: .72rem; font-weight: 700; }
+.vol-tile.has-missing { border-color: #e0a54a; }
+.vol-tile:hover { border-color: var(--accent); }
+@media (max-width: 640px) {
+  .island-summary.has-bell { grid-template-columns: repeat(3, 1fr); }
+  .vol-tile strong { font-size: 1.15rem; }
+}
+.upd-status.ok { border-right: 4px solid var(--accent); }
+.vol-got { display: grid; grid-template-columns: auto 1fr auto; gap: .4rem .7rem; align-items: center; margin-top: .4rem; }
+.vol-got span { font-family: system-ui, "MV Funa", sans-serif; font-weight: 700; }
+.vol-got a { font-family: system-ui, sans-serif; text-decoration: none; font-weight: 600; }
