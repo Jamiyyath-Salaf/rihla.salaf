@@ -849,7 +849,7 @@
     function needs(x) {
       var out = {};
       function add(k, text, en) { if (k == null) k = -1; out[k] = out[k] || []; if (!out[k].some(function (y) { return y.text === text; })) out[k].push({ text: text, en: en }); }
-      (x.activities || []).forEach(function (a) { var g = groupOf[String(a).trim()] || String(a).trim(); add(typeOf[g], g, false); });
+      (x.activities || []).forEach(function (a) { var t = String(a).trim(), g = groupOf[t] || t; add(typeOf[g], t, false); });
       var sc = x.school;
       if (sc) {
         (sc.sessions || []).forEach(function (s) { add(typeOf[s], s, true); });
@@ -868,19 +868,24 @@
       var title = (document.querySelector('.event h1') || {}).textContent || '';
       var count = types.map(function () { return []; });   // type -> islands needing it
       var blocks = [pdfHeader()];
-      blocks.push('<h2>' + pdfNum('1.') + ' ރަށްތަކަށް ބޭނުންވާ މީހުން</h2><p class="p-sum">ކޮންމެ ރަށެއްގެ ހަރަކާތްތަކާއި ސްކޫލު ސެޝަންތައް ބަލައިގެން، ކޮންމެ ބާވަތަކަށް <b>' + pdfNum('1') + ' މީހާ</b></p>');
+      blocks.push('<h2>' + pdfNum('1.') + ' ރަށްތަކަށް ބޭނުންވާ މީހުން</h2><p class="p-sum">ކޮންމެ ރަށެއްގެ ހުރިހާ ހަރަކާތެއް (ރަށާއި ސްކޫލު)، ކޮންމެ ހަރަކާތަކަށް ބޭނުންވާ ފަރާތާއެކު. ކޮންމެ ބާވަތަކަށް <b>' + pdfNum('1') + ' މީހާ</b></p>');
       isl.forEach(function (x, n) {
         var nd = needs(x);
         var flags = (x.pending ? '<span class="p-flag">ރަށުގެ ހަރަކާތްތައް ނުލިބޭ</span>' : '') + (!x.school ? '<span class="p-flag">ސްކޫލު ސެޝަންތައް ފޯމު ނުފުރާ</span>' : '');
-        var rows = types.map(function (t, k) {
-          if (!nd[k]) return '';
-          count[k].push(x.name);
-          return '<tr><td class="p-role">' + esc(t.role) + (t.about ? '<small>' + aboutHtml(t.about) + '</small>' : '') + '</td><td class="p-c">' + pdfNum('1') + '</td><td>' + nd[k].map(itemHtml).join('، ') + '</td></tr>';
-        }).join('') + (nd[-1] ? '<tr><td class="p-role">އެހެނިހެން</td><td class="p-c">—</td><td>' + nd[-1].map(itemHtml).join('، ') + '</td></tr>' : '');
-        var people = Object.keys(nd).filter(function (k) { return k !== '-1'; }).length;
+        var rows = '', k2 = 0, need = [];
+        types.forEach(function (t, k) {
+          if (!nd[k]) return;
+          count[k].push(x.name); need.push(t.role);
+          nd[k].forEach(function (y, j) {
+            rows += '<tr class="' + (j === 0 ? 'p-first' : '') + '"><td class="p-c">' + (++k2) + '</td><td>' + itemHtml(y) + '</td><td class="p-type">' + esc(t.role) + '</td></tr>';
+          });
+        });
+        (nd[-1] || []).forEach(function (y, j) { rows += '<tr class="' + (j === 0 ? 'p-first' : '') + '"><td class="p-c">' + (++k2) + '</td><td>' + itemHtml(y) + '</td><td class="p-type">—</td></tr>'; });
+        var people = need.length;
         blocks.push('<section class="p-staff"><h3><span class="p-n">' + (n + 1) + '</span>ބ. ' + esc(x.name) +
           '<span class="p-people">' + pdfNum(people) + ' މީހުން</span></h3>' + (flags ? '<div class="p-flags">' + flags + '</div>' : '') +
-          (rows ? '<table class="p-mini"><thead><tr><th>ބޭނުންވާ ފަރާތް</th><th>އަދަދު</th><th>ހަރަކާތްތައް</th></tr></thead><tbody>' + rows + '</tbody></table>'
+          (rows ? '<table class="p-mini p-acts"><thead><tr><th>#</th><th>ހަރަކާތް</th><th>ބޭނުންވާ ފަރާތް</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+                  '<div class="p-need"><b>ބޭނުންވާ މީހުން:</b> ' + need.map(function (r) { return '<span>' + esc(r) + ' ' + pdfNum('1') + '</span>'; }).join('') + '</div>'
                 : '<p class="p-pending">އަދި އެއްވެސް ހަރަކާތެއް ނުލިބޭ</p>') + '</section>');
       });
       blocks.push('break');
