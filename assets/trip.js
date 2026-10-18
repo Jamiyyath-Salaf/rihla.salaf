@@ -935,6 +935,63 @@
     });
   })();
 
+  /* ---------- Schedule tab: the trip step by step ---------- */
+  (function () {
+    var el = document.getElementById('program');
+    if (!el) return;
+    var stages = T.program || [];
+    var isl = all.filter(function (x) { return x.kind === 'island'; });
+    var TBC = '<span class="pg-tbc">ތަފްޞީލު ފަހުން</span>';
+    // people coming from outside Malé: facilitators whose route ends in Malé
+    var F = T.facilitators || {};
+    var outside = (F.sheikhs || []).concat(F.others || []).filter(function (p) { return (p.route || []).length; });
+    function when(s) {
+      var bits = [];
+      if (s.date) bits.push(ICON.clock + dvDay(s.date) + dvDate(s.date) + (s.time ? ' <span class="nowrap">· <span dir="ltr">' + esc(s.time) + '</span></span>' : ''));
+      else if (s.time) bits.push(ICON.clock + '<span dir="ltr">' + esc(s.time) + '</span>');
+      if (s.place) bits.push('<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>' + esc(s.place));
+      return bits.length ? '<div class="task-meta">' + bits.map(function (b) { return '<span>' + b + '</span>'; }).join('') + '</div>' : '';
+    }
+    function islandChips(field) {
+      return '<div class="chips">' + isl.map(function (x) {
+        var n = field === 'schedule' ? (x.schedule || []).length : (x.to_eydhafushi ? 1 : 0);
+        return '<button class="chip pg-chip" data-i="' + all.indexOf(x) + '" data-f="' + field + '">' + esc(x.name) +
+          (field === 'schedule' && n ? ' <b>' + n + '</b>' : '') + '</button>';
+      }).join('') + '</div>';
+    }
+    el.innerHTML = stages.length ? '<ol class="pg">' + stages.map(function (s, i) {
+      var extra = '';
+      if (s.key === 'arrive') extra = outside.length ? '<div class="pg-people">' + outside.map(function (p) {
+        return '<div><b>' + esc(p.name) + '</b><span>' + esc(p.route.join(' ← ')) + '</span></div>';
+      }).join('') + '</div>' : '';
+      if (s.key === 'islands') extra = islandChips('schedule');
+      if (s.key === 'to_eydh') extra = islandChips('to_eydhafushi');
+      var has = s.date || s.time || s.details || extra;
+      return '<li class="pg-step"><span class="pg-n">' + (i + 1) + '</span><div class="pg-card">' +
+        '<div class="pg-title">' + esc(s.title || '') + '</div>' + when(s) +
+        (s.details ? '<p class="task-details">' + esc(s.details).replace(/\n/g, '<br>') + '</p>' : '') +
+        extra + (!s.date && !s.details ? TBC : '') + '</div></li>';
+    }).join('') + '</ol>' : '<p class="none">' + EMPTY + '</p>';
+    el.addEventListener('click', function (e) {
+      var c = e.target.closest('.pg-chip');
+      if (!c) return;
+      var x = all[+c.dataset.i];
+      if (c.dataset.f === 'schedule') {
+        var sched = x.schedule || [], days = [], byDay = {};
+        sched.forEach(function (s) { var d = s.day || ''; if (!byDay[d]) { byDay[d] = []; days.push(d); } byDay[d].push(s); });
+        openSheet('<p class="sheet-kicker">ރަށްރަށުގެ ޝެޑިއުލް</p><h2>ބ. ' + esc(x.name) + '</h2>' +
+          (sched.length ? days.map(function (d) {
+            return '<div class="sched-day">' + (d ? '<p class="sched-date">' + esc(d) + '</p>' : '') + '<ul class="sched">' + byDay[d].map(function (s) {
+              return '<li><span class="sched-time" dir="ltr">' + esc(s.time || '') + '</span><span>' + esc(s.activity) + '</span></li>';
+            }).join('') + '</ul></div>';
+          }).join('') : '<p class="none">' + EMPTY + '</p>'));
+      } else {
+        openSheet('<p class="sheet-kicker">އޭދަފުށިއަށް ދަތުރު</p><h2>ބ. ' + esc(x.name) + '</h2>' +
+          (x.to_eydhafushi ? '<p class="task-details">' + esc(x.to_eydhafushi).replace(/\n/g, '<br>') + '</p>' : '<p class="none">' + EMPTY + '</p>'));
+      }
+    });
+  })();
+
   /* ---------- Tabs ---------- */
   var tabs = document.querySelectorAll('.tabs [data-tab]');
   var panels = document.querySelectorAll('.panel');
