@@ -797,3 +797,18 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .vol-main { flex: 1; min-width: 0; }
 .vol-name { font-weight: 900; font-size: 1.05rem; }
 .vol .call { flex: none; font-size: .85rem; padding: .15rem .7rem; }
+
+/* People-needed PDF */
+.pdf-doc .p-staff { border: 1px solid #ccc; border-radius: 8px; padding: 6px 10px 8px; }
+.pdf-doc .p-staff h3 { margin: 0 0 4px; font-size: 15px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+.pdf-doc .p-people { margin-right: auto; font-size: 11.5px; font-weight: 700; color: #1f7a35; background: #e3f0e6; border-radius: 999px; padding: 0 8px; }
+.pdf-doc .p-flags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+.pdf-doc .p-flag { font-size: 11px; font-weight: 700; color: #a15c12; background: #fbecd9; border-radius: 999px; padding: 0 8px; }
+.pdf-doc .p-mini { width: 100%; border-collapse: collapse; font-size: 11.5px; line-height: 1.55; }
+.pdf-doc .p-mini th { background: #f1efe9; color: #333; padding: 3px 6px; text-align: right; font-weight: 700; }
+.pdf-doc .p-mini td { border-top: 1px solid #e6e2d8; padding: 3px 6px; vertical-align: top; }
+.pdf-doc .p-mini th:nth-child(2), .pdf-doc .p-mini td:nth-child(2) { width: 40px; text-align: center; }
+.pdf-doc .p-role { font-weight: 700; width: 24%; }
+.pdf-doc .p-role small { display: block; font-weight: 400; color: #777; font-size: 10px; white-space: normal; }
+.pdf-doc .p-en { display: inline-block; direction: ltr; font-family: system-ui, sans-serif; font-size: 11px; }
+#island-grid > .print-bar { max-width: 900px; margin: 0 auto .7rem; }

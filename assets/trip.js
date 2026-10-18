@@ -331,7 +331,7 @@
   }
   // blocks: html strings in reading order; 'break' starts a new page, 'table' places tableHtml (split across pages if needed)
   function pdfDownload(btn, blocks, tableHtml, filename) {
-    var label = btn.querySelector('span');
+    var label = btn.querySelector('span'), labelText = label.textContent;
     // The PDF engine loses spaces between right-to-left words, so give every word its own box
     function wordify(root) {
       var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
@@ -358,6 +358,7 @@
         if (b === 'break') return 'break';
         var d = document.createElement('div'); d.className = 'blk';
         d.innerHTML = b === 'table' ? tableHtml : b;
+        if (b === 'table') d.setAttribute('data-split', '1');   // only the big table is split across pages
         mpage.appendChild(d); return d;
       });
       wordify(mpage);
@@ -370,7 +371,7 @@
       }
       nodes.forEach(function (n) {
         if (n === 'break') { if (pages[pages.length - 1].length) { pages.push([]); used = 0; } return; }
-        var table = n.querySelector('table');
+        var table = n.getAttribute('data-split') ? n.querySelector('table') : null;
         if (!table) { place(n, n.offsetHeight); return; }
         // split the table into page-sized pieces, repeating the header row
         var headH = table.tHead.offsetHeight, rows = [].slice.call(table.tBodies[0].rows), chunk = null;
@@ -415,7 +416,7 @@
           pagebreak: { mode: [] }
         }).from(doc).toPdf().then(function () { pdfPreview(this.prop.pdf, this.prop.canvas, filename); });
       }).catch(function () { alert('PDF ހެދިއެއް ނުދިޔައީ. އަލުން މަސައްކަތްކުރައްވާ.'); })
-        .then(function () { window.scrollTo(0, sy); label.textContent = DL_LABEL; btn.disabled = false; });
+        .then(function () { window.scrollTo(0, sy); label.textContent = labelText; btn.disabled = false; });
     }
     if (window.html2pdf) save();
     else {
@@ -423,7 +424,7 @@
       var sc = document.createElement('script');
       sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
       sc.onload = save;
-      sc.onerror = function () { label.textContent = DL_LABEL; alert('PDF ހެދިއެއް ނުދިޔައީ. އިންޓަނެޓް ޗެކްކުރައްވާ.'); };
+      sc.onerror = function () { label.textContent = labelText; alert('PDF ހެދިއެއް ނުދިޔައީ. އިންޓަނެޓް ޗެކްކުރައްވާ.'); };
       document.head.appendChild(sc);
     }
   }
@@ -833,6 +834,73 @@
       if (k && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); schoolSheet(+k.dataset.s); }
     });
   }
+
+  /* ---------- People needed per island (PDF, from the islands tab) ---------- */
+  (function () {
+    var types = T.staff_types || [];
+    if (!types.length || !grid) return;
+    var typeOf = {};   // item -> type index
+    types.forEach(function (t, k) { (t.items || []).forEach(function (it) { if (it.indexOf('topic:') !== 0) typeOf[it] = k; }); });
+    var topicRules = [];
+    types.forEach(function (t, k) { (t.items || []).forEach(function (it) { if (it.indexOf('topic:') === 0) topicRules.push({ word: it.slice(6).toLowerCase(), k: k }); }); });
+    var isl = all.filter(function (x) { return x.kind === 'island'; });
+
+    // for one island: type index -> list of {text, en}
+    function needs(x) {
+      var out = {};
+      function add(k, text, en) { if (k == null) k = -1; out[k] = out[k] || []; if (!out[k].some(function (y) { return y.text === text; })) out[k].push({ text: text, en: en }); }
+      (x.activities || []).forEach(function (a) { var g = groupOf[String(a).trim()] || String(a).trim(); add(typeOf[g], g, false); });
+      var sc = x.school;
+      if (sc) {
+        (sc.sessions || []).forEach(function (s) { add(typeOf[s], s, true); });
+        var tp = String(sc.topics || '').toLowerCase();
+        topicRules.forEach(function (r) { if (tp.indexOf(r.word.toLowerCase()) >= 0) add(r.k, 'ސްކޫލު ޓޮޕިކް: ' + r.word, false); });
+      }
+      return out;
+    }
+    function aboutHtml(t) { return /[A-Za-z]/.test(t) ? '<span class="p-en" dir="ltr">' + esc(t) + '</span>' : esc(t); }
+    function itemHtml(y) { return y.en ? '<span class="p-en" dir="ltr">' + esc(y.text) + '</span>' : esc(y.text); }
+
+    var btn = dlButton();
+    btn.querySelector('span').textContent = 'ބޭނުންވާ މީހުން (PDF)';
+    grid.insertBefore(btn, grid.firstChild);
+    btn.querySelector('button').addEventListener('click', function () {
+      var title = (document.querySelector('.event h1') || {}).textContent || '';
+      var count = types.map(function () { return []; });   // type -> islands needing it
+      var blocks = [pdfHeader()];
+      blocks.push('<h2>' + pdfNum('1.') + ' ރަށްތަކަށް ބޭނުންވާ މީހުން</h2><p class="p-sum">ކޮންމެ ރަށެއްގެ ހަރަކާތްތަކާއި ސްކޫލު ސެޝަންތައް ބަލައިގެން، ކޮންމެ ބާވަތަކަށް <b>' + pdfNum('1') + ' މީހާ</b></p>');
+      isl.forEach(function (x, n) {
+        var nd = needs(x);
+        var flags = (x.pending ? '<span class="p-flag">ރަށުގެ ހަރަކާތްތައް ނުލިބޭ</span>' : '') + (!x.school ? '<span class="p-flag">ސްކޫލު ސެޝަންތައް ފޯމު ނުފުރާ</span>' : '');
+        var rows = types.map(function (t, k) {
+          if (!nd[k]) return '';
+          count[k].push(x.name);
+          return '<tr><td class="p-role">' + esc(t.role) + (t.about ? '<small>' + aboutHtml(t.about) + '</small>' : '') + '</td><td class="p-c">' + pdfNum('1') + '</td><td>' + nd[k].map(itemHtml).join('، ') + '</td></tr>';
+        }).join('') + (nd[-1] ? '<tr><td class="p-role">އެހެނިހެން</td><td class="p-c">—</td><td>' + nd[-1].map(itemHtml).join('، ') + '</td></tr>' : '');
+        var people = Object.keys(nd).filter(function (k) { return k !== '-1'; }).length;
+        blocks.push('<section class="p-staff"><h3><span class="p-n">' + (n + 1) + '</span>ބ. ' + esc(x.name) +
+          '<span class="p-people">' + pdfNum(people) + ' މީހުން</span></h3>' + (flags ? '<div class="p-flags">' + flags + '</div>' : '') +
+          (rows ? '<table class="p-mini"><thead><tr><th>ބޭނުންވާ ފަރާތް</th><th>އަދަދު</th><th>ހަރަކާތްތައް</th></tr></thead><tbody>' + rows + '</tbody></table>'
+                : '<p class="p-pending">އަދި އެއްވެސް ހަރަކާތެއް ނުލިބޭ</p>') + '</section>');
+      });
+      blocks.push('break');
+      var total = count.reduce(function (n, c) { return n + c.length; }, 0);
+      blocks.push('<h2>' + pdfNum('2.') + ' ޖުމްލަ ބޭނުންވާ މީހުން</h2><p class="p-sum">ކޮންމެ ރަށަކަށް ވަކި މީހަކު ނަމަ ޖުމްލަ ' + pdfNum(total) + ' މީހުން</p>');
+      blocks.push('table');
+      var pend = isl.filter(function (x) { return x.pending; }), noSchool = isl.filter(function (x) { return !x.school; });
+      if (pend.length) blocks.push('<p class="p-pending">ރަށުގެ ހަރަކާތްތައް ނުލިބޭ (' + pdfNum(pend.length) + '): ' + pend.map(function (x) { return esc(x.name); }).join('، ') + '</p>');
+      if (noSchool.length) blocks.push('<p class="p-pending">ސްކޫލު ސެޝަންތައް ފޯމު ނުފުރާ (' + pdfNum(noSchool.length) + '): ' + noSchool.map(function (x) { return esc(x.name); }).join('، ') + '</p>');
+      blocks.push('<p class="p-foot">ތައްޔާރުކުރި ތާރީޚު: ' + dvDate(today).replace(/(\d+)/g, pdfNum('$1')) + '</p>');
+      var tableHtml = '<table class="p-table"><thead><tr><th>ބޭނުންވާ ފަރާތް</th><th>ރަށް</th><th>ރަށްތައް</th></tr></thead><tbody>' +
+        types.map(function (t, k) { return { t: t, k: k }; }).filter(function (o) { return count[o.k].length; })
+          .sort(function (a, b) { return count[b.k].length - count[a.k].length; })
+          .map(function (o) {
+            return '<tr><td class="p-role">' + esc(o.t.role) + (o.t.about ? '<small>' + aboutHtml(o.t.about) + '</small>' : '') + '</td><td class="p-c">' + count[o.k].length + '</td><td>' +
+              count[o.k].map(esc).join('، ') + '</td></tr>';
+          }).join('') + '</tbody></table>';
+      pdfDownload(btn.querySelector('button'), blocks, tableHtml, title.trim() + ' - ބޭނުންވާ މީހުން.pdf');
+    });
+  })();
 
   /* ---------- Tabs ---------- */
   var tabs = document.querySelectorAll('.tabs [data-tab]');
