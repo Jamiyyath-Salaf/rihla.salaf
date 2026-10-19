@@ -57,7 +57,7 @@ a { color: var(--accent); }
 .tabs {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: .4rem;
   background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
-  padding: .35rem; margin: 0 0 1.5rem; position: sticky; top: .5rem; z-index: 5;
+  padding: .35rem; margin: 0 0 1.5rem;
 }
 .tabs button {
   display: flex; flex-direction: column; align-items: center; gap: .1rem;
