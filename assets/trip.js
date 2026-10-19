@@ -1048,6 +1048,18 @@
     });
   })();
 
+  /* ---------- Report tab: notes for the after-trip report ---------- */
+  (function () {
+    var el = document.getElementById('report');
+    if (!el) return;
+    var improve = (T.report || {}).improve || [];
+    el.innerHTML = '<h2 class="group-title">ރަނގަޅުކުރަން ޖެހޭ <span class="group-count">' + improve.length + '</span></h2>' +
+      (improve.length ? '<ol class="rp-list">' + improve.map(function (p, i) {
+        return '<li class="rp"><span class="rp-n">' + (i + 1) + '</span><div class="rp-body"><div class="rp-point">' + esc(p.point || '') + '</div>' +
+          (p.details ? '<p class="rp-details">' + esc(p.details).replace(/\n/g, '<br>') + '</p>' : '') + '</div></li>';
+      }).join('') + '</ol>' : '<p class="none">' + EMPTY + '</p>');
+  })();
+
   /* ---------- Tabs ---------- */
   var tabs = document.querySelectorAll('.tabs [data-tab]');
   var panels = document.querySelectorAll('.panel');

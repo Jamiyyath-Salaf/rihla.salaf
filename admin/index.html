@@ -553,6 +553,16 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
           b.appendChild(textField(st, 'place', 'ތަން', { onchange: r }));
           b.appendChild(areaField(st, 'details', 'ތަފްޞީލު'));
         } });
+    } },
+    report: { label: 'ރިޕޯޓު', render: function () {
+      data.report = data.report || {};
+      data.report.improve = data.report.improve || [];
+      return itemList(data.report.improve, { heading: 'ރަނގަޅުކުރަން ޖެހޭ', addLabel: 'ޕޮއިންޓެއް', titleKey: 'point',
+        blank: function () { return { point: '', details: '' }; },
+        fields: function (p, b, r) {
+          b.appendChild(textField(p, 'point', 'މައިގަނޑު ޕޮއިންޓު', { onchange: r }));
+          b.appendChild(areaField(p, 'details', 'ތަފްޞީލު'));
+        } });
     } }
   };
   var MONTHS = ['ޖަނަވަރީ', 'ފެބްރުއަރީ', 'މާރިޗު', 'އޭޕްރީލް', 'މެއި', 'ޖޫން', 'ޖުލައި', 'އޮގަސްޓު', 'ސެޕްޓެމްބަރު', 'އޮކްޓޫބަރު', 'ނޮވެންބަރު', 'ޑިސެމްބަރު'];
