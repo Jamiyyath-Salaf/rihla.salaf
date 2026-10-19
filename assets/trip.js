@@ -188,7 +188,7 @@
 
   var html = '';
   var islandList = all.filter(function (x) { return x.kind === 'island'; });
-  var missingN = islandList.filter(function (x) { return x.profile_pending || !x.school_form || x.pending; }).length;
+  var missingN = islandList.filter(function (x) { return x.profile_pending || !x.school_form || x.pending || !String(x.main_dars || '').trim(); }).length;
   var bellHtml = '<button type="button" class="upd-btn upd-tile" id="upd-btn">' +
     '<svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>' +
     '<span>އަޕްޑޭޓްތައް</span>' + (missingN ? '<b class="upd-badge">' + missingN + '</b>' : '') + '</button>';
@@ -235,6 +235,7 @@
     h += status('ސްކޫލު ސެޝަންތައް ފޯމު ނުފުރާ', islandList.filter(function (x) { return !x.school_form; }), 'warn');
     h += status('ހަރަކާތްތައް ނުފޮނުވާ', islandList.filter(function (x) { return x.pending; }), 'warn');
     h += status('ވޮލަންޓިއަރު ނުލިބޭ', volMissing, 'warn');
+    h += status('ބޮޑު ދަރުސް މައުޟޫޢު ނުލިބޭ', islandList.filter(function (x) { return !String(x.main_dars || '').trim(); }), 'warn');
     openSheet(h);
   }
   sheet.addEventListener('click', function (e) {
