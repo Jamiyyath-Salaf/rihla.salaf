@@ -353,6 +353,7 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
         textField(pr, 'focus', 'އިތުރަށް އަލިއަޅުވާލަން ބޭނުންވާ (، ޖަހާ ވަކިކުރައްވާ)'),
         textField(pr, 'influencer', 'ސޯޝަލް މީޑިއަރ އިންފުލުއެންޒަރ')]));
       body.appendChild(checkField(it, 'pending', 'ހަރަކާތްތައް އަދި ނުލިބޭ'));
+      body.appendChild(textField(it, 'main_dars', 'ބޮޑު ދަރުސް މައުޟޫޢު'));
       if (!it.volunteer || typeof it.volunteer !== 'object') it.volunteer = {};
       body.appendChild(el('fieldset', null, [el('legend', { text: 'ވޮލަންޓިއަރު' }),
         el('div', { class: 'grid2' }, [textField(it.volunteer, 'name', 'ނަން'), textField(it.volunteer, 'phone', 'ނަންބަރު', { ltr: true })])]));

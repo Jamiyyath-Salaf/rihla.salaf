@@ -888,3 +888,9 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .ai-name { text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent); text-underline-offset: 4px; }
 /* island card highlight after jumping from the activities tab */
 .island.flash { outline: 3px solid var(--warm); outline-offset: 3px; transition: outline-color .3s; }
+
+/* Main dars topic in the island popup */
+.dars-box { margin-top: .8rem; display: grid; gap: .1rem; background: color-mix(in srgb, var(--accent) 9%, var(--surface)); border-right: 4px solid var(--accent); border-radius: 12px; padding: .6rem .9rem; }
+.dars-label { color: var(--accent); font-size: .82rem; font-weight: 700; }
+.dars-box strong { font-size: 1.15rem; font-weight: 900; line-height: 1.6; }
+.dars-none { color: var(--muted); font-size: .92rem; }

@@ -100,6 +100,8 @@
       if (v.phone) h += '<div>' + ICON.phone + '<span class="lbl">ނަންބަރު</span><a href="tel:' + esc(String(v.phone).replace(/\s/g, '')) + '" dir="ltr"><strong>' + esc(v.phone) + '</strong></a></div>';
     }
     h += '</div>';
+    if (isl.kind === 'island') h += '<div class="dars-box"><span class="dars-label">ބޮޑު ދަރުސް މައުޟޫޢު</span>' +
+      (isl.main_dars ? '<strong>' + esc(isl.main_dars) + '</strong>' : '<span class="dars-none">އަދި ނުނިންމާ</span>') + '</div>';
     h += popHtml(isl);
     h += '<h3>އެދިފައިވާ ހަރަކާތްތައް</h3>' + (isl.pending ? '<p>' + '<span class="pending-tag">ހަރަކާތްތައް އަދި ނުލިބޭ</span>' + '</p>' : list(isl.activities));
     h += issuesHtml(isl);
