@@ -76,6 +76,10 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
 .row { display: flex; gap: .4rem; align-items: center; margin-top: .4rem; }
 .row input { flex: 1; min-width: 0; }
 .row input.narrow { flex: 0 0 6rem; }
+.rowhead { margin-top: .2rem; font-size: .8rem; color: var(--muted); }
+.rowhead span { flex: 1; }
+.rowhead span.narrow { flex: 0 0 6rem; text-align: center; }
+.rowhead span.gap { flex: 0 0 34px; }
 .row .x { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: transparent; cursor: pointer; color: var(--danger); }
 .section-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 1rem 0 .7rem; }
 .section-head h2 { font-size: 1.3rem; }
@@ -289,6 +293,42 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
       obj.info = o;
     }
     return fs;
+  }
+
+  /* ---------- Report: how many people each activity reached, per island ---------- */
+  function reachNum(v) { var n = parseInt(String(v == null ? '' : v).replace(/[^0-9]/g, ''), 10); return isNaN(n) ? 0 : n; }
+  function reachSection() {
+    var wrap = el('div');
+    var COLS = [{ key: 'activity', ph: 'ހަރަކާތް' }, { key: 'male', ph: 'ފިރިހެން', narrow: true, ltr: true }, { key: 'female', ph: 'އަންހެން', narrow: true, ltr: true }];
+    function total(rows) { return (rows || []).reduce(function (s, r) { return s + reachNum(r.male) + reachNum(r.female); }, 0); }
+    (data.islands || []).forEach(function (isl) {
+      var sub = el('span', { class: 'item-sub' });
+      function refresh() { sub.textContent = 'ޖުމްލަ ' + (total(isl.reach) + total(isl.student_reach)); }
+      var d = el('details', { class: 'item' }, [el('summary', null, [el('span', { class: 'item-title', text: 'ބ. ' + (isl.name || '') }), sub])]);
+      var body = el('div', { class: 'item-body' });
+      function part(key, legend, fromList, addLabel) {
+        var fs = rowsField(isl, key, legend, COLS, addLabel);
+        fs.insertBefore(el('div', { class: 'row rowhead' }, [el('span', { text: 'ހަރަކާތް' }), el('span', { class: 'narrow', text: 'ފިރިހެން' }), el('span', { class: 'narrow', text: 'އަންހެން' }), el('span', { class: 'gap' })]), fs.children[1]);
+        if (fromList.length) fs.appendChild(el('button', { class: 'btn btn-ghost btn-small', type: 'button', style: 'margin:.5rem .5rem 0 0', text: 'އެދުނު ލިސްޓުން ހަރަކާތްތައް ލާ', onclick: function () {
+          var have = isl[key].map(function (r) { return String(r.activity || '').trim(); });
+          fromList.forEach(function (a) { if (have.indexOf(String(a).trim()) < 0) isl[key].push({ activity: a, male: '', female: '' }); });
+          markDirty(); build();
+        } }));
+        fs.addEventListener('input', refresh); fs.addEventListener('click', function () { setTimeout(refresh); });
+        return fs;
+      }
+      function build() {
+        body.innerHTML = '';
+        body.appendChild(part('reach', 'ހަރަކާތްތައް (ޢާންމުން)', isl.activities || [], 'ހަރަކާތެއް'));
+        body.appendChild(part('student_reach', 'ދަރިވަރުން (ސްކޫލު ސެޝަންތައް)', (isl.school || {}).sessions || [], 'ސެޝަނެއް'));
+        refresh();
+      }
+      build();
+      d.appendChild(body);
+      wrap.appendChild(d);
+    });
+    return el('div', null, [el('div', { class: 'section-head' }, [el('h2', { text: 'ރީޗު' })]),
+      el('p', { class: 'hint', text: 'ކޮންމެ ރަށެއްގެ ކޮންމެ ހަރަކާތެއްގައި ބައިވެރިވި ފިރިހެނުންނާއި އަންހެނުންގެ އަދަދު. ދަރިވަރުން ވަކިން.' }), wrap]);
   }
 
   /* ---------- Generic list-of-items section ---------- */
@@ -557,12 +597,12 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
     report: { label: 'ރިޕޯޓު', render: function () {
       data.report = data.report || {};
       data.report.improve = data.report.improve || [];
-      return itemList(data.report.improve, { heading: 'ރަނގަޅުކުރަން ޖެހޭ', addLabel: 'ޕޮއިންޓެއް', titleKey: 'point',
+      return el('div', null, [reachSection(), itemList(data.report.improve, { heading: 'ރަނގަޅުކުރަން ޖެހޭ', addLabel: 'ޕޮއިންޓެއް', titleKey: 'point',
         blank: function () { return { point: '', details: '' }; },
         fields: function (p, b, r) {
           b.appendChild(textField(p, 'point', 'މައިގަނޑު ޕޮއިންޓު', { onchange: r }));
           b.appendChild(areaField(p, 'details', 'ތަފްޞީލު'));
-        } });
+        } })]);
     } }
   };
   var MONTHS = ['ޖަނަވަރީ', 'ފެބްރުއަރީ', 'މާރިޗު', 'އޭޕްރީލް', 'މެއި', 'ޖޫން', 'ޖުލައި', 'އޮގަސްޓު', 'ސެޕްޓެމްބަރު', 'އޮކްޓޫބަރު', 'ނޮވެންބަރު', 'ޑިސެމްބަރު'];

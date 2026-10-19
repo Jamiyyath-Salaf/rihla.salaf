@@ -1053,7 +1053,44 @@
     var el = document.getElementById('report');
     if (!el) return;
     var improve = (T.report || {}).improve || [];
-    el.innerHTML = '<h2 class="group-title">ރަނގަޅުކުރަން ޖެހޭ <span class="group-count">' + improve.length + '</span></h2>' +
+    var isl = all.filter(function (x) { return x.kind === 'island'; });
+    function n(v) { var k = parseInt(String(v == null ? '' : v).replace(/[^0-9]/g, ''), 10); return isNaN(k) ? 0 : k; }
+    function rows(list) { return (list || []).filter(function (r) { return String(r.activity || '').trim() && (n(r.male) || n(r.female)); }); }
+    function sum(list) { var s = { m: 0, f: 0 }; list.forEach(function (r) { s.m += n(r.male); s.f += n(r.female); }); return s; }
+    function add(a, b) { return { m: a.m + b.m, f: a.f + b.f }; }
+    function fmt(k) { return '<span dir="ltr">' + k.toLocaleString('en-US') + '</span>'; }
+    function split(s) {
+      var t = s.m + s.f, pm = t ? Math.round(s.m * 100 / t) : 50;
+      return '<div class="rc-split"><span class="boy"><i></i>ފިރިހެން <b>' + fmt(s.m) + '</b></span><span class="girl"><i></i>އަންހެން <b>' + fmt(s.f) + '</b></span></div>' +
+        '<div class="rc-bar' + (t ? '' : ' is-empty') + '"><span class="boy" style="width:' + pm + '%"></span><span class="girl" style="width:' + (100 - pm) + '%"></span></div>';
+    }
+    function card(label, s, cls) {
+      return '<div class="rc-card ' + (cls || '') + '"><div class="rc-label">' + label + '</div><div class="rc-total">' + fmt(s.m + s.f) + '</div>' + split(s) + '</div>';
+    }
+    function table(title, list) {
+      if (!list.length) return '';
+      var s = sum(list);
+      return '<p class="rc-sub">' + title + '</p><table class="rc-table"><thead><tr><th>ހަރަކާތް</th><th class="boy">ފިރިހެން</th><th class="girl">އަންހެން</th><th>ޖުމްލަ</th></tr></thead><tbody>' +
+        list.map(function (r) {
+          return '<tr><td>' + esc(r.activity) + '</td><td class="boy">' + fmt(n(r.male)) + '</td><td class="girl">' + fmt(n(r.female)) + '</td><td>' + fmt(n(r.male) + n(r.female)) + '</td></tr>';
+        }).join('') + '</tbody><tfoot><tr><td>ޖުމްލަ</td><td class="boy">' + fmt(s.m) + '</td><td class="girl">' + fmt(s.f) + '</td><td>' + fmt(s.m + s.f) + '</td></tr></tfoot></table>';
+    }
+    var tripPub = { m: 0, f: 0 }, tripStu = { m: 0, f: 0 }, done = [], waiting = [];
+    isl.forEach(function (x) {
+      var a = rows(x.reach), b = rows(x.student_reach);
+      if (!a.length && !b.length) { waiting.push(x); return; }
+      var sa = sum(a), sb = sum(b);
+      tripPub = add(tripPub, sa); tripStu = add(tripStu, sb);
+      done.push('<div class="rc-island"><div class="rc-head"><h3>ބ. ' + esc(x.name) + '</h3>' + card('ރަށުގެ ޖުމްލަ', add(sa, sb), 'is-mini') + '</div>' +
+        table('ހަރަކާތްތައް (ޢާންމުން)', a) + table('ދަރިވަރުން (ސްކޫލު ސެޝަންތައް)', b) + '</div>');
+    });
+    var reachHtml = '<h2 class="group-title">ރީޗު</h2>' +
+      '<div class="rc-cards">' + card('ޖުމްލަ ރީޗު · ' + isl.length + ' ރަށް', add(tripPub, tripStu), 'is-main') +
+      card('ޢާންމުން', tripPub) + card('ދަރިވަރުން', tripStu) + '</div>' +
+      '<p class="rc-note">ރީޗު ލިބުނު ރަށް: <b>' + done.length + ' / ' + isl.length + '</b></p>' +
+      done.join('') +
+      (waiting.length ? '<div class="rc-waiting"><p class="rc-sub">ރީޗު އަދި ނުލިބޭ</p><div class="chips">' + waiting.map(function (x) { return '<span class="chip">' + esc(x.name) + '</span>'; }).join('') + '</div></div>' : '');
+    el.innerHTML = reachHtml + '<h2 class="group-title">ރަނގަޅުކުރަން ޖެހޭ <span class="group-count">' + improve.length + '</span></h2>' +
       (improve.length ? '<ol class="rp-list">' + improve.map(function (p, i) {
         return '<li class="rp"><span class="rp-n">' + (i + 1) + '</span><div class="rp-body"><div class="rp-point">' + esc(p.point || '') + '</div>' +
           (p.details ? '<p class="rp-details">' + esc(p.details).replace(/\n/g, '<br>') + '</p>' : '') + '</div></li>';
