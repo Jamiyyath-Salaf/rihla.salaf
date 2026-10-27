@@ -68,7 +68,7 @@
     return h + '<div class="school" dir="ltr">' +
       '<div class="school-name">' + esc(sc.name || '') + '</div>' +
       ((sc.sessions || []).length ? '<div class="tag-list">' + sc.sessions.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>' : '') +
-      (sc.topics ? '<div class="school-topics">' + esc(sc.topics) + '</div>' : '') +
+      (sc.topics ? '<div class="school-topics">' + esc(sc.topics).replace(/\n/g, '<br>') + '</div>' : '') +
       (sc.focal ? '<div class="school-focal">' + ICON.user + '<span>' + esc(sc.focal) + '</span></div>' : '') +
       '</div>';
   }
@@ -342,7 +342,7 @@
           : acts.length ? '<ol class="ai-list">' + acts.map(function (a) { return '<li>' + esc(a) + '</li>'; }).join('') + '</ol>' : '<p class="none" style="text-align:right;margin:0">—</p>') + '</div>';
       if (x.kind === 'island') h += '<div class="ai-sec"><div class="ai-label">ސްކޫލުން އެދިފައިވާ</div>' +
         (sc ? '<ol class="ai-list ai-en" dir="ltr">' + (sc.sessions || []).map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol>' +
-              (sc.topics ? '<div class="ai-topics" dir="ltr">' + esc(sc.topics) + '</div>' : '')
+              (sc.topics ? '<div class="ai-topics" dir="ltr">' + esc(sc.topics).replace(/\n/g, '<br>') + '</div>' : '')
             : '<span class="pending-tag">ސްކޫލު ސެޝަންތައް ފޯމު ނުފުރާ</span>') + '</div>';
       return h + '</div>';
     }
@@ -887,7 +887,7 @@
           '<div class="p-ltr" dir="ltr">' +
             '<div class="p-school">' + esc(sc.name || '') + '</div>' +
             '<div class="p-list">' + (sc.sessions || []).map(function (t, k) { return '<div class="p-row"><span class="p-k">' + (k + 1) + '.</span><span>' + esc(t) + '</span></div>'; }).join('') + '</div>' +
-            (sc.topics ? '<div class="p-topics">' + esc(sc.topics) + '</div>' : '') +
+            (sc.topics ? '<div class="p-topics">' + esc(sc.topics).replace(/\n/g, '<br>') + '</div>' : '') +
             (sc.focal ? '<div class="p-focal">Focal: ' + esc(sc.focal) + '</div>' : '') +
           '</div></section>';
       }
