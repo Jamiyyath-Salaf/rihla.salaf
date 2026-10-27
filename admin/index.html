@@ -380,6 +380,10 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
       textField(it, 'phone', 'ނަންބަރު', { ltr: true }),
       withTitleEmail ? textField(it, 'email', 'އީމެއިލް', { ltr: true }) : null
     ]));
+    if (!withTitleEmail) body.appendChild(el('div', { class: 'grid2' }, [
+      textField(it, 'focal2', 'ފޯކަލް ޕޮއިންޓް 2 (ބޭނުންނަމަ)'),
+      textField(it, 'phone2', 'ނަންބަރު 2', { ltr: true })
+    ]));
     if (withTitleEmail) body.appendChild(textField(it, 'title', 'މަޤާމް'));
     if (!withTitleEmail) {
       // ރަށުގެ މަޢުލޫމާތު

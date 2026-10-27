@@ -93,6 +93,10 @@
     if (isl.title) h += '<div class="contact-title">' + esc(isl.title) + '</div>';
     h += '<div>' + ICON.phone + '<span class="lbl">ނަންބަރު</span>' +
       (isl.phone ? '<a href="tel:' + esc(String(isl.phone).replace(/\s/g, '')) + '" dir="ltr"><strong>' + esc(isl.phone) + '</strong></a>' : '<strong>—</strong>') + '</div>';
+    if (isl.focal2 || isl.phone2) {
+      h += '<div>' + ICON.user + '<span class="lbl">ފޯކަލް ޕޮއިންޓް 2</span><strong>' + (isl.focal2 ? esc(isl.focal2) : '—') + '</strong></div>';
+      if (isl.phone2) h += '<div>' + ICON.phone + '<span class="lbl">ނަންބަރު</span><a href="tel:' + esc(String(isl.phone2).replace(/\s/g, '')) + '" dir="ltr"><strong>' + esc(isl.phone2) + '</strong></a></div>';
+    }
     if (isl.email) h += '<div>' + ICON.mail + '<span class="lbl">އީމެއިލް</span><a href="mailto:' + esc(isl.email) + '" dir="ltr"><strong>' + esc(isl.email) + '</strong></a></div>';
     if (isl.kind === 'island') {
       var v = isl.volunteer || {};
@@ -174,6 +178,9 @@
           '<span class="focal-text"><span class="focal-label">ފޯކަލް ޕޮއިންޓް</span><span class="focal-name">' + (x.focal ? esc(x.focal) : '—') + '</span>' +
           (x.title ? '<span class="focal-title">' + esc(x.title) + '</span>' : '') + '</span></div>' +
         (x.phone ? '<a class="call" href="tel:' + esc(String(x.phone).replace(/\s/g, '')) + '">' + ICON.phone + '<span dir="ltr">' + esc(x.phone) + '</span></a>' : '') +
+        (x.focal2 ? '<div class="focal focal-2"><span class="avatar">' + esc(x.focal2.charAt(0)) + '</span>' +
+          '<span class="focal-text"><span class="focal-label">ފޯކަލް ޕޮއިންޓް 2</span><span class="focal-name">' + esc(x.focal2) + '</span></span></div>' : '') +
+        (x.phone2 ? '<a class="call" href="tel:' + esc(String(x.phone2).replace(/\s/g, '')) + '">' + ICON.phone + '<span dir="ltr">' + esc(x.phone2) + '</span></a>' : '') +
         (island ? '<div class="card-vol' + (hasVol(x) ? '' : ' none-yet') + '"><span class="focal-label">ވޮލަންޓިއަރު</span>' +
           (hasVol(x) ? '<span class="cv-name" dir="auto">' + esc(x.volunteer.name) + '</span>' +
             (x.volunteer.phone ? '<a class="cv-phone" href="tel:' + esc(String(x.volunteer.phone).replace(/\s/g, '')) + '" dir="ltr">' + esc(x.volunteer.phone) + '</a>' : '')
@@ -502,7 +509,8 @@
     function block(x, n) {
       var acts = x.activities || [];
       return '<section class="p-island"><h3>' + (n ? '<span class="p-n">' + n + '</span>' : '') + (x.kind === 'island' ? 'ބ. ' : '') + esc(x.name) +
-        (x.focal ? '<small>' + esc(x.focal) + (x.phone ? ' · ' + num(esc(x.phone)) : '') + '</small>' : '') + '</h3>' +
+        (x.focal ? '<small>' + esc(x.focal) + (x.phone ? ' · ' + num(esc(x.phone)) : '') +
+          (x.focal2 ? ' / ' + esc(x.focal2) + (x.phone2 ? ' · ' + num(esc(x.phone2)) : '') : '') + '</small>' : '') + '</h3>' +
         (x.pending ? '<p class="p-pending">ހަރަކާތްތައް އަދި ނުލިބޭ</p>'
           : acts.length ? '<div class="p-list">' + acts.map(function (a, k) { return '<div class="p-row"><span class="p-k">' + (k + 1) + '.</span><span>' + esc(a) + '</span></div>'; }).join('') + '</div>' : '<p class="p-pending">—</p>') +
         '</section>';

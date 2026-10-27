@@ -938,3 +938,5 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .rc-table tfoot td:first-child { font-family: inherit; }
 .rc-waiting { max-width: 760px; margin: 0 auto 1.4rem; text-align: right; }
 #report .group-title + .rp-list { margin-top: 0; }
+
+.focal-2 { margin-top: .3rem; padding-top: .5rem; border-top: 1px dashed var(--line); }
