@@ -665,6 +665,44 @@
           (v.phone ? '<a class="call" href="tel:' + esc(String(v.phone).replace(/\s/g, '')) + '">' + ICON.phone + '<span dir="ltr">' + esc(v.phone) + '</span></a>' : '') +
           '</div>';
       }).join('') + '</div>' : '<p class="none">' + EMPTY + '</p>'));
+    // Island teams: a second view beside the facilitator list
+    var tIsl = all.filter(function (x) { return x.kind === 'island'; });
+    var isLead = function (m) { return /^ޝައިޚު/.test(m.name || '') || m.role === 'ފެސިލިޓޭޓަރ'; };
+    var ready = tIsl.filter(function (x) { return (x.team || []).length; });
+    var tPeople = ready.reduce(function (n, x) { return n + x.team.length; }, 0);
+    function teamCard(x) {
+      var team = x.team || [], leads = team.filter(isLead), rest = team.filter(function (m) { return !isLead(m); });
+      if (!team.length) return '<div class="tm tm-empty" role="button" tabindex="0" data-i="' + all.indexOf(x) + '">' +
+        '<div class="tm-head"><span class="tm-isl">' + PIN + esc(x.name) + '</span></div>' +
+        '<p class="tm-wait">ޓީމު ކަނޑައަޅަން ބާކީ</p></div>';
+      return '<div class="tm" role="button" tabindex="0" data-i="' + all.indexOf(x) + '">' +
+        '<div class="tm-head"><span class="tm-isl">' + PIN + esc(x.name) + '</span><span class="tm-n">' + team.length + ' ' + ICON.team + '</span></div>' +
+        leads.map(function (m) {
+          return '<div class="tm-lead"><span class="tm-av">' + esc((m.name || '').replace(/^ޝައިޚު\s*/, '').charAt(0)) + '</span>' +
+            '<span><b>' + esc(m.name) + '</b><small>ފެސިލިޓޭޓަރ</small></span></div>';
+        }).join('') +
+        (rest.length ? '<ul class="tm-crew">' + rest.map(function (m) {
+          return '<li><span class="tm-dot">' + esc((m.name || '').charAt(0)) + '</span><span class="tm-name">' + esc(m.name) + '</span>' +
+            (m.role ? '<span class="tm-role">' + esc(m.role) + '</span>' : '') + '</li>';
+        }).join('') + '</ul>' : '') + '</div>';
+    }
+    var teamsHtml = '<div class="tm-sum"><div class="tm-sum-n"><b>' + ready.length + '</b><span>/ ' + tIsl.length + ' ރަށް</span></div>' +
+      '<div class="tm-dots">' + tIsl.map(function (x) { return '<i class="' + ((x.team || []).length ? 'on' : '') + '" title="' + esc(x.name) + '"></i>'; }).join('') + '</div>' +
+      '<div class="tm-sum-n"><b>' + tPeople + '</b><span>މީހުން ކަށަވަރު</span></div></div>' +
+      '<div class="tm-grid">' + ready.concat(tIsl.filter(function (x) { return !(x.team || []).length; })).map(teamCard).join('') + '</div>';
+    facEl.innerHTML = '<div class="seg" role="tablist"><button type="button" data-v="fac" aria-selected="true">ފެސިލިޓޭޓަރުން</button>' +
+      '<button type="button" data-v="teams" aria-selected="false">ރަށްރަށުގެ ޓީމުތައް</button></div>' +
+      '<div class="fac-view" data-view="fac">' + facEl.innerHTML + '</div><div class="fac-view" data-view="teams" hidden>' + teamsHtml + '</div>';
+    facEl.querySelector('.seg').addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      facEl.querySelectorAll('.seg button').forEach(function (x) { x.setAttribute('aria-selected', x === b); });
+      facEl.querySelectorAll('.fac-view').forEach(function (v) { v.hidden = v.dataset.view !== b.dataset.v; });
+    });
+    facEl.addEventListener('click', function (e) { var c = e.target.closest('.tm'); if (c) islandSheet(+c.dataset.i); });
+    facEl.addEventListener('keydown', function (e) {
+      var c = e.target.closest('.tm');
+      if (c && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); islandSheet(+c.dataset.i); }
+    });
     function volSheet(i) {
       var v = vols[i];
       var h = '<p class="sheet-kicker">ވޮލަންޓިއަރު</p><h2>' + (v.name ? esc(v.name) : '—') + '</h2><div class="contact-card">' +
