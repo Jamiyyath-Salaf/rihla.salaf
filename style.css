@@ -1028,3 +1028,12 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .pdf-doc .sched-legend .lg-public::before { background: #8cc49a; }
 .pdf-doc .sched-legend .lg-school::before { background: #9dbde3; }
 .sched li.is-public, .sched li.is-school { margin-bottom: .25rem; }
+
+/* Ceremony agenda: folded until tapped */
+.pg-ag summary { list-style: none; display: inline-flex; align-items: center; gap: .45rem; cursor: pointer; font-size: .95rem; font-weight: 700; color: var(--accent); border: 1px solid var(--line); border-radius: 999px; padding: .1rem .9rem; background: var(--surface); }
+.pg-ag summary::-webkit-details-marker { display: none; }
+.pg-ag summary::after { content: "▾"; font-family: system-ui, sans-serif; transition: transform .2s; }
+.pg-ag[open] summary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pg-ag[open] summary::after { transform: rotate(180deg); }
+.pg-ag summary b { font-family: system-ui, sans-serif; font-size: .8rem; }
+.pg-ag[open] .pg-agenda { margin-top: .5rem; animation: pgOpen .2s ease-out; }

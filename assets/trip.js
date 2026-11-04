@@ -1104,10 +1104,10 @@
       if (s.key === 'to_eydh') extra = islandChips('to_eydhafushi');
       // ceremony agenda: time · item · who runs it
       var ag = (s.agenda || []).filter(function (a) { return a.item; });
-      if (ag.length) extra += '<ol class="pg-agenda">' + ag.map(function (a) {
+      if (ag.length) extra += '<details class="pg-ag"><summary><span>އެޖެންޑާ</span><b>' + ag.length + '</b></summary><ol class="pg-agenda">' + ag.map(function (a) {
         return '<li>' + (a.time ? '<span class="sched-time" dir="ltr">' + esc(a.time) + '</span>' : '<span class="sched-time"></span>') +
           '<span>' + esc(a.item) + (a.by ? '<small class="sched-by">' + esc(a.by) + '</small>' : '') + '</span></li>';
-      }).join('') + '</ol>';
+      }).join('') + '</ol></details>';
       var has = s.date || s.time || s.details || extra;
       return '<li class="pg-step"><span class="pg-n">' + (i + 1) + '</span><div class="pg-card">' +
         '<div class="pg-title">' + esc(s.title || '') + '</div>' + when(s) +
