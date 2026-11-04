@@ -88,6 +88,12 @@
     var c = s.break ? 'is-break' : s.type === 'school' ? 'is-school' : s.type === 'public' ? 'is-public' : '';
     return c ? ' class="' + c + '"' : '';
   }
+  // registration: 'yes' = needs announcing/sign-up, 'no' = open to everyone
+  function regTag(s) {
+    if (s.break) return '';
+    return s.reg === 'yes' ? '<span class="reg reg-yes">އިޢުލާނު ކުރަން ޖެހޭ</span>'
+      : s.reg === 'no' ? '<span class="reg reg-no">ޢާންމުކޮށް ހުޅުވާލެވިގެން</span>' : '';
+  }
   function schedLegend(list) {
     var has = function (t) { return (list || []).some(function (s) { return s.type === t; }); };
     return has('school') || has('public') ? '<div class="sched-legend"><span class="lg-public">ޢާންމު ސެޝަން</span><span class="lg-school">ސްކޫލް ސެޝަން</span></div>' : '';
@@ -142,7 +148,7 @@
       h += days.map(function (d) {
         return '<div class="sched-day">' + (d ? '<p class="sched-date">' + esc(d) + '</p>' : '') +
           '<ul class="sched">' + byDay[d].map(function (s) {
-            return '<li' + schedCls(s) + '><span class="sched-time" dir="ltr">' + esc(s.time || '') + '</span><span>' + esc(s.activity) + (s.by ? '<small class="sched-by">' + esc(s.by) + '</small>' : '') + '</span></li>';
+            return '<li' + schedCls(s) + '><span class="sched-time" dir="ltr">' + esc(s.time || '') + '</span><span>' + regTag(s) + esc(s.activity) + (s.by ? '<small class="sched-by">' + esc(s.by) + '</small>' : '') + '</span></li>';
           }).join('') + '</ul></div>';
       }).join('');
     } else {
@@ -368,7 +374,7 @@
         (items.length ? days.map(function (d) {
           return '<div class="ai-sec"><div class="ai-label">' + esc(d || '—') + '</div><ul class="fin-list">' + byDay[d].map(function (s) {
             return '<li' + schedCls(s) + '>' + (s.time ? '<span class="fin-time" dir="ltr">' + esc(s.time) + '</span>' : '<span class="fin-time"></span>') +
-              '<span>' + esc(s.activity) + (s.by ? '<small class="sched-by">' + esc(s.by) + '</small>' : '') + '</span></li>';
+              '<span>' + regTag(s) + esc(s.activity) + (s.by ? '<small class="sched-by">' + esc(s.by) + '</small>' : '') + '</span></li>';
           }).join('') + '</ul></div>';
         }).join('') : '<div class="ai-sec"><span class="pending-tag">ފައިނަލް ޝެޑިއުލް އަދި ނުހަދާ</span></div>') + '</div>';
     }
@@ -1138,7 +1144,7 @@
         panel.innerHTML = '<div class="pg-open-head"><b>ބ. ' + esc(x.name) + '</b><button type="button" class="pg-close" aria-label="ބަންދުކުރޭ">✕</button></div>' + schedLegend(sched) +
           (sched.length ? days.map(function (d) {
             return '<div class="sched-day">' + (d ? '<p class="sched-date">' + esc(d) + '</p>' : '') + '<ul class="sched">' + byDay[d].map(function (s) {
-              return '<li' + schedCls(s) + '><span class="sched-time" dir="ltr">' + esc(s.time || '') + '</span><span>' + esc(s.activity) + (s.by ? '<small class="sched-by">' + esc(s.by) + '</small>' : '') + '</span></li>';
+              return '<li' + schedCls(s) + '><span class="sched-time" dir="ltr">' + esc(s.time || '') + '</span><span>' + regTag(s) + esc(s.activity) + (s.by ? '<small class="sched-by">' + esc(s.by) + '</small>' : '') + '</span></li>';
             }).join('') + '</ul></div>';
           }).join('') : '<p class="none">' + EMPTY + '</p>');
         panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1167,7 +1173,7 @@
         dayEl.innerHTML = '<div class="pg-grid">' + isl.map(function (x) {
           var rows = (x.schedule || []).filter(function (e) { return e.day === d; });
           return '<div class="pg-isl"><h3>ބ. ' + esc(x.name) + '</h3>' + (rows.length ? '<ul class="sched">' + rows.map(function (e) {
-            return '<li' + schedCls(e) + '><span class="sched-time" dir="ltr">' + esc(e.time || '') + '</span><span>' + esc(e.activity) + (e.by ? '<small class="sched-by">' + esc(e.by) + '</small>' : '') + '</span></li>';
+            return '<li' + schedCls(e) + '><span class="sched-time" dir="ltr">' + esc(e.time || '') + '</span><span>' + regTag(e) + esc(e.activity) + (e.by ? '<small class="sched-by">' + esc(e.by) + '</small>' : '') + '</span></li>';
           }).join('') + '</ul>' : '<p class="none">—</p>') + '</div>';
         }).join('') + '</div>';
       }
@@ -1200,7 +1206,7 @@
           '<h4>ޝެޑިއުލް</h4>' + schedLegend(sched) + (sched.length ? '<table class="p-table"><thead><tr><th>ދުވަސް</th><th>ގަޑި</th><th>ހަރަކާތް</th><th>ހިންގާނީ</th></tr></thead><tbody>' +
             sched.map(function (e, k) {
               var first = k === 0 || sched[k - 1].day !== e.day;
-              return '<tr class="' + (first ? 'p-first' : '') + (e.break ? ' p-break' : e.type === 'school' ? ' p-school' : e.type === 'public' ? ' p-public' : '') + '"><td class="p-day">' + (first ? nums(e.day || '') : '') + '</td><td class="p-c">' + pdfNum(esc(e.time || '')) + '</td><td>' + txt(e.activity || '') + '</td><td class="p-by">' + esc(e.by || '') + '</td></tr>';
+              return '<tr class="' + (first ? 'p-first' : '') + (e.break ? ' p-break' : e.type === 'school' ? ' p-school' : e.type === 'public' ? ' p-public' : '') + '"><td class="p-day">' + (first ? nums(e.day || '') : '') + '</td><td class="p-c">' + pdfNum(esc(e.time || '')) + '</td><td>' + regTag(e) + txt(e.activity || '') + '</td><td class="p-by">' + esc(e.by || '') + '</td></tr>';
             }).join('') + '</tbody></table>' : '<p class="p-pending">ޝެޑިއުލް އަދި ނުލިބޭ</p>') + '</section>');
       });
       blocks.push('<p class="p-foot">ތައްޔާރުކުރި ތާރީޚު: ' + dvDate(today).replace(/(\d+)/g, pdfNum('$1')) + '</p>');

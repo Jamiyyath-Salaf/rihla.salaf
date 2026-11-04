@@ -418,7 +418,8 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
     body.appendChild(rowsField(it, 'team', 'ޓީމް', [{ key: 'name', ph: 'ނަން' }, { key: 'role', ph: 'މަސައްކަތް' }], 'މެމްބަރެއް'));
     body.appendChild(rowsField(it, 'schedule', 'ހަރަކާތްތަކުގެ ޝެޑިއުލް', [
       { key: 'day', ph: 'ދުވަސް (މިސާލު: 12 ނޮވެންބަރު)' }, { key: 'time', ph: '09:00', narrow: true, ltr: true }, { key: 'activity', ph: 'ހަރަކާތް' }, { key: 'by', ph: 'ހިންގާނީ' },
-      { key: 'type', options: [['', '—'], ['public', 'ޢާންމު'], ['school', 'ސްކޫލް']] }
+      { key: 'type', options: [['', '—'], ['public', 'ޢާންމު'], ['school', 'ސްކޫލް']] },
+      { key: 'reg', options: [['', '—'], ['yes', 'އިޢުލާނު ކުރަން ޖެހޭ'], ['no', 'ޢާންމުކޮށް ހުޅުވާލެވިގެން']] }
     ], 'ހަރަކާތެއް'));
     body.appendChild(infoField(it));
   }
