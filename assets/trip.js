@@ -1059,8 +1059,11 @@
     }
     el.innerHTML = stages.length ? '<ol class="pg">' + stages.map(function (s, i) {
       var extra = '';
-      if (s.key === 'arrive') extra = outside.length ? '<div class="pg-people">' + outside.map(function (p) {
-        return '<div><b>' + esc(p.name) + '</b><span>' + esc(p.route.join(' ← ')) + '</span></div>';
+      // coming to Malé: people with a route, plus anyone given an arrival day
+      var coming = (F.sheikhs || []).concat(F.others || []).filter(function (p) { return (p.route || []).length || p.arrive; });
+      if (s.key === 'arrive') extra = coming.length ? '<div class="pg-people">' + coming.map(function (p) {
+        return '<div><b>' + esc(p.name) + '</b>' + ((p.route || []).length ? '<span>' + esc(p.route.join(' ← ')) + '</span>' : '') +
+          (p.arrive ? '<span class="pg-arrive">' + ICON.clock + esc(p.arrive) + '</span>' : '') + '</div>';
       }).join('') + '</div>' : '';
       // going home: the same people, route reversed (Malé → their island)
       if (s.key === 'home') extra = outside.length ? '<div class="pg-people">' + outside.map(function (p) {

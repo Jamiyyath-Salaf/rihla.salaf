@@ -996,3 +996,4 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .tm-empty { background: transparent; border-style: dashed; opacity: .75; }
 .tm-empty::before { background: var(--line); }
 .tm-wait { margin: 0; color: var(--muted); font-size: .9rem; }
+.pg-people .pg-arrive { display: inline-flex; align-items: center; gap: .25rem; color: var(--accent); font-weight: 700; }
