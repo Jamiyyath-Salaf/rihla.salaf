@@ -347,9 +347,29 @@
       return h + '</div>';
     }
     var byIsland = '<div class="ai-grid">' + islOnly.map(function (x, i) { return box(x, i + 1); }).join('') + '</div>';
+    // Final: what each island's schedule actually holds (breaks left out), day by day
+    function finalBox(x, n) {
+      var items = (x.schedule || []).filter(function (s) { return !s.break && s.activity; });
+      var days = [], byDay = {};
+      items.forEach(function (s) { var d = s.day || ''; if (!byDay[d]) { byDay[d] = []; days.push(d); } byDay[d].push(s); });
+      return '<div class="ai" role="button" tabindex="0" title="ބޮޑުކޮށް ބަލާ"><div class="ai-head"><span class="ai-n">' + n + '</span>' +
+        '<button class="ai-name" data-i="' + all.indexOf(x) + '">ބ. ' + esc(x.name) + '</button>' +
+        '<span class="ai-count">' + items.length + '</span></div>' +
+        (items.length ? days.map(function (d) {
+          return '<div class="ai-sec"><div class="ai-label">' + esc(d || '—') + '</div><ul class="fin-list">' + byDay[d].map(function (s) {
+            return '<li>' + (s.time ? '<span class="fin-time" dir="ltr">' + esc(s.time) + '</span>' : '<span class="fin-time"></span>') +
+              '<span>' + esc(s.activity) + (s.by ? '<small class="sched-by">' + esc(s.by) + '</small>' : '') + '</span></li>';
+          }).join('') + '</ul></div>';
+        }).join('') : '<div class="ai-sec"><span class="pending-tag">ފައިނަލް ޝެޑިއުލް އަދި ނުހަދާ</span></div>') + '</div>';
+    }
+    var finReady = islOnly.filter(function (x) { return (x.schedule || []).some(function (s) { return !s.break && s.activity; }); }).length;
+    var byFinal = '<p class="summary">' + finReady + ' / ' + islOnly.length + ' ރަށުގެ ފައިނަލް ޝެޑިއުލް ތައްޔާރު</p>' +
+      '<div class="ai-grid">' + islOnly.map(function (x, i) { return finalBox(x, i + 1); }).join('') + '</div>';
     actEl.innerHTML = '<div class="seg" role="tablist"><button type="button" data-v="island" aria-selected="true">ރަށްތަކުގެ ގޮތުން</button>' +
-      '<button type="button" data-v="type" aria-selected="false">ހަރަކާތްތަކުގެ ގޮތުން</button></div>' +
-      '<div class="act-view" data-view="island">' + byIsland + '</div><div class="act-view" data-view="type" hidden>' + byType + '</div>';
+      '<button type="button" data-v="type" aria-selected="false">ހަރަކާތްތަކުގެ ގޮތުން</button>' +
+      '<button type="button" data-v="final" aria-selected="false">ފައިނަލް</button></div>' +
+      '<div class="act-view" data-view="island">' + byIsland + '</div><div class="act-view" data-view="type" hidden>' + byType + '</div>' +
+      '<div class="act-view" data-view="final" hidden>' + byFinal + '</div>';
     actEl.querySelector('.seg').addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
       actEl.querySelectorAll('.seg button').forEach(function (x) { x.setAttribute('aria-selected', x === b); });
