@@ -262,9 +262,13 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
       obj[key].forEach(function (rowObj, i) {
         var row = el('div', { class: 'row' });
         cols.forEach(function (c) {
-          var inp = el('input', { type: 'text', placeholder: c.ph, class: (c.narrow ? 'narrow ' : '') + (c.ltr ? 'ltr' : '') });
+          var inp;
+          if (c.options) {   // a fixed choice instead of free text
+            inp = el('select', { class: 'narrow' });
+            c.options.forEach(function (o) { var op = el('option', { value: o[0], text: o[1] }); inp.appendChild(op); });
+          } else inp = el('input', { type: 'text', placeholder: c.ph, class: (c.narrow ? 'narrow ' : '') + (c.ltr ? 'ltr' : '') });
           inp.value = rowObj[c.key] == null ? '' : rowObj[c.key];
-          inp.addEventListener('input', function () { rowObj[c.key] = inp.value; markDirty(); });
+          inp.addEventListener(c.options ? 'change' : 'input', function () { rowObj[c.key] = inp.value; markDirty(); });
           row.appendChild(inp);
         });
         row.appendChild(el('button', { class: 'x', type: 'button', title: 'ފޮހެލާ', text: '✕', onclick: function () {
@@ -413,7 +417,8 @@ legend { padding: 0 .4rem; color: var(--warm); font-weight: 700; font-size: .95r
     body.appendChild(listField(it, 'activities', 'އެދިފައިވާ ހަރަކާތްތައް'));
     body.appendChild(rowsField(it, 'team', 'ޓީމް', [{ key: 'name', ph: 'ނަން' }, { key: 'role', ph: 'މަސައްކަތް' }], 'މެމްބަރެއް'));
     body.appendChild(rowsField(it, 'schedule', 'ހަރަކާތްތަކުގެ ޝެޑިއުލް', [
-      { key: 'day', ph: 'ދުވަސް (މިސާލު: 12 ނޮވެންބަރު)' }, { key: 'time', ph: '09:00', narrow: true, ltr: true }, { key: 'activity', ph: 'ހަރަކާތް' }, { key: 'by', ph: 'ހިންގާނީ' }
+      { key: 'day', ph: 'ދުވަސް (މިސާލު: 12 ނޮވެންބަރު)' }, { key: 'time', ph: '09:00', narrow: true, ltr: true }, { key: 'activity', ph: 'ހަރަކާތް' }, { key: 'by', ph: 'ހިންގާނީ' },
+      { key: 'type', options: [['', '—'], ['public', 'ޢާންމު'], ['school', 'ސްކޫލް']] }
     ], 'ހަރަކާތެއް'));
     body.appendChild(infoField(it));
   }
