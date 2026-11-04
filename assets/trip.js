@@ -91,8 +91,11 @@
   // registration: 'yes' = needs announcing/sign-up, 'no' = open to everyone
   function regTag(s) {
     if (s.break) return '';
-    return s.reg === 'yes' ? '<span class="reg reg-yes">އިޢުލާނު ކުރަން ޖެހޭ</span>'
-      : s.reg === 'no' ? '<span class="reg reg-no">ޢާންމުކޮށް ހުޅުވާލެވިގެން</span>' : '';
+    // how many people the session takes, shown beside the tag
+    var lim = s.limit ? '<span class="reg reg-limit">' + esc(s.limit) + '</span>' : '';
+    var tags = (s.reg === 'yes' ? '<span class="reg reg-yes">އިޢުލާނު ކުރަން ޖެހޭ</span>'
+      : s.reg === 'no' ? '<span class="reg reg-no">ޢާންމުކޮށް ހުޅުވާލެވިގެން</span>' : '') + lim;
+    return tags ? '<span class="regs">' + tags + '</span>' : '';
   }
   function schedLegend(list) {
     var has = function (t) { return (list || []).some(function (s) { return s.type === t; }); };

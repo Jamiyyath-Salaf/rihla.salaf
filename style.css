@@ -1049,4 +1049,11 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 /* activity name on the right, its registration tag on the left */
 .sched li > span:last-child, .fin-list li > span:last-child { flex: 1; min-width: 0; }
 .sched-act { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; }
-.sched-act .reg { flex: none; margin: .35rem 0 0; }
+.sched-act .regs { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: .2rem; margin-top: .35rem; }
+.sched-act .reg { margin: 0; }
+.reg-limit { background: var(--text); color: var(--surface); }
+.pdf-doc .reg-limit { background: #333; color: #fff; }
+/* narrow screens: tags drop under the name instead of pushing past the edge */
+.sched-act { flex-wrap: wrap; }
+.sched-act > span:first-child { flex: 1 1 7rem; min-width: 0; overflow-wrap: anywhere; }
+.sched li > .sched-time { flex-shrink: 0; }
