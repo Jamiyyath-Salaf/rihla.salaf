@@ -1104,18 +1104,33 @@
         extra + (!s.date && !s.details && !ag.length ? TBC : '') + '</div></li>';
     }).join('') + '</ol>' : '<p class="none">' + EMPTY + '</p>';
     el.addEventListener('click', function (e) {
+      var cl = e.target.closest('.pg-close');
+      if (cl) {
+        var cd = cl.closest('.pg-card');
+        cd.querySelectorAll('.pg-chip').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+        cl.closest('.pg-open').remove();
+        return;
+      }
       var c = e.target.closest('.pg-chip');
       if (!c) return;
       var x = all[+c.dataset.i];
       if (c.dataset.f === 'schedule') {
         var sched = x.schedule || [], days = [], byDay = {};
         sched.forEach(function (s) { var d = s.day || ''; if (!byDay[d]) { byDay[d] = []; days.push(d); } byDay[d].push(s); });
-        openSheet('<p class="sheet-kicker">ރަށްރަށުގެ ޝެޑިއުލް</p><h2>ބ. ' + esc(x.name) + '</h2>' +
+        // opens right under the chips; tapping the same island again closes it
+        var card = c.closest('.pg-card'), panel = card.querySelector('.pg-open');
+        var wasOpen = c.getAttribute('aria-expanded') === 'true';
+        card.querySelectorAll('.pg-chip').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+        if (wasOpen) { if (panel) panel.remove(); return; }
+        if (!panel) { panel = document.createElement('div'); panel.className = 'pg-open'; card.appendChild(panel); }
+        c.setAttribute('aria-expanded', 'true');
+        panel.innerHTML = '<div class="pg-open-head"><b>ބ. ' + esc(x.name) + '</b><button type="button" class="pg-close" aria-label="ބަންދުކުރޭ">✕</button></div>' +
           (sched.length ? days.map(function (d) {
             return '<div class="sched-day">' + (d ? '<p class="sched-date">' + esc(d) + '</p>' : '') + '<ul class="sched">' + byDay[d].map(function (s) {
               return '<li' + (s.break ? ' class="is-break"' : '') + '><span class="sched-time" dir="ltr">' + esc(s.time || '') + '</span><span>' + esc(s.activity) + (s.by ? '<small class="sched-by">' + esc(s.by) + '</small>' : '') + '</span></li>';
             }).join('') + '</ul></div>';
-          }).join('') : '<p class="none">' + EMPTY + '</p>'));
+          }).join('') : '<p class="none">' + EMPTY + '</p>');
+        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } else {
         openSheet('<p class="sheet-kicker">އޭދަފުށިއަށް ދަތުރު</p><h2>ބ. ' + esc(x.name) + '</h2>' +
           (x.to_eydhafushi ? '<p class="task-details">' + esc(x.to_eydhafushi).replace(/\n/g, '<br>') + '</p>' : '<p class="none">' + EMPTY + '</p>'));

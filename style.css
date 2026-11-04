@@ -1002,3 +1002,11 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .fin-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .2rem; font-size: .95rem; line-height: 1.6; }
 .fin-list li { display: flex; gap: .6rem; align-items: baseline; }
 .fin-time { flex: none; min-width: 6.2rem; font-family: system-ui, sans-serif; font-size: .8rem; font-weight: 700; color: var(--accent); }
+
+/* Schedule tab: one island's schedule opened in place */
+.pg-chip[aria-expanded="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pg-chip[aria-expanded="true"] b { color: #fff; }
+.pg-open { border-top: 1px dashed var(--line); padding-top: .6rem; animation: pgOpen .2s ease-out; }
+.pg-open-head { display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; margin-bottom: .3rem; }
+.pg-close { font: inherit; font-size: .9rem; border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px; width: 2rem; height: 2rem; cursor: pointer; }
+@keyframes pgOpen { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
