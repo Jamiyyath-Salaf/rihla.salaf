@@ -1037,3 +1037,4 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .pg-ag[open] summary::after { transform: rotate(180deg); }
 .pg-ag summary b { font-family: system-ui, sans-serif; font-size: .8rem; }
 .pg-ag[open] .pg-agenda { margin-top: .5rem; animation: pgOpen .2s ease-out; }
+.pg-ag[open] .pg-fold { margin-top: .5rem; animation: pgOpen .2s ease-out; }
