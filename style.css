@@ -1053,6 +1053,8 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .sched-act .reg { margin: 0; }
 .reg-limit { background: var(--text); color: var(--surface); }
 .pdf-doc .reg-limit { background: #333; color: #fff; }
+.reg-note { background: #fff4d6; color: #7a5a00; border: 1px solid #ecd58a; }
+.pdf-doc .reg-note { background: #fff4d6; color: #7a5a00; }
 /* narrow screens: tags drop under the name instead of pushing past the edge */
 .sched-act { flex-wrap: wrap; }
 .sched-act > span:first-child { flex: 1 1 7rem; min-width: 0; overflow-wrap: anywhere; }

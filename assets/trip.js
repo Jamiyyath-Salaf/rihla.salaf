@@ -92,9 +92,10 @@
   function regTag(s) {
     if (s.break) return '';
     // how many people the session takes, shown beside the tag
+    var note = s.note ? '<span class="reg reg-note">' + esc(s.note) + '</span>' : '';
     var lim = s.limit ? '<span class="reg reg-limit">' + esc(s.limit) + '</span>' : '';
     var tags = (s.reg === 'yes' ? '<span class="reg reg-yes">އިޢުލާނު ކުރަން ޖެހޭ</span>'
-      : s.reg === 'no' ? '<span class="reg reg-no">ޢާންމުކޮށް ހުޅުވާލެވިގެން</span>' : '') + lim;
+      : s.reg === 'no' ? '<span class="reg reg-no">ޢާންމުކޮށް ހުޅުވާލެވިގެން</span>' : '') + lim + note;
     return tags ? '<span class="regs">' + tags + '</span>' : '';
   }
   function schedLegend(list) {
