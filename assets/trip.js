@@ -551,7 +551,7 @@
       var acts = x.activities || [];
       return '<section class="p-island"><h3>' + (n ? '<span class="p-n">' + n + '</span>' : '') + (x.kind === 'island' ? 'ބ. ' : '') + esc(x.name) +
         (x.focal ? '<small>' + esc(x.focal) + (x.phone ? ' · ' + num(esc(x.phone)) : '') +
-          (x.focal2 ? ' / ' + esc(x.focal2) + (x.phone2 ? ' · ' + num(esc(x.phone2)) : '') : '') + '</small>' : '') + '</h3>' +
+          (x.focal2 ? ' / ' + esc(x.focal2) + (x.phone2 ? ' · ' + num(esc(x.phone2)) : '') : (x.phone2 ? ' / ' + num(esc(x.phone2)) : '')) + '</small>' : '') + '</h3>' +
         (x.pending ? '<p class="p-pending">ހަރަކާތްތައް އަދި ނުލިބޭ</p>'
           : acts.length ? '<div class="p-list">' + acts.map(function (a, k) { return '<div class="p-row"><span class="p-k">' + (k + 1) + '.</span><span>' + esc(a) + '</span></div>'; }).join('') + '</div>' : '<p class="p-pending">—</p>') +
         '</section>';
