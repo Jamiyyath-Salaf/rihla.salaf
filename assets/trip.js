@@ -1271,7 +1271,7 @@
       var a = rows(x.reach).concat(rows(fromAtt(x.name, false))), b = rows(x.student_reach).concat(rows(fromAtt(x.name, true)));
       latestAtt(x.name).forEach(function (r) {
         if (String(r.suggestion || '').trim()) ideas.push('<li class="rp"><div class="rp-body"><div class="rp-point">ބ. ' + esc(x.name) + ' · ' + esc(r.activity) + '</div>' +
-          '<p class="rp-details">' + esc(r.suggestion).replace(/\n/g, '<br>') + '</p><p class="rc-when">' + esc(r.volunteer || '') + '</p></div></li>');
+          '<ul class="bullets rp-details">' + String(r.suggestion).split('\n').filter(function (t) { return t.trim(); }).map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul><p class="rc-when">' + esc(r.volunteer || '') + '</p></div></li>');
       });
       if (!a.length && !b.length) { waiting.push(x); return; }
       var sa = sum(a), sb = sum(b);
