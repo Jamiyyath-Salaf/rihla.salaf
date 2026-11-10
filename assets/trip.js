@@ -1224,6 +1224,26 @@
     if (!el) return;
     var improve = (T.report || {}).improve || [];
     var isl = all.filter(function (x) { return x.kind === 'island'; });
+    // Session records sent from /attendance/ are kept in a Google Sheet; read them live
+    var ATT = 'https://script.google.com/macros/s/AKfycbwLJje9h1cPook0x-FQWjeuNhb9AjaO4nhZDAV21V-oBrO-JpCLt0cbDgQhgPu3lorheA/exec';
+    var att = null, attErr = false;
+    function latestAtt(name) {
+      var last = {};
+      (att || []).forEach(function (r) {
+        if (r.island !== name) return;
+        var k = [r.day, r.time, r.activity].join('|');
+        if (!last[k] || String(r.received) > String(last[k].received)) last[k] = r;
+      });
+      return Object.keys(last).map(function (k) { return last[k]; }).sort(function (a, b) {
+        var da = parseInt(String(a.day).replace(/[^0-9]/g, ''), 10) || 0, db = parseInt(String(b.day).replace(/[^0-9]/g, ''), 10) || 0;
+        return da - db || String(a.time).localeCompare(String(b.time));
+      });
+    }
+    function fromAtt(name, school) {
+      return latestAtt(name).filter(function (r) { return (r.type === 'school') === school; }).map(function (r) {
+        return { activity: r.activity, day: r.day, time: r.time, male: r.men, female: r.women };
+      });
+    }
     function n(v) { var k = parseInt(String(v == null ? '' : v).replace(/[^0-9]/g, ''), 10); return isNaN(k) ? 0 : k; }
     function rows(list) { return (list || []).filter(function (r) { return String(r.activity || '').trim() && (n(r.male) || n(r.female)); }); }
     function sum(list) { var s = { m: 0, f: 0 }; list.forEach(function (r) { s.m += n(r.male); s.f += n(r.female); }); return s; }
@@ -1242,12 +1262,17 @@
       var s = sum(list);
       return '<p class="rc-sub">' + title + '</p><table class="rc-table"><thead><tr><th>ހަރަކާތް</th><th class="boy">ފިރިހެން</th><th class="girl">އަންހެން</th><th>ޖުމްލަ</th></tr></thead><tbody>' +
         list.map(function (r) {
-          return '<tr><td>' + esc(r.activity) + '</td><td class="boy">' + fmt(n(r.male)) + '</td><td class="girl">' + fmt(n(r.female)) + '</td><td>' + fmt(n(r.male) + n(r.female)) + '</td></tr>';
+          return '<tr><td>' + esc(r.activity) + (r.time ? '<small class="rc-when">' + esc(r.day) + ' · <span dir="ltr">' + esc(r.time) + '</span></small>' : '') + '</td><td class="boy">' + fmt(n(r.male)) + '</td><td class="girl">' + fmt(n(r.female)) + '</td><td>' + fmt(n(r.male) + n(r.female)) + '</td></tr>';
         }).join('') + '</tbody><tfoot><tr><td>ޖުމްލަ</td><td class="boy">' + fmt(s.m) + '</td><td class="girl">' + fmt(s.f) + '</td><td>' + fmt(s.m + s.f) + '</td></tr></tfoot></table>';
     }
-    var tripPub = { m: 0, f: 0 }, tripStu = { m: 0, f: 0 }, done = [], waiting = [];
+    function render() {
+    var tripPub = { m: 0, f: 0 }, tripStu = { m: 0, f: 0 }, done = [], waiting = [], ideas = [];
     isl.forEach(function (x) {
-      var a = rows(x.reach), b = rows(x.student_reach);
+      var a = rows(x.reach).concat(rows(fromAtt(x.name, false))), b = rows(x.student_reach).concat(rows(fromAtt(x.name, true)));
+      latestAtt(x.name).forEach(function (r) {
+        if (String(r.suggestion || '').trim()) ideas.push('<li class="rp"><div class="rp-body"><div class="rp-point">ބ. ' + esc(x.name) + ' · ' + esc(r.activity) + '</div>' +
+          '<p class="rp-details">' + esc(r.suggestion).replace(/\n/g, '<br>') + '</p><p class="rc-when">' + esc(r.volunteer || '') + '</p></div></li>');
+      });
       if (!a.length && !b.length) { waiting.push(x); return; }
       var sa = sum(a), sb = sum(b);
       tripPub = add(tripPub, sa); tripStu = add(tripStu, sb);
@@ -1257,14 +1282,22 @@
     var reachHtml = '<h2 class="group-title">ރީޗު</h2>' +
       '<div class="rc-cards">' + card('ޖުމްލަ ރީޗު · ' + isl.length + ' ރަށް', add(tripPub, tripStu), 'is-main') +
       card('ޢާންމުން', tripPub) + card('ދަރިވަރުން', tripStu) + '</div>' +
-      '<p class="rc-note">ރީޗު ލިބުނު ރަށް: <b>' + done.length + ' / ' + isl.length + '</b></p>' +
+      '<p class="rc-note">ރީޗު ލިބުނު ރަށް: <b>' + done.length + ' / ' + isl.length + '</b>' +
+        (attErr ? ' · ހާޒިރީ ރެކޯޑުތައް ލޯޑު ނުކުރެވުނު' : att ? ' · ހާޒިރީ ފޯމުން ލިބުނު ސެޝަން: <b>' + isl.reduce(function (t, x) { return t + latestAtt(x.name).length; }, 0) + '</b>' : ' · ހާޒިރީ ރެކޯޑުތައް ލޯޑުވަނީ…') + '</p>' +
       done.join('') +
       (waiting.length ? '<div class="rc-waiting"><p class="rc-sub">ރީޗު އަދި ނުލިބޭ</p><div class="chips">' + waiting.map(function (x) { return '<span class="chip">' + esc(x.name) + '</span>'; }).join('') + '</div></div>' : '');
     el.innerHTML = reachHtml + '<h2 class="group-title">ރަނގަޅުކުރަން ޖެހޭ <span class="group-count">' + improve.length + '</span></h2>' +
       (improve.length ? '<ol class="rp-list">' + improve.map(function (p, i) {
         return '<li class="rp"><span class="rp-n">' + (i + 1) + '</span><div class="rp-body"><div class="rp-point">' + esc(p.point || '') + '</div>' +
           (p.details ? '<p class="rp-details">' + esc(p.details).replace(/\n/g, '<br>') + '</p>' : '') + '</div></li>';
-      }).join('') + '</ol>' : '<p class="none">' + EMPTY + '</p>');
+      }).join('') + '</ol>' : '<p class="none">' + EMPTY + '</p>') +
+      '<h2 class="group-title">ވޮލަންޓިއަރުންގެ ހިޔާލު <span class="group-count">' + ideas.length + '</span></h2>' +
+      (ideas.length ? '<ol class="rp-list">' + ideas.join('') + '</ol>' : '<p class="none">' + EMPTY + '</p>');
+    }
+    render();
+    fetch(ATT).then(function (r) { return r.json(); })
+      .then(function (j) { if (!j || !j.ok) throw new Error('bad'); att = j.rows || []; render(); })
+      .catch(function () { attErr = true; render(); });
   })();
 
   /* ---------- Tabs ---------- */

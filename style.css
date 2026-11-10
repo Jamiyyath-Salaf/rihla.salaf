@@ -1059,3 +1059,6 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .sched-act { flex-wrap: wrap; }
 .sched-act > span:first-child { flex: 1 1 7rem; min-width: 0; overflow-wrap: anywhere; }
 .sched li > .sched-time { flex-shrink: 0; }
+
+/* attendance records in the report tab */
+.rc-when { display: block; font-size: .78em; color: var(--muted); font-weight: 400; line-height: 1.5; }
