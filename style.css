@@ -1063,3 +1063,4 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 /* attendance records in the report tab */
 .rc-by { display: block; font-size: .82em; color: var(--accent); font-weight: 700; line-height: 1.5; }
 .rc-when { display: block; font-size: .78em; color: var(--muted); font-weight: 400; line-height: 1.5; }
+.rc-when .rc-isl { color: var(--accent); }
