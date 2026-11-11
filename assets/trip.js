@@ -1262,11 +1262,11 @@
       var s = sum(list);
       return '<p class="rc-sub">' + title + '</p><table class="rc-table"><thead><tr><th>ހަރަކާތް</th><th class="boy">ފިރިހެން</th><th class="girl">އަންހެން</th><th>ޖުމްލަ</th></tr></thead><tbody>' +
         list.map(function (r) {
-          return '<tr><td>' + esc(r.activity) + (String(r.by || '').trim() ? '<small class="rc-by">' + esc(r.by) + '</small>' : '') + (r.time ? '<small class="rc-when">' + esc(r.day) + ' · <span dir="ltr">' + esc(r.time) + '</span></small>' : '') + '</td><td class="boy">' + fmt(n(r.male)) + '</td><td class="girl">' + fmt(n(r.female)) + '</td><td>' + fmt(n(r.male) + n(r.female)) + '</td></tr>';
+          return '<tr><td>' + esc(r.activity) + (String(r.by || '').trim() ? '<small class="rc-by">' + esc(r.by) + '</small>' : '') + (r.sub ? '<small class="rc-when">' + r.sub + '</small>' : '') + (r.time ? '<small class="rc-when">' + esc(r.day) + ' · <span dir="ltr">' + esc(r.time) + '</span></small>' : '') + '</td><td class="boy">' + fmt(n(r.male)) + '</td><td class="girl">' + fmt(n(r.female)) + '</td><td>' + fmt(n(r.male) + n(r.female)) + '</td></tr>';
         }).join('') + '</tbody><tfoot><tr><td>ޖުމްލަ</td><td class="boy">' + fmt(s.m) + '</td><td class="girl">' + fmt(s.f) + '</td><td>' + fmt(s.m + s.f) + '</td></tr></tfoot></table>';
     }
     function render() {
-    var tripPub = { m: 0, f: 0 }, tripStu = { m: 0, f: 0 }, done = [], waiting = [], ideas = [];
+    var tripPub = { m: 0, f: 0 }, tripStu = { m: 0, f: 0 }, done = [], waiting = [], ideas = [], acts = {}, actOrder = [], nActs = 0;
     isl.forEach(function (x) {
       var a = rows(x.reach).concat(rows(fromAtt(x.name, false))), b = rows(x.student_reach).concat(rows(fromAtt(x.name, true)));
       latestAtt(x.name).forEach(function (r) {
@@ -1275,15 +1275,22 @@
       });
       if (!a.length && !b.length) { waiting.push(x); return; }
       var sa = sum(a), sb = sum(b);
+      a.concat(b).forEach(function (r) {
+        var k = String(r.activity).trim(), g = acts[k];
+        if (!g) { g = acts[k] = { activity: k, male: 0, female: 0, isl: [], n: 0 }; actOrder.push(k); }
+        g.male += n(r.male); g.female += n(r.female); g.n++; nActs++;
+        if (g.isl.indexOf(x.name) < 0) g.isl.push(x.name);
+      });
       tripPub = add(tripPub, sa); tripStu = add(tripStu, sb);
       done.push('<div class="rc-island"><div class="rc-head"><h3>ބ. ' + esc(x.name) + '</h3>' + card('ރަށުގެ ޖުމްލަ', add(sa, sb), 'is-mini') + '</div>' +
         table('ހަރަކާތްތައް (ޢާންމުން)', a) + table('ދަރިވަރުން (ސްކޫލު ސެޝަންތައް)', b) + '</div>');
     });
     var reachHtml = '<h2 class="group-title">ރީޗު</h2>' +
-      '<div class="rc-cards">' + card('ޖުމްލަ ރީޗު · ' + isl.length + ' ރަށް', add(tripPub, tripStu), 'is-main') +
+      '<div class="rc-cards">' + card('ޖުމްލަ ރީޗު · <span dir="ltr">' + done.length + '</span> ރަށް · <span dir="ltr">' + nActs + '</span> ހަރަކާތް', add(tripPub, tripStu), 'is-main') +
       card('ޢާންމުން', tripPub) + card('ދަރިވަރުން', tripStu) + '</div>' +
       '<p class="rc-note">ރީޗު ލިބުނު ރަށް: <b>' + done.length + ' / ' + isl.length + '</b>' +
         (attErr ? ' · ހާޒިރީ ރެކޯޑުތައް ލޯޑު ނުކުރެވުނު' : att ? ' · ހާޒިރީ ފޯމުން ލިބުނު ސެޝަން: <b>' + isl.reduce(function (t, x) { return t + latestAtt(x.name).length; }, 0) + '</b>' : ' · ހާޒިރީ ރެކޯޑުތައް ލޯޑުވަނީ…') + '</p>' +
+      table('ހަރަކާތްތަކުގެ ރީޗު (ހުރިހާ ރަށެއްގައި)', actOrder.map(function (k) { var g = acts[k]; return { activity: g.activity, male: g.male, female: g.female, sub: '<span dir="ltr">' + g.isl.length + '</span> ރަށް · <span dir="ltr">' + g.n + '</span> ސެޝަން · ' + g.isl.map(esc).join('، ') }; }).sort(function (p, q) { return (q.male + q.female) - (p.male + p.female); })) +
       done.join('') +
       (waiting.length ? '<div class="rc-waiting"><p class="rc-sub">ރީޗު އަދި ނުލިބޭ</p><div class="chips">' + waiting.map(function (x) { return '<span class="chip">' + esc(x.name) + '</span>'; }).join('') + '</div></div>' : '');
     el.innerHTML = reachHtml + '<h2 class="group-title">ރަނގަޅުކުރަން ޖެހޭ <span class="group-count">' + improve.length + '</span></h2>' +
