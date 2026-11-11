@@ -1241,7 +1241,7 @@
     }
     function fromAtt(name, school) {
       return latestAtt(name).filter(function (r) { return (r.type === 'school') === school; }).map(function (r) {
-        return { activity: r.activity, day: r.day, time: r.time, male: r.men, female: r.women };
+        return { activity: r.activity, by: r.by, day: r.day, time: r.time, male: r.men, female: r.women };
       });
     }
     function n(v) { var k = parseInt(String(v == null ? '' : v).replace(/[^0-9]/g, ''), 10); return isNaN(k) ? 0 : k; }
@@ -1262,7 +1262,7 @@
       var s = sum(list);
       return '<p class="rc-sub">' + title + '</p><table class="rc-table"><thead><tr><th>ހަރަކާތް</th><th class="boy">ފިރިހެން</th><th class="girl">އަންހެން</th><th>ޖުމްލަ</th></tr></thead><tbody>' +
         list.map(function (r) {
-          return '<tr><td>' + esc(r.activity) + (r.time ? '<small class="rc-when">' + esc(r.day) + ' · <span dir="ltr">' + esc(r.time) + '</span></small>' : '') + '</td><td class="boy">' + fmt(n(r.male)) + '</td><td class="girl">' + fmt(n(r.female)) + '</td><td>' + fmt(n(r.male) + n(r.female)) + '</td></tr>';
+          return '<tr><td>' + esc(r.activity) + (String(r.by || '').trim() ? '<small class="rc-by">' + esc(r.by) + '</small>' : '') + (r.time ? '<small class="rc-when">' + esc(r.day) + ' · <span dir="ltr">' + esc(r.time) + '</span></small>' : '') + '</td><td class="boy">' + fmt(n(r.male)) + '</td><td class="girl">' + fmt(n(r.female)) + '</td><td>' + fmt(n(r.male) + n(r.female)) + '</td></tr>';
         }).join('') + '</tbody><tfoot><tr><td>ޖުމްލަ</td><td class="boy">' + fmt(s.m) + '</td><td class="girl">' + fmt(s.f) + '</td><td>' + fmt(s.m + s.f) + '</td></tr></tfoot></table>';
     }
     function render() {
@@ -1270,7 +1270,7 @@
     isl.forEach(function (x) {
       var a = rows(x.reach).concat(rows(fromAtt(x.name, false))), b = rows(x.student_reach).concat(rows(fromAtt(x.name, true)));
       latestAtt(x.name).forEach(function (r) {
-        if (String(r.suggestion || '').trim()) ideas.push('<li class="rp"><div class="rp-body"><div class="rp-point">ބ. ' + esc(x.name) + ' · ' + esc(r.activity) + '</div>' +
+        if (String(r.suggestion || '').trim()) ideas.push('<li class="rp"><div class="rp-body"><div class="rp-point">ބ. ' + esc(x.name) + ' · ' + esc(r.activity) + (String(r.by || '').trim() ? ' (' + esc(r.by) + ')' : '') + '</div>' +
           '<ul class="bullets rp-details">' + String(r.suggestion).split('\n').filter(function (t) { return t.trim(); }).map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul><p class="rc-when">' + esc(r.volunteer || '') + '</p></div></li>');
       });
       if (!a.length && !b.length) { waiting.push(x); return; }
