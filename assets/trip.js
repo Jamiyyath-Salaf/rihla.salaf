@@ -1239,9 +1239,12 @@
         return da - db || String(a.time).localeCompare(String(b.time));
       });
     }
+    // Sessions held at schools but attended by adults (parents, teachers, staff) count as adults, not students
+    var ADULT = /parent|staff|teacher|ethics|admin|ޕޭރެންޓިންގ|ބެލެނިވެރި|މުވައްޒަފ|ޓީޗަރ/i;
+    function audience(r) { return r.type !== 'school' ? 'adult' : ADULT.test(String(r.activity || '')) ? 'school-adult' : 'student'; }
     function fromAtt(name, school) {
-      return latestAtt(name).filter(function (r) { return (r.type === 'school') === school; }).map(function (r) {
-        return { activity: r.activity, by: r.by, day: r.day, time: r.time, male: r.men, female: r.women };
+      return latestAtt(name).filter(function (r) { return (audience(r) === 'student') === school; }).map(function (r) {
+        return { activity: r.activity, by: r.by, day: r.day, time: r.time, male: r.men, female: r.women, sub: audience(r) === 'school-adult' ? '<span class="rc-tag">ސްކޫލުގައި · ބެލެނިވެރިން / މުވައްޒަފުން</span>' : '' };
       });
     }
     function n(v) { var k = parseInt(String(v == null ? '' : v).replace(/[^0-9]/g, ''), 10); return isNaN(k) ? 0 : k; }
@@ -1286,11 +1289,11 @@
       });
       tripPub = add(tripPub, sa); tripStu = add(tripStu, sb);
       done.push('<div class="rc-island"><div class="rc-head"><h3>ބ. ' + esc(x.name) + '</h3>' + card('ރަށުގެ ޖުމްލަ', add(sa, sb), 'is-mini') + '</div>' +
-        table('ހަރަކާތްތައް (ޢާންމުން)', a) + table('ދަރިވަރުން (ސްކޫލު ސެޝަންތައް)', b) + '</div>');
+        table('ބޮޑެތި މީހުން (ޢާންމުން، ބެލެނިވެރިން، މުވައްޒަފުން)', a) + table('ދަރިވަރުން', b) + '</div>');
     });
     var reachHtml = '<h2 class="group-title">ރީޗު</h2>' +
       '<div class="rc-cards">' + card('ޖުމްލަ ރީޗު · <span dir="ltr">' + done.length + '</span> ރަށް · <span dir="ltr">' + nActs + '</span> ހަރަކާތް', add(tripPub, tripStu), 'is-main') +
-      card('ޢާންމުން', tripPub) + card('ދަރިވަރުން', tripStu) + '</div>' +
+      card('ބޮޑެތި މީހުން', tripPub) + card('ދަރިވަރުން', tripStu) + '</div>' +
       '<p class="rc-note">ރީޗު ލިބުނު ރަށް: <b>' + done.length + ' / ' + isl.length + '</b>' +
         (attErr ? ' · ހާޒިރީ ރެކޯޑުތައް ލޯޑު ނުކުރެވުނު' : att ? ' · ހާޒިރީ ފޯމުން ލިބުނު ސެޝަން: <b>' + isl.reduce(function (t, x) { return t + latestAtt(x.name).length; }, 0) + '</b>' : ' · ހާޒިރީ ރެކޯޑުތައް ލޯޑުވަނީ…') + '</p>' +
       table('ހަރަކާތްތަކުގެ ރީޗު (ހުރިހާ ރަށެއްގައި)', actOrder.map(function (k) { var g = acts[k]; return { activity: g.activity, male: g.male, female: g.female, sub: '<b class="rc-isl"><span dir="ltr">' + g.isl.length + (planned[k] ? ' / ' + planned[k].length : '') + '</span> ރަށް</b> · <span dir="ltr">' + g.n + '</span> ސެޝަން · ' + g.isl.map(esc).join('، ') }; }).sort(function (p, q) { return (q.male + q.female) - (p.male + p.female); })) +
