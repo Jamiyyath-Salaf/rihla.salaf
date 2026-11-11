@@ -1276,7 +1276,9 @@
       if (!a.length && !b.length) { waiting.push(x); return; }
       var sa = sum(a), sb = sum(b);
       a.concat(b).forEach(function (r) {
-        var k = String(r.activity).trim(), g = acts[k];
+        var k = String(r.activity).trim(), g;
+        if (/^parenting session$/i.test(k)) k = 'ޕޭރެންޓިންގ ސެޝަން';
+        g = acts[k];
         if (!g) { g = acts[k] = { activity: k, male: 0, female: 0, isl: [], n: 0 }; actOrder.push(k); }
         g.male += n(r.male); g.female += n(r.female); g.n++; nActs++;
         if (g.isl.indexOf(x.name) < 0) g.isl.push(x.name);
