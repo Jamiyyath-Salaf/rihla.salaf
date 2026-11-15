@@ -57,6 +57,16 @@ h2 .n { flex: none; width: 28px; height: 28px; border-radius: 50%; background: v
 .rlabel { text-align: center; font-weight: 700; color: var(--muted); min-height: 1.75em; margin-top: 4px; }
 .rlabel.set { color: #a46a00; }
 .locked { opacity: .45; pointer-events: none; }
+.next { width: 100%; margin-top: 4px; border: 0; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 900; font-size: 19px; padding: 10px 0; box-shadow: 0 4px 12px rgba(31,122,53,.3); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.next svg { width: 20px; height: 20px; }
+.next:disabled { background: #b9c9bd; box-shadow: none; cursor: default; }
+.chosen { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--accent-soft); border-radius: 14px; padding: 8px 14px; margin-bottom: 12px; box-shadow: 0 0 0 1.5px #bfdcc6 inset; }
+.chosen small { display: block; color: var(--muted); font-size: 12.5px; line-height: 1.4; }
+.chosen b { color: var(--accent-dark); font-size: 16.5px; }
+.chg { flex: none; border: 0; background: #fff; color: var(--accent-dark); border-radius: 999px; padding: 3px 14px; font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 0 0 1px #bfdcc6 inset; }
+.step2 { animation: slide .25s ease; }
+@keyframes slide { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: none; } }
+[hidden] { display: none !important; }
 
 /* points */
 .pts { list-style: none; margin: 0; padding: 0; counter-reset: pt; }
@@ -122,16 +132,17 @@ footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top:
     var pending = queue().length;
     app.innerHTML = (pending ? '<div class="note">ފޮނުވަން ހުރި ރިވިއު: <span class="num">' + pending + '</span> · އިންޓަނެޓް ލިބުމުން އަމިއްލައަށް ފޮނުވޭނެ</div>' : '') +
       '' +
-      '<form id="f" novalidate>' +
+      '<form id="f" novalidate><div id="s1">' +
       '<div class="card"><p class="hint" style="margin:0 2px 8px">ސަލަފް ރިޙްލާ 2026 އާ ބެހޭގޮތުން ތިބާގެ ޚިޔާލު ހިއްސާކުރައްވާ</p><h2><span class="n">1</span>ތިބާއަކީ</h2><div class="roles" role="radiogroup">' +
         ROLES.map(function (r, i) { return '<button type="button" class="role" role="radio" aria-checked="false" data-role="' + i + '"><i></i>' + esc(r) + '</button>'; }).join('') +
-      '</div></div>' +
-      '<div class="card locked" id="rate"><h2><span class="n">2</span>ރިޙްލާއަށް ދެއްވާ ރޭޓިންގ</h2>' +
+      '</div></div><button type="button" class="next" id="nx" disabled>ކުރިއަށް <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button></div>' +
+      '<div id="s2" class="step2" hidden><div class="chosen"><div><small>ތިބާއަކީ</small><b id="rn"></b></div><button type="button" class="chg" data-back="1">ބަދަލުކުރޭ</button></div>' +
+      '<div class="card" id="rate"><h2><span class="n">2</span>ރިޙްލާއަށް ދެއްވާ ރޭޓިންގ</h2>' +
         '<div class="stars" role="radiogroup">' + [1, 2, 3, 4, 5].map(function (k) { return '<button type="button" class="star" role="radio" aria-checked="false" aria-label="' + k + '" data-star="' + k + '">' + starSvg + '</button>'; }).join('') + '</div>' +
         '<div class="rlabel" id="rl">ތަރި ހޮއްވަވާ</div></div>' +
-      '<div class="card locked" id="pc"><h2><span class="n">3</span>ޚިޔާލު ހުށައަޅުއްވާ</h2><p class="hint">ކޮންމެ ނުކުތާއެއް ވަކިން ލިޔުއްވާ · ލާޒިމެއް ނޫން</p>' +
+      '<div class="card" id="pc"><h2><span class="n">3</span>ޚިޔާލު ހުށައަޅުއްވާ</h2><p class="hint">ކޮންމެ ނުކުތާއެއް ވަކިން ލިޔުއްވާ · ލާޒިމެއް ނޫން</p>' +
         '<ol class="pts" id="pts"></ol><button type="button" class="addpt" data-pt="add">+ ނުކުތާއެއް އިތުރުކުރޭ</button></div>' +
-      '<div class="err" id="err"></div><button class="send" type="submit">ފޮނުވާ</button></form>' +
+      '<div class="err" id="err"></div><button class="send" type="submit">ފޮނުވާ</button></div></form>' +
       '<footer>ޖަމްޢިއްޔަތުއް ސަލަފް</footer>';
     addPoint('');
     window.scrollTo(0, 0);
@@ -152,7 +163,6 @@ footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top:
     rating = k;
     Array.prototype.forEach.call(document.querySelectorAll('.star'), function (s) { var v = +s.getAttribute('data-star'); s.classList.toggle('on', v <= k); s.setAttribute('aria-checked', v === k ? 'true' : 'false'); });
     var rl = document.getElementById('rl'); rl.innerHTML = '<span class="num">' + k + '/5</span> · ' + LABELS[k]; rl.classList.add('set');
-    document.getElementById('pc').classList.remove('locked');
     document.getElementById('err').textContent = '';
   }
 
@@ -177,7 +187,7 @@ footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top:
     if (b) {
       role = +b.getAttribute('data-role');
       Array.prototype.forEach.call(document.querySelectorAll('.role'), function (x) { x.setAttribute('aria-checked', x === b ? 'true' : 'false'); });
-      document.getElementById('rate').classList.remove('locked');
+      document.getElementById('nx').disabled = false;
       document.getElementById('err').textContent = '';
       return;
     }
@@ -190,6 +200,8 @@ footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top:
       } else { var li = pt.parentNode, ol = li.parentNode; ol.removeChild(li); if (!ol.children.length) addPoint(''); }
       return;
     }
+    if (ev.target.closest('#nx') && role >= 0) { document.getElementById('rn').textContent = ROLES[role]; document.getElementById('s1').hidden = true; document.getElementById('s2').hidden = false; window.scrollTo(0, 0); return; }
+    if (ev.target.closest('[data-back]')) { document.getElementById('s2').hidden = true; document.getElementById('s1').hidden = false; window.scrollTo(0, 0); return; }
     if (ev.target.closest('[data-again]')) form();
   });
   app.addEventListener('submit', function (ev) {
