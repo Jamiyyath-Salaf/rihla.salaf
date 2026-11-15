@@ -1086,3 +1086,4 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .rv-top { max-width: 760px; margin-left: auto; margin-right: auto; }
 .rv-avg { flex-wrap: wrap; gap: .2rem .5rem; }
 .rv-avg .rv-stars { font-size: .95rem; }
+.rv-who { margin: .3rem 0 0; font-weight: 700; color: var(--accent); font-size: .92rem; }

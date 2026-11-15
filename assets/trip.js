@@ -1330,13 +1330,13 @@
         return '<div class="rc-card"><div class="rc-label">' + esc(ro) + '</div>' + (l.length ? '<div class="rv-avg"><b dir="ltr">' + one(avg(l)) + '</b>' + stars(avg(l)) + '</div><small class="rc-when"><span dir="ltr">' + l.length + '</span> ރިވިއު</small>' : '<small class="rc-when">ރިވިއު ނުލިބޭ</small>') + '</div>';
       }).join('') + '</div>';
       roles.forEach(function (ro) {
-        var l = revs.filter(function (r) { return r.activity === ro && String(r.suggestion || '').trim(); }).sort(function (p, q) { return String(q.received).localeCompare(String(p.received)); });
+        var l = revs.filter(function (r) { return r.activity === ro && (String(r.suggestion || '').trim() || String(r.volunteer || '').trim() || String(r.by || '').trim()); }).sort(function (p, q) { return String(q.received).localeCompare(String(p.received)); });
         if (!l.length) return;
         h += '<h2 class="group-title">' + esc(ro) + ' <span class="group-count">' + l.length + '</span></h2><ol class="rp-list">' + l.map(function (r) {
           var d = new Date(r.received || r.at);
           return '<li class="rp"><div class="rp-body"><div class="rp-point">' + stars(n(r.men)) + '</div><ul class="bullets rp-details">' +
             String(r.suggestion).split('\n').filter(function (t) { return t.trim(); }).map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') +
-            '</ul>' + (isNaN(d) ? '' : '<p class="rc-when" dir="ltr">' + d.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</p>') + '</div></li>';
+            '</ul>' + ((String(r.volunteer || '').trim() || String(r.by || '').trim()) ? '<p class="rv-who">' + [r.volunteer, r.by ? 'ބ. ' + r.by : ''].filter(function (t) { return String(t || '').trim(); }).map(esc).join(' · ') + '</p>' : '') + (isNaN(d) ? '' : '<p class="rc-when" dir="ltr">' + d.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</p>') + '</div></li>';
         }).join('') + '</ol>';
       });
       return h;

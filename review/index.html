@@ -78,6 +78,11 @@ h2 .n { flex: none; width: 28px; height: 28px; border-radius: 50%; background: v
 .pts .del { margin-top: 6px; flex: none; width: 34px; height: 34px; border: 0; border-radius: 50%; background: #f1ede4; color: var(--muted); font: 700 20px/1 Arial, sans-serif; cursor: pointer; }
 .addpt { border: 1.5px dashed var(--accent); background: transparent; color: var(--accent-dark); border-radius: 999px; padding: 3px 16px; font-weight: 700; font-size: 15px; cursor: pointer; }
 
+.fld { display: block; margin-bottom: 10px; }
+.fld:last-child { margin-bottom: 0; }
+.fld span { display: block; font-weight: 700; font-size: 15px; margin: 0 2px 4px; }
+.fld input { width: 100%; border: 1px solid var(--line); border-radius: 12px; background: #fdfcf9; padding: 8px 12px; font-size: 16px; line-height: 1.8; }
+.fld input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .err { color: var(--danger); font-size: 14px; margin: 4px 2px 0; min-height: 1em; text-align: center; }
 .send { width: 100%; margin-top: 6px; border: 0; border-radius: 999px; background: var(--warm); color: #fff; font-weight: 900; font-size: 19px; padding: 10px 0; box-shadow: 0 4px 12px rgba(200,116,58,.35); cursor: pointer; }
 .send:active { transform: translateY(1px); }
@@ -141,7 +146,8 @@ footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top:
       '<div class="card" id="rate"><h2><span class="n">2</span>ރިޙްލާއަށް ދެއްވާ ރޭޓިންގ</h2>' +
         '<div class="stars" role="radiogroup">' + [1, 2, 3, 4, 5].map(function (k) { return '<button type="button" class="star" role="radio" aria-checked="false" aria-label="' + k + '" data-star="' + k + '">' + starSvg + '</button>'; }).join('') + '</div>' +
         '<div class="rlabel" id="rl">ތަރި ހޮއްވަވާ</div></div>' +
-      '<div class="card" id="pc"><h2><span class="n">3</span>ޚިޔާލު ހުށައަޅުއްވާ</h2><p class="guide">ރިޙްލާގެ އިދާރީ ކަންކަމާއި، ރިޙްލާގައި ކުރިއަށް ގެންދެވުނު ޙަރަކާތްތަކާއި، ޙަރަކާތްތައް ކުރިއަށް ގެންދެވުނު ގޮތާ މެދު ޚިޔާލު ހުށައަޅުއްވާ!</p>' +
+      '<div class="card"><h2><span class="n">3</span>ނަން</h2><label class="fld"><span>ރަށުގެ ނަން</span><input id="isl" dir="auto" autocomplete="off" maxlength="60"></label><label class="fld"><span>ފުރުއްވާ ފަރާތުގެ ނަން</span><input id="nm" dir="auto" autocomplete="name" maxlength="100"></label></div>' +
+      '<div class="card" id="pc"><h2><span class="n">4</span>ޚިޔާލު ހުށައަޅުއްވާ</h2><p class="guide">ރިޙްލާގެ އިދާރީ ކަންކަމާއި، ރިޙްލާގައި ކުރިއަށް ގެންދެވުނު ޙަރަކާތްތަކާއި، ޙަރަކާތްތައް ކުރިއަށް ގެންދެވުނު ގޮތާ މެދު ޚިޔާލު ހުށައަޅުއްވާ!</p>' +
         '<ol class="pts" id="pts"></ol><button type="button" class="addpt" data-pt="add">+ ނުކުތާއެއް އިތުރުކުރޭ</button></div>' +
       '<div class="err" id="err"></div><button class="send" type="submit">ފޮނުވާ</button></div></form>' +
       '<footer>ޖަމްޢިއްޔަތުއް ސަލަފް</footer>';
@@ -215,8 +221,8 @@ footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top:
     if (role < 0) { err.textContent = 'ތިބާއަކީ ކާކުކަން ހޮއްވަވާ'; return; }
     if (!rating) { err.textContent = 'ތަރި ހޮއްވަވާ'; return; }
     var at = new Date().toISOString();
-    last = { id: at + '-rv' + Math.random().toString(36).slice(2, 8), at: at, island: 'ރިވިއު', day: 'ރިވިއު', time: '', activity: ROLES[role], by: '', type: 'review',
-      role: ROLES[role], rating: rating, men: rating, women: 0, total: rating, suggestion: points(), volunteer: '' };
+    last = { id: at + '-rv' + Math.random().toString(36).slice(2, 8), at: at, island: 'ރިވިއު', day: 'ރިވިއު', time: '', activity: ROLES[role], by: document.getElementById('isl').value.replace(/\s+/g, ' ').trim(), type: 'review',
+      role: ROLES[role], rating: rating, men: rating, women: 0, total: rating, suggestion: points(), volunteer: document.getElementById('nm').value.replace(/\s+/g, ' ').trim() };
     setQueue(queue().concat([last]));
     done(true);
     flush();
