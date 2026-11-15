@@ -70,11 +70,11 @@ h2 .n { flex: none; width: 28px; height: 28px; border-radius: 50%; background: v
 
 /* points */
 .pts { list-style: none; margin: 0; padding: 0; counter-reset: pt; }
-.pts li { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; counter-increment: pt; }
-.pts li::before { content: counter(pt); flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-dark); display: grid; place-items: center; font: 700 14px/1 Arial, sans-serif; }
-.pts input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 12px; background: #fdfcf9; padding: 8px 12px; font-size: 16px; line-height: 1.8; }
-.pts input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.pts .del { flex: none; width: 34px; height: 34px; border: 0; border-radius: 50%; background: #f1ede4; color: var(--muted); font: 700 20px/1 Arial, sans-serif; cursor: pointer; }
+.pts li { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; counter-increment: pt; }
+.pts li::before { margin-top: 9px; content: counter(pt); flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-dark); display: grid; place-items: center; font: 700 14px/1 Arial, sans-serif; }
+.pts textarea { display: block; resize: none; overflow: hidden; white-space: pre-wrap; overflow-wrap: anywhere; min-height: 46px; flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 12px; background: #fdfcf9; padding: 8px 12px; font-size: 16px; line-height: 1.8; }
+.pts textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.pts .del { margin-top: 6px; flex: none; width: 34px; height: 34px; border: 0; border-radius: 50%; background: #f1ede4; color: var(--muted); font: 700 20px/1 Arial, sans-serif; cursor: pointer; }
 .addpt { border: 1.5px dashed var(--accent); background: transparent; color: var(--accent-dark); border-radius: 999px; padding: 3px 16px; font-weight: 700; font-size: 15px; cursor: pointer; }
 
 .err { color: var(--danger); font-size: 14px; margin: 4px 2px 0; min-height: 1em; text-align: center; }
@@ -169,18 +169,22 @@ footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top:
   function addPoint(val, after, focus) {
     var ol = document.getElementById('pts'); if (!ol) return;
     var li = document.createElement('li');
-    li.innerHTML = '<input dir="auto" autocomplete="off" maxlength="300"><button type="button" class="del" data-pt="del" aria-label="ފޮހެލާ">×</button>';
-    li.querySelector('input').value = val || '';
+    li.innerHTML = '<textarea rows="1" dir="auto" autocomplete="off" maxlength="500"></textarea><button type="button" class="del" data-pt="del" aria-label="ފޮހެލާ">×</button>';
+    li.querySelector('textarea').value = val || ''; grow(li.querySelector('textarea'));
     if (after && after.nextSibling) ol.insertBefore(li, after.nextSibling); else ol.appendChild(li);
-    if (focus) li.querySelector('input').focus();
+    if (focus) li.querySelector('textarea').focus();
   }
+  // Each point box grows downward as the text wraps, so the whole point stays visible
+  function grow(t) { t.style.height = 'auto'; t.style.height = t.scrollHeight + 2 + 'px'; }
   function points() {
-    return Array.prototype.map.call(document.querySelectorAll('#pts input'), function (x) { return x.value.replace(/\s+/g, ' ').trim(); })
+    return Array.prototype.map.call(document.querySelectorAll('#pts textarea'), function (x) { return x.value.replace(/\s+/g, ' ').trim(); })
       .filter(function (x) { return x; }).join('\n');
   }
 
+  app.addEventListener('input', function (ev) { if (ev.target.matches('#pts textarea')) grow(ev.target); });
+  window.addEventListener('resize', function () { Array.prototype.forEach.call(document.querySelectorAll('#pts textarea'), grow); });
   app.addEventListener('keydown', function (ev) {
-    if (ev.key === 'Enter' && ev.target.matches('#pts input')) { ev.preventDefault(); if (ev.target.value.trim()) addPoint('', ev.target.parentNode, true); }
+    if (ev.key === 'Enter' && ev.target.matches('#pts textarea')) { ev.preventDefault(); if (ev.target.value.trim()) addPoint('', ev.target.parentNode, true); }
   });
   app.addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-role]');
@@ -195,7 +199,7 @@ footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top:
     var pt = ev.target.closest('[data-pt]');
     if (pt) {
       if (pt.getAttribute('data-pt') === 'add') {
-        var empty = Array.prototype.filter.call(document.querySelectorAll('#pts input'), function (x) { return !x.value.trim(); })[0];
+        var empty = Array.prototype.filter.call(document.querySelectorAll('#pts textarea'), function (x) { return !x.value.trim(); })[0];
         if (empty) empty.focus(); else addPoint('', null, true);
       } else { var li = pt.parentNode, ol = li.parentNode; ol.removeChild(li); if (!ol.children.length) addPoint(''); }
       return;
