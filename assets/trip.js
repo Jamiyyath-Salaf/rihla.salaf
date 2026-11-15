@@ -1299,14 +1299,54 @@
       table('ހަރަކާތްތަކުގެ ރީޗު (ހުރިހާ ރަށެއްގައި)', actOrder.map(function (k) { var g = acts[k]; return { activity: g.activity, male: g.male, female: g.female, sub: '<b class="rc-isl"><span dir="ltr">' + g.isl.length + (planned[k] ? ' / ' + planned[k].length : '') + '</span> ރަށް</b> · <span dir="ltr">' + g.n + '</span> ސެޝަން · ' + g.isl.map(esc).join('، ') }; }).sort(function (p, q) { return (q.male + q.female) - (p.male + p.female); })) +
       done.join('') +
       (waiting.length ? '<div class="rc-waiting"><p class="rc-sub">ރީޗު އަދި ނުލިބޭ</p><div class="chips">' + waiting.map(function (x) { return '<span class="chip">' + esc(x.name) + '</span>'; }).join('') + '</div></div>' : '');
-    el.innerHTML = reachHtml + '<h2 class="group-title">ރަނގަޅުކުރަން ޖެހޭ <span class="group-count">' + improve.length + '</span></h2>' +
+    var mainHtml = reachHtml + '<h2 class="group-title">ރަނގަޅުކުރަން ޖެހޭ <span class="group-count">' + improve.length + '</span></h2>' +
       (improve.length ? '<ol class="rp-list">' + improve.map(function (p, i) {
         return '<li class="rp"><span class="rp-n">' + (i + 1) + '</span><div class="rp-body"><div class="rp-point">' + esc(p.point || '') + '</div>' +
           (p.details ? '<p class="rp-details">' + esc(p.details).replace(/\n/g, '<br>') + '</p>' : '') + '</div></li>';
       }).join('') + '</ol>' : '<p class="none">' + EMPTY + '</p>') +
       '<h2 class="group-title">ވޮލަންޓިއަރުންގެ ހިޔާލު <span class="group-count">' + ideas.length + '</span></h2>' +
       (ideas.length ? '<ol class="rp-list">' + ideas.join('') + '</ol>' : '<p class="none">' + EMPTY + '</p>');
+    var revs = (att || []).filter(function (r) { return r.type === 'review'; });
+    el.innerHTML = '<div class="seg rv-seg" role="tablist"><button type="button" data-sub="report" aria-selected="' + (sub === 'report') + '">ރިޕޯޓު</button><button type="button" data-sub="reviews" aria-selected="' + (sub === 'reviews') + '">ރިވިއު' + (revs.length ? ' <span class="rv-count" dir="ltr">' + revs.length + '</span>' : '') + '</button></div>' +
+      '<div data-subpanel="report"' + (sub === 'report' ? '' : ' hidden') + '>' + mainHtml + '</div><div data-subpanel="reviews"' + (sub === 'reviews' ? '' : ' hidden') + '>' + reviewsHtml(revs) + '</div>';
     }
+    // Trip reviews sent from the public /review/ page (stored in the same sheet with type "review")
+    var sub = 'report';
+    var ROLE_ORDER = ['ކައުންސިލް / ރަށުގެ ފޯކަލް', 'ސްކޫލު ފަރާތުން', 'ރިޙްލާގެ ފެސިލިޓޭޓަރެއް', 'ރިޙްލާގެ އެހީތެރިއެއް'];
+    function stars(v) { var k = Math.round(v); return '<span class="rv-stars" aria-label="' + v + '/5"><b>' + '★★★★★'.slice(0, k) + '</b>' + '★★★★★'.slice(k) + '</span>'; }
+    function avg(list) { return list.length ? list.reduce(function (t, r) { return t + n(r.men); }, 0) / list.length : 0; }
+    function one(v) { return (Math.round(v * 10) / 10).toFixed(1); }
+    function reviewsHtml(revs) {
+      if (attErr) return '<p class="none">ރިވިއުތައް ލޯޑު ނުކުރެވުނު</p>';
+      if (!att) return '<p class="none">ލޯޑުވަނީ…</p>';
+      var link = '<p class="rc-note">ރިވިއު ލިންކު: <a href="/review/" dir="ltr">rihla.salaf.mv/review</a></p>';
+      if (!revs.length) return link + '<p class="none">' + EMPTY + '</p>';
+      var a = avg(revs), dist = [5, 4, 3, 2, 1].map(function (k) { return { k: k, c: revs.filter(function (r) { return n(r.men) === k; }).length }; });
+      var roles = ROLE_ORDER.concat(revs.map(function (r) { return String(r.activity || ''); }).filter(function (x, i, arr) { return x && ROLE_ORDER.indexOf(x) < 0 && arr.indexOf(x) === i; }));
+      var h = link + '<div class="rv-top"><div class="rc-card is-main rv-main"><div class="rc-label">ޖުމްލަ ރޭޓިންގ · <span dir="ltr">' + revs.length + '</span> ރިވިއު</div><div class="rc-total" dir="ltr">' + one(a) + '<small>/5</small></div>' + stars(a) + '</div>' +
+        '<div class="rc-card rv-dist">' + dist.map(function (d) { var p = revs.length ? Math.round(d.c * 100 / revs.length) : 0; return '<div class="rv-row"><span dir="ltr">' + d.k + ' ★</span><span class="rv-bar"><i style="width:' + p + '%"></i></span><span dir="ltr">' + d.c + '</span></div>'; }).join('') + '</div></div>';
+      h += '<div class="rc-cards rv-roles">' + roles.map(function (ro) {
+        var l = revs.filter(function (r) { return r.activity === ro; });
+        return '<div class="rc-card"><div class="rc-label">' + esc(ro) + '</div>' + (l.length ? '<div class="rv-avg"><b dir="ltr">' + one(avg(l)) + '</b>' + stars(avg(l)) + '</div><small class="rc-when"><span dir="ltr">' + l.length + '</span> ރިވިއު</small>' : '<small class="rc-when">ރިވިއު ނުލިބޭ</small>') + '</div>';
+      }).join('') + '</div>';
+      roles.forEach(function (ro) {
+        var l = revs.filter(function (r) { return r.activity === ro && String(r.suggestion || '').trim(); }).sort(function (p, q) { return String(q.received).localeCompare(String(p.received)); });
+        if (!l.length) return;
+        h += '<h2 class="group-title">' + esc(ro) + ' <span class="group-count">' + l.length + '</span></h2><ol class="rp-list">' + l.map(function (r) {
+          var d = new Date(r.received || r.at);
+          return '<li class="rp"><div class="rp-body"><div class="rp-point">' + stars(n(r.men)) + '</div><ul class="bullets rp-details">' +
+            String(r.suggestion).split('\n').filter(function (t) { return t.trim(); }).map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') +
+            '</ul>' + (isNaN(d) ? '' : '<p class="rc-when" dir="ltr">' + d.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</p>') + '</div></li>';
+        }).join('') + '</ol>';
+      });
+      return h;
+    }
+    el.addEventListener('click', function (e) {
+      var b = e.target.closest('.rv-seg [data-sub]'); if (!b) return;
+      sub = b.getAttribute('data-sub');
+      el.querySelectorAll('.rv-seg [data-sub]').forEach(function (x) { x.setAttribute('aria-selected', x === b); });
+      el.querySelectorAll('[data-subpanel]').forEach(function (p) { p.hidden = p.getAttribute('data-subpanel') !== sub; });
+    });
     render();
     fetch(ATT).then(function (r) { return r.json(); })
       .then(function (j) { if (!j || !j.ok) throw new Error('bad'); att = j.rows || []; render(); })

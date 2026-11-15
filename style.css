@@ -1065,3 +1065,24 @@ h1, h2, .event-name, .island-name, .act-name { font-weight: 900; }
 .rc-when { display: block; font-size: .78em; color: var(--muted); font-weight: 400; line-height: 1.5; }
 .rc-when .rc-isl { color: var(--accent); }
 .rc-tag { display: inline-block; font-size: .9em; color: var(--warm); font-weight: 700; }
+
+/* Report: trip reviews sub-tab */
+.rv-seg { max-width: 360px; }
+.rv-count { display: inline-block; min-width: 1.4em; padding: 0 .4em; border-radius: 99px; background: color-mix(in srgb, currentColor 18%, transparent); font-size: .8rem; font-family: system-ui, sans-serif; }
+.rv-stars { color: #ddd5c4; letter-spacing: .08em; font-size: 1.05rem; white-space: nowrap; }
+.rv-stars b { color: #f2a516; font-weight: 400; }
+.rv-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: .8rem; margin-bottom: .8rem; }
+.rv-main .rc-total small { font-size: 1rem; color: var(--muted); font-weight: 400; }
+.rv-main .rv-stars { font-size: 1.5rem; }
+.rv-dist { align-content: center; }
+.rv-row { display: grid; grid-template-columns: 2.6rem 1fr 1.8rem; align-items: center; gap: .5rem; font-size: .9rem; color: var(--muted); }
+.rv-bar { height: 8px; background: color-mix(in srgb, var(--line) 70%, transparent); border-radius: 99px; overflow: hidden; }
+.rv-bar i { display: block; height: 100%; background: #f2a516; border-radius: 99px; }
+.rv-roles { margin-bottom: .5rem; }
+.rv-avg { display: flex; align-items: center; gap: .5rem; }
+.rv-avg b { font-size: 1.6rem; font-family: system-ui, sans-serif; }
+@media (max-width: 560px) { .rv-top { grid-template-columns: 1fr; } }
+.rv-roles { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.rv-top { max-width: 760px; margin-left: auto; margin-right: auto; }
+.rv-avg { flex-wrap: wrap; gap: .2rem .5rem; }
+.rv-avg .rv-stars { font-size: .95rem; }
